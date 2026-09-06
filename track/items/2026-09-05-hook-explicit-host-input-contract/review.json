@@ -60,6 +60,276 @@
           "hash": "rvw1:sha256:dbd7b46a645ca541b6be0e6efa9a8b3fe436278d46600b964d2c269991eaf2eb",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T10:48:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1756006957493220ebcd5191ba8eb00dba54ad171f668a0c38f1bfae11b9d459",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T10:54:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1756006957493220ebcd5191ba8eb00dba54ad171f668a0c38f1bfae11b9d459",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-05T12:47:43Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 6,
+              "message": "T001〜T006 の task description は対象と操作を記載していますが、AC-NN / IN-NN / CN-NN / spec element id の anchor cite がなく、実行可能性要件を満たしません。各 description に対象・操作・anchor cite を明示してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 6,
+              "message": "T001〜T006 の description は、cache 除外、host 選択、入力形式、fallback 禁止、接続移行、advisory 動作など upstream の spec/ADR 契約を散文で再記述しています。対象 + 操作 + anchor cite に縮約してください（根拠: .harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 60,
+              "message": "plan.sections の implementation description は cache correction と host contract の upstream rationale/behavior を再記述しています。セクション説明を実行順序・境界の短い記述にし、詳細契約は spec/anchor 参照へ委ねてください（根拠: .harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5399961a868ac04b8f4b559d171cf211efc6bbad2cbea22049eeb7c671b77df0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-05T12:57:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:04ef1aa6c5e073c15d149c5f4d1fde9a0154416e166050a5e8cd2223dbd1c385",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T13:07:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:04ef1aa6c5e073c15d149c5f4d1fde9a0154416e166050a5e8cd2223dbd1c385",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-05T13:00:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73403cb969e04f1b13be537ad3c3b3d05deb21c2cea2953d79f42f16224bc733",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T13:15:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73403cb969e04f1b13be537ad3c3b3d05deb21c2cea2953d79f42f16224bc733",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-05T08:06:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05aa5210ff95e19452f0dc1e88b080561c4b083e1c995f7d46af4ee842027743",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T08:09:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05aa5210ff95e19452f0dc1e88b080561c4b083e1c995f7d46af4ee842027743",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-05T06:59:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4aa636bff899586cda77fef0cd35e3c4c48bc56bfd2aa86999a3289da71a01d6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T07:05:42Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+              "line": 157,
+              "message": "GO-02 は UserPromptSubmit の既存ガード動作の維持を目標に含めていますが、AC-02 は固定 host の引き渡し、AC-05 は失敗時の advisory 吸収、AC-07 は対象動作を特定しない一般的なテスト通過しか確認しません。正常な UserPromptSubmit 入力が各 host で既存の共通 prompt 処理へ到達し、従来の skill-compliance 判定結果を維持することを決定的に証明する AC がないため、GO-02 の受け入れ条件カバレッジが不完全です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4aa636bff899586cda77fef0cd35e3c4c48bc56bfd2aa86999a3289da71a01d6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-05T07:11:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54719c532c5fe6629e0cbf99b2cc136062392a8906c0d6dc54bf18137cb403cc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T07:17:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4533d64425844b40ed0d191e261e4a1a785d5396024de7bfbb4d09866fce5f7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T07:19:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4533d64425844b40ed0d191e261e4a1a785d5396024de7bfbb4d09866fce5f7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T11:02:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cac3ceab9cfb0c1bf04757dfffa7b9ba56e846e73f5974d0e738674f1ba5ded",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T11:05:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cac3ceab9cfb0c1bf04757dfffa7b9ba56e846e73f5974d0e738674f1ba5ded",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-05T08:08:00Z",
+          "findings": [
+            {
+              "category": "API shape",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+              "line": null,
+              "message": "`cli::commands::hook::HookCommand` derives `Debug` while containing `Option<cli_driver::hook::HookHost>`, but `HookHost` declares no `Debug` implementation. The derived CLI type is therefore not implementable as declared. The `--host` field also lacks a declared Clap parsing contract. Add the required trait/parser contract or use a CLI-owned boundary type with explicit conversion.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:6ff8dafebff8ea670d8172e46ef62d4e4066a619f439e353fc582d2c0b2d820b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-05T08:23:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e05fb9a196f52b6f87ddd5dff47b8d73df21ee2b03ce892602c115bbebc19436",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T08:32:13Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
+              "line": 72,
+              "message": "`CliHookHost` の `docs` は、Clap が claude/codex/grok を解析し、dispatch が `cli_driver::hook::HookHost` へ変換するという upstream の挙動契約を散文で再記述しています。型の短い識別だけを残し、挙動は `spec_refs` に委ねてください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
+              "line": 182,
+              "message": "`cli::commands::hook::HookCommand` の `docs` は、agent hook の host 必須、Git hook の host 禁止、実行時検証、変換、`git_hook_args` の扱いという IN-01/CN-01 の挙動契約を再記述しています。変更対象・型固有の短い識別に縮約し、挙動は anchor 参照に委ねてください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+              "line": 10,
+              "message": "`HookHost` の `docs` は、host が入力契約を選択し、認証・権限を与えないという D1/OS-01 の契約を散文で再記述しています。driver-boundary selector という短い型識別だけを残し、upstream behavior は anchor 参照に委ねてください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+              "line": 65,
+              "message": "`cli_driver::hook::HookInput` の `docs` は、agent dispatch の host 必須、Git dispatch の host 禁止、および Git argv の扱いという IN-01 の挙動契約を再記述しています。型の sum-type identity だけを残し、詳細は `spec_refs` に委ねてください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e05fb9a196f52b6f87ddd5dff47b8d73df21ee2b03ce892602c115bbebc19436",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-05T08:44:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43859758a2ac73c2cc3f45cc52e9957908cdcae355d2d08162f37c79e6476502",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T08:49:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43859758a2ac73c2cc3f45cc52e9957908cdcae355d2d08162f37c79e6476502",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T12:14:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:167ad5179360c59eccb9f944cbe275b64dfd31ae5521746d3af46f67022fcbb6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T12:17:55Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+              "line": 5,
+              "message": "`infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer` is declared `action: modify`, but its parameters, return type, and syncness are identical to the frozen rustdoc baseline. The `.cache` exclusion changes implementation behavior in the function/private walker, not this public type contract; classify the entry as `reference` (or omit it if no edge exposure is required).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:167ad5179360c59eccb9f944cbe275b64dfd31ae5521746d3af46f67022fcbb6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-05T12:32:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c313d3204ed2785bda4ef2628505b2d5a80bde0ac59367a5d51d76d9ba5f28db",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T12:35:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c313d3204ed2785bda4ef2628505b2d5a80bde0ac59367a5d51d76d9ba5f28db",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }

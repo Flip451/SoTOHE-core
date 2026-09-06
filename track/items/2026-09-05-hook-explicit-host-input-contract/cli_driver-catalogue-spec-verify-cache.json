@@ -1,0 +1,270 @@
+{
+  "entries": [
+    {
+      "claim_hash": "73c1856823702ddb540f6dfe1bbbbdf79d6af54020489a04067a3d718e54e812",
+      "claim_origin": {
+        "data": {
+          "entry_key": "HookHost",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b0200fde5c568d25906a197a33bd8069edbff34c5dd87b9b3ab64d7a097082a2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "73c1856823702ddb540f6dfe1bbbbdf79d6af54020489a04067a3d718e54e812",
+      "claim_origin": {
+        "data": {
+          "entry_key": "HookHost",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0ea424acff05f2506b1bf81833b745ca641e9e486dd1007b71da03870c3ebdfe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Grok host の PreToolUse は toolName と toolInput を正とし、同居する Claude 互換別名を無視して既存 terminal と search_replace の写像へ正規化する。未知の Grok tool、必須値の欠落、または型不正は拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok host の PreToolUse は toolName と toolInput を正とし、同居する Claude 互換別名を無視して既存 terminal と search_replace の写像へ正規化する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "73c1856823702ddb540f6dfe1bbbbdf79d6af54020489a04067a3d718e54e812",
+      "claim_origin": {
+        "data": {
+          "entry_key": "HookHost",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cdada473e0f7c9245fbf04103b4bb099569088305b81214a8fae395a0fd55c92",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Claude と Codex host の PreToolUse は既存 snake_case 契約を共有して解釈し、Codex の apply_patch 処理、共通ハンドラーへの正規化、および既存ガードポリシーを維持する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Claude と Codex host の PreToolUse は既存 snake_case 契約を共有して解釈し、Codex の apply_patch 処理、共通ハンドラーへの正規化、および既存ガードポリシーを維持する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "73c1856823702ddb540f6dfe1bbbbdf79d6af54020489a04067a3d718e54e812",
+      "claim_origin": {
+        "data": {
+          "entry_key": "HookHost",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f790dba062dbb30d0ddefe4a501007d9b3bef480a90b288b5fbee97e677db35",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "agent hook の標準呼び出し順は hook dispatch --host <host> <hook-id> とし、入力 JSON のキーの有無や組み合わせを host 選択に用いない"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "agent hook の標準呼び出し順は hook dispatch --host <host> <hook-id> とし",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "73c1856823702ddb540f6dfe1bbbbdf79d6af54020489a04067a3d718e54e812",
+      "claim_origin": {
+        "data": {
+          "entry_key": "HookHost",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "68ffdbc16942dcdc311eb16a0e733ace03ea65d739ba9b8e6dfbfe1ac28075a2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "選択済み host の入力契約を解釈できない場合は別形式へフォールバックせず拒否し、Grok の同居別名は一致確認を要求せず無視する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "選択済み host の入力契約を解釈できない場合は別形式へフォールバックせず拒否し、Grok の同居別名は一致確認を要求せず無視する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3dcf7383f0a66e7000b35e2a0ad7bf5687efbf05abc42c195c8acf1912bf66f3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::hook::HookInput",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b0200fde5c568d25906a197a33bd8069edbff34c5dd87b9b3ab64d7a097082a2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3dcf7383f0a66e7000b35e2a0ad7bf5687efbf05abc42c195c8acf1912bf66f3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::hook::HookInput",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0ea424acff05f2506b1bf81833b745ca641e9e486dd1007b71da03870c3ebdfe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Grok host の PreToolUse は toolName と toolInput を正とし、同居する Claude 互換別名を無視して既存 terminal と search_replace の写像へ正規化する。未知の Grok tool、必須値の欠落、または型不正は拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok host の PreToolUse は toolName と toolInput を正とし、同居する Claude 互換別名を無視して既存 terminal と search_replace の写像へ正規化する。未知の Grok tool、必須値の欠落、または型不正は拒否する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3dcf7383f0a66e7000b35e2a0ad7bf5687efbf05abc42c195c8acf1912bf66f3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::hook::HookInput",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cdada473e0f7c9245fbf04103b4bb099569088305b81214a8fae395a0fd55c92",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Claude と Codex host の PreToolUse は既存 snake_case 契約を共有して解釈し、Codex の apply_patch 処理、共通ハンドラーへの正規化、および既存ガードポリシーを維持する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Claude と Codex host の PreToolUse は既存 snake_case 契約を共有して解釈し、Codex の apply_patch 処理、共通ハンドラーへの正規化、および既存ガードポリシーを維持する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3dcf7383f0a66e7000b35e2a0ad7bf5687efbf05abc42c195c8acf1912bf66f3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::hook::HookInput",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "68ffdbc16942dcdc311eb16a0e733ace03ea65d739ba9b8e6dfbfe1ac28075a2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "選択済み host の入力契約を解釈できない場合は別形式へフォールバックせず拒否し、Grok の同居別名は一致確認を要求せず無視する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "選択済み host の入力契約を解釈できない場合は別形式へフォールバックせず拒否し、Grok の同居別名は一致確認を要求せず無視する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3dcf7383f0a66e7000b35e2a0ad7bf5687efbf05abc42c195c8acf1912bf66f3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::hook::HookInput",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5ca2f694aa0dab975439156e34c53781567104e89f18b779edafd7092f1fa026",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "入力契約の解釈は Rust の入力境界に集約し、wrapper は JSON を加工せず、正規化後の共通ハンドラーと既存ガードポリシーを変更しない"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "入力契約の解釈は Rust の入力境界に集約し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ba5ec0cc3341074a0a719b0b65a2f19adbe58ce75d695fb249cc19d73d12be10",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::hook::HookName",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b0200fde5c568d25906a197a33bd8069edbff34c5dd87b9b3ab64d7a097082a2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 1
+}

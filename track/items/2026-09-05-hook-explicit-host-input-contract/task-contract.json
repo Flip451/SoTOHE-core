@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-09-05-hook-explicit-host-input-contract",
+  "entries": {
+    "T001": [],
+    "T002": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "HookHost"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::hook::HookInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::hook::HookName"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "cli",
+        "entry_key": "CliHookHost"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::hook::HookCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::hook::CliHookName"
+      }
+    ],
+    "T004": [],
+    "T005": [],
+    "T006": []
+  }
+}

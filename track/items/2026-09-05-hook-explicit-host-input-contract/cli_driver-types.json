@@ -1,0 +1,209 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "HookHost": {
+      "action": "add",
+      "docs": "Driver-boundary connection-host selector.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Claude",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Codex",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Grok",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::hook::HookInput": {
+      "action": "modify",
+      "docs": "Hook-driver input sum type; Vec<String> is opaque process-argument payload without a narrower domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AgentDispatch",
+            "payload": {
+              "fields": [
+                "HookName",
+                "HookHost"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "GitDispatch",
+            "payload": {
+              "fields": [
+                "HookName",
+                "Vec<String>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::hook::HookName": {
+      "action": "reference",
+      "docs": "Baseline-identical finite hook selector carried for the modified HookInput edge; hook_name returns its fixed wire spelling rather than accepting unconstrained text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "HooksPathSetup",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockDirectGitOps",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockTestFileDeletion",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitPrePush",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SkillCompliance",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "hook_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "accepts_git_hook_args",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookName"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookName"
+    }
+  ]
+}

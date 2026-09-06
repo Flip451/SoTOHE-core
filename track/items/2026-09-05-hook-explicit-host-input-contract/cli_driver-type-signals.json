@@ -1,0 +1,39 @@
+{
+  "baseline_hash": "837c1de8feae6fcc158df3391b5130a0f6599b248bd7e54a2ff85522d926ea76",
+  "declaration_hash": "69bbe573bcb1cd5f62821bc1618e91bbe93c4015ed3a1c4cc3404313f432886c",
+  "generated_at": "2026-09-05T23:58:46Z",
+  "head_commit": "d86153cd72aab6b560cd2ec7205fe4c05a2d95b2",
+  "implementation_fingerprint": "9c3f152684923e56f364b0428bbda71db80dd44161ce535272387f6c0b209981",
+  "resolution_fingerprint": "51198accee12b1531f4d778749351a547f1e987dad0979ecc63129f3505c9579",
+  "rustdoc_execution_identity": {
+    "crate_name": "cli_driver",
+    "expected_json_path": "target/.sotp-rustdoc/bd91895567b604ee45dc2f1248a9a2fe1cf585086d6c6a84fda103155e7cf658/doc/cli_driver.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/bd91895567b604ee45dc2f1248a9a2fe1cf585086d6c6a84fda103155e7cf658"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "yellow",
+      "type_name": "HookHost"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "yellow",
+      "type_name": "cli_driver::hook::HookInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::hook::HookName"
+    }
+  ]
+}

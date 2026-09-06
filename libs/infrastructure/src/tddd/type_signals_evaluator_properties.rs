@@ -316,7 +316,7 @@ fn property_evaluator_ignores_parent_cargo_config_and_resolved_home() {
 }
 
 #[test]
-fn property_evaluator_excludes_only_the_resolved_target_directory() {
+fn property_evaluator_excludes_root_cache_and_resolved_target_directory() {
     super::with_process_environment_lock(|| {
         with_fingerprint_test_toolchain(|| {
             let workspace = tempfile::tempdir().expect("workspace tempdir");
@@ -329,30 +329,82 @@ fn property_evaluator_excludes_only_the_resolved_target_directory() {
             fs::create_dir_all(cache_source.parent().expect("cache source directory"))
                 .expect("cache source directory");
             fs::write(&cache_source, b"cache semantic input a").expect("cache source");
-            let nested_source = workspace.path().join("src/target/semantic.rs");
-            fs::create_dir_all(nested_source.parent().expect("nested source directory"))
-                .expect("nested source directory");
-            fs::write(&nested_source, b"semantic input a").expect("nested source");
+            let cache_generated = workspace.path().join(".cache/generated.a");
+            fs::File::create(&cache_generated)
+                .expect("oversized cache output")
+                .set_len(64 * 1024 * 1024 + 1)
+                .expect("oversized cache output length");
+            let nested_cache_source = workspace.path().join("src/.cache/semantic.rs");
+            fs::create_dir_all(
+                nested_cache_source.parent().expect("nested cache source directory"),
+            )
+            .expect("nested cache source directory");
+            fs::write(&nested_cache_source, b"nested cache semantic input a")
+                .expect("nested cache source");
+            let included_source = workspace.path().join("src/lib.rs");
 
             temp_env::with_var("CARGO_TARGET_DIR", Some(target_dir.as_os_str()), || {
                 let first = freshness::rustdoc_input_fingerprint(workspace.path())
-                    .expect("custom target directory must be excluded");
+                    .expect("custom target and root cache directories must be excluded");
                 fs::write(&generated, b"cargo output b").expect("changed generated output");
-                let second = freshness::rustdoc_input_fingerprint(workspace.path())
-                    .expect("generated output remains excluded");
-                assert_eq!(first, second, "only the exact Cargo target directory is excluded");
                 fs::write(&cache_source, b"cache semantic input b").expect("changed cache source");
+                let second = freshness::rustdoc_input_fingerprint(workspace.path())
+                    .expect("excluded generated contents must not affect fingerprinting");
+                assert_eq!(
+                    first, second,
+                    "target and root .cache contents must remain outside the fingerprint"
+                );
+                fs::write(&included_source, b"pub struct Changed;").expect("changed source");
                 let third = freshness::rustdoc_input_fingerprint(workspace.path())
-                    .expect("root .cache source remains authoritative");
+                    .expect("included source must remain fingerprintable");
                 assert_ne!(
                     second, third,
-                    "a root .cache directory is an implementation-fingerprint input"
+                    "an included source change must change the implementation fingerprint"
                 );
-                fs::write(&nested_source, b"semantic input b").expect("changed nested source");
+                fs::write(&nested_cache_source, b"nested cache semantic input b")
+                    .expect("changed nested cache source");
                 let fourth = freshness::rustdoc_input_fingerprint(workspace.path())
-                    .expect("nested source remains authoritative");
-                assert_ne!(third, fourth, "a nested source directory named target is not excluded");
+                    .expect("nested .cache source remains authoritative");
+                assert_ne!(third, fourth, "a nested directory named .cache must remain an input");
             });
+        });
+    });
+}
+
+#[cfg(unix)]
+#[test]
+fn property_evaluator_excludes_root_cache_symlink_but_rejects_other_symlinks() {
+    super::with_process_environment_lock(|| {
+        with_fingerprint_test_toolchain(|| {
+            let outer = tempfile::tempdir().expect("outer tempdir");
+            let workspace = outer.path().join("workspace");
+            fs::create_dir_all(&workspace).expect("workspace directory");
+            write_fingerprint_fixture(&workspace);
+
+            let outside_cache = outer.path().join("outside-cache");
+            fs::create_dir_all(&outside_cache).expect("outside cache directory");
+            fs::File::create(outside_cache.join("generated.a"))
+                .expect("oversized outside cache output")
+                .set_len(64 * 1024 * 1024 + 1)
+                .expect("oversized outside cache output length");
+            std::os::unix::fs::symlink(&outside_cache, workspace.join(".cache"))
+                .expect("root cache symlink");
+
+            freshness::rustdoc_input_fingerprint(&workspace)
+                .expect("root .cache symlink must be excluded without traversal");
+
+            let outside_source = outer.path().join("outside-source.rs");
+            fs::write(&outside_source, b"outside source").expect("outside source");
+            let non_excluded_symlink = workspace.join("linked-source.rs");
+            std::os::unix::fs::symlink(&outside_source, &non_excluded_symlink)
+                .expect("non-excluded symlink");
+            let error = freshness::rustdoc_input_fingerprint(&workspace)
+                .expect_err("non-excluded symlink must remain rejected");
+            assert!(matches!(
+                error,
+                freshness::RustdocInputFingerprintError::Symlink { path }
+                    if path == non_excluded_symlink
+            ));
         });
     });
 }

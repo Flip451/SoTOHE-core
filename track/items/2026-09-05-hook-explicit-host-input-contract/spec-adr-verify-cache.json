@@ -1,0 +1,971 @@
+{
+  "entries": [
+    {
+      "claim_hash": "5ec7568710ce52e88c7e99286393b20d6040e0d47cedd3da41ca51a8237161ea",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "agent hook の接続元を入力 JSON から推定せず明示的な host 引数で選択し、互換フィールドが同居する PreToolUse envelope でも選択済み host の入力契約を一貫して解釈できるようにする"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "JSON のキーから host を自動判定しない。host は入力契約の選択情報であり、送信元の認証や権限付与を意味しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5ec7568710ce52e88c7e99286393b20d6040e0d47cedd3da41ca51a8237161ea",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "agent hook の接続元を入力 JSON から推定せず明示的な host 引数で選択し、互換フィールドが同居する PreToolUse envelope でも選択済み host の入力契約を一貫して解釈できるようにする"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Grok の PreToolUse は `toolName` と `toolInput` を読み、Claude 互換の別名フィールドを無視する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "222a670a8b0675c531c12f386263ab4aa45cfb7b85c1df92870fee6e9a211009",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "PreToolUse と UserPromptSubmit の既存ガードおよび advisory 動作を保ったまま、新バイナリと各接続設定を一組で host 明示契約へ移行する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`skill-compliance` にも host を明示する。各 host の現在の共通 `prompt` 処理を再利用し、入力パース失敗時の advisory 動作を維持する。接続設定の `|| exit 0` を維持し、host 指定ミスや CLI 起動失敗でも UserPromptSubmit をブロックしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "222a670a8b0675c531c12f386263ab4aa45cfb7b85c1df92870fee6e9a211009",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "PreToolUse と UserPromptSubmit の既存ガードおよび advisory 動作を保ったまま、新バイナリと各接続設定を一組で host 明示契約へ移行する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新バイナリと接続設定を一組で導入する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e1cce90aad450c904e86e204c942732051551520512341c1b090ba74bdbd13c3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-03",
+          "section": "goal",
+          "text_label": "実装 fingerprint の workspace 入力集合から root 直下の再生成可能な .cache だけを除外しつつ、その他の記録対象の変更検知と新規則による再取得を維持する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint の workspace 走査で、workspace root の直下にある `.cache/` を既存の除外領域に追加する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e1cce90aad450c904e86e204c942732051551520512341c1b090ba74bdbd13c3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-03",
+          "section": "goal",
+          "text_label": "実装 fingerprint の workspace 入力集合から root 直下の再生成可能な .cache だけを除外しつつ、その他の記録対象の変更検知と新規則による再取得を維持する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「除外規則の変更前に得た fingerprint や型シグナルを、変更後の規則で取得・検証した結果として流用しない。新しい規則で入力 identity を取得し直し」および「キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b0200fde5c568d25906a197a33bd8069edbff34c5dd87b9b3ab64d7a097082a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "PreToolUse と UserPromptSubmit の `sotp hook dispatch` は `--host claude|codex|grok` を必須とする。未指定と不正値は CLI エラーとして終了コード 2 を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d472edd121916e84b14570a4e43d8fd4e94a192927724c53c9b0665a03961e62",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Claude の接続設定と Codex・Grok の wrapper を、各々が固定の host を渡して PreToolUse と skill-compliance を起動する接続契約へ更新する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude の接続設定、Codex と Grok の wrapper は固定の host を渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d472edd121916e84b14570a4e43d8fd4e94a192927724c53c9b0665a03961e62",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Claude の接続設定と Codex・Grok の wrapper を、各々が固定の host を渡して PreToolUse と skill-compliance を起動する接続契約へ更新する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`skill-compliance` にも host を明示する。各 host の現在の共通 `prompt` 処理を再利用し、入力パース失敗時の advisory 動作を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0ea424acff05f2506b1bf81833b745ca641e9e486dd1007b71da03870c3ebdfe",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Grok host の PreToolUse は toolName と toolInput を正とし、同居する Claude 互換別名を無視して既存 terminal と search_replace の写像へ正規化する。未知の Grok tool、必須値の欠落、または型不正は拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Grok の PreToolUse は `toolName` と `toolInput` を読み、Claude 互換の別名フィールドを無視する。別名との一致は要求しない。Grok の既存の terminal と `search_replace` の写像を維持し、未知の Grok ツール、必須値の欠落や型不正は拒否する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0ea424acff05f2506b1bf81833b745ca641e9e486dd1007b71da03870c3ebdfe",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Grok host の PreToolUse は toolName と toolInput を正とし、同居する Claude 互換別名を無視して既存 terminal と search_replace の写像へ正規化する。未知の Grok tool、必須値の欠落、または型不正は拒否する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D9",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「sotp hook dispatch」は grok の封筒（camelCase の tool 名と入力、Grok の tool 識別子）を、既存の Claude 封筒と同じ内部契約へ写してから handler に渡す。写像不能な封筒は fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdada473e0f7c9245fbf04103b4bb099569088305b81214a8fae395a0fd55c92",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Claude と Codex host の PreToolUse は既存 snake_case 契約を共有して解釈し、Codex の apply_patch 処理、共通ハンドラーへの正規化、および既存ガードポリシーを維持する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude と Codex の PreToolUse は既存の snake_case 入力処理を共有し、Codex の `apply_patch` 処理を維持する。正規化後の共通ハンドラーとガードポリシーを維持し、wrapper で JSON を加工しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a31d54ea509cfe3cbc4821d5f6dfb12932d6e63eacbbf40434efa16d444c2e5b",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "シェルを実行できる環境では cargo make build-sotp で新バイナリを構築し、host 明示済みの接続設定と一組で切り替える"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "シェルを実行できる環境で `cargo make build-sotp` により新バイナリを構築し、新接続設定と一組で切り替える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2ec0eba3d5f38ac5258e199452c173082375bd6e435de3ed1d49d33940a9c16e",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "実装 fingerprint の workspace 走査で root 直下の .cache だけを列挙・読取・内容 hash 化・件数または bytes 予算計上から除外し、root .cache 自体が symlink の場合も参照先へ進まない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint の workspace 走査で、workspace root の直下にある `.cache/` を既存の除外領域に追加する。配下を列挙・読取・内容 hash 化せず、その内容を入力ファイル件数と bytes の予算に含めない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e92fbe764c0541f228a15b8d90b9bc74b16ae894182c14927f004beb61d9f2f0",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "新しい入力集合の規則で fingerprint と関連する型シグナルを取得し直し、root .cache 以外の Rust source、Cargo manifest、lockfile など記録対象の内容変更を引き続き input identity に反映する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しい規則で入力 identity を取得し直し、その identity に対して再利用可否を判定する。キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "61eb8077793f4d61c5cfb2c9acf34a70ec75b8db9a65b0a696a330878187e6ca",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "--host を接続元の認証、権限付与、または信頼境界の根拠として扱うこと"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "host は入力契約の選択情報であり、送信元の認証や権限付与を意味しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "04f53b126b1a1db2485af2f6a4b6e625812fb9736eec13a7593799bdafbbfb56",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "host 未指定時または選択済み形式の解釈失敗時に、JSON キーから host や別入力形式を自動推定してフォールバックする互換経路"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "JSON のキーから host を自動判定しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "04f53b126b1a1db2485af2f6a4b6e625812fb9736eec13a7593799bdafbbfb56",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "host 未指定時または選択済み形式の解釈失敗時に、JSON キーから host や別入力形式を自動推定してフォールバックする互換経路"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "選択した形式を解釈できないとき、別形式へフォールバックしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c09696ea50f445361eeb1528a9714653bbb55299d65e2277775a82161839824",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "wrapper による入力 JSON の加工、Claude 互換フィールドの除去、または旧バイナリを前提にした接続設定との互換化"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude と Codex の PreToolUse は既存の snake_case 入力処理を共有し、Codex の `apply_patch` 処理を維持する。正規化後の共通ハンドラーとガードポリシーを維持し、wrapper で JSON を加工しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c09696ea50f445361eeb1528a9714653bbb55299d65e2277775a82161839824",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "wrapper による入力 JSON の加工、Claude 互換フィールドの除去、または旧バイナリを前提にした接続設定との互換化"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "旧バイナリ向けの自動判定や wrapper の JSON 加工による互換経路は追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e23e93d6f843264e8fedf04319dde61410ad019445d9b731b0c3cec138570539",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-05",
+          "section": "out_of_scope",
+          "text_label": "深い階層の同名 directory、任意の Git ignored path、または拡張子に基づく一般的な生成物除外と、Cargo の意味的な完全入力集合を独自に保証すること"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "追加する除外はこの固定された領域に限る。深い階層の同名 directory、任意の Git ignored path、拡張子が `.a` や `.bin` のファイル一般へ拡張しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1f790dba062dbb30d0ddefe4a501007d9b3bef480a90b288b5fbee97e677db35",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "agent hook の標準呼び出し順は hook dispatch --host <host> <hook-id> とし、入力 JSON のキーの有無や組み合わせを host 選択に用いない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "標準の引数順は `hook dispatch --host grok <hook-id>` とする。\\n\\nJSON のキーから host を自動判定しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "68ffdbc16942dcdc311eb16a0e733ace03ea65d739ba9b8e6dfbfe1ac28075a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "選択済み host の入力契約を解釈できない場合は別形式へフォールバックせず拒否し、Grok の同居別名は一致確認を要求せず無視する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Grok の PreToolUse は `toolName` と `toolInput` を読み、Claude 互換の別名フィールドを無視する。別名との一致は要求しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5ca2f694aa0dab975439156e34c53781567104e89f18b779edafd7092f1fa026",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "入力契約の解釈は Rust の入力境界に集約し、wrapper は JSON を加工せず、正規化後の共通ハンドラーと既存ガードポリシーを変更しない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude と Codex の PreToolUse は既存の snake_case 入力処理を共有し、Codex の `apply_patch` 処理を維持する。正規化後の共通ハンドラーとガードポリシーを維持し、wrapper で JSON を加工しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "81b41eff3983b9aaf909b121e6b23fc0712695b9e05515cbb3391dff8f99245a",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "skill-compliance は各 host の既存 prompt 処理を再利用し、接続設定の || exit 0 を維持して、host 指定ミス・CLI 起動失敗・入力パース失敗が UserPromptSubmit を停止させない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`skill-compliance` にも host を明示する。各 host の現在の共通 `prompt` 処理を再利用し、入力パース失敗時の advisory 動作を維持する。接続設定の `|| exit 0` を維持し、host 指定ミスや CLI 起動失敗でも UserPromptSubmit をブロックしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ee0ade99f2e19e6543234e7b7a30d7b2609fcb7a09264a8309ce532de4ff02c6",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "接続設定を切り替える前に新バイナリを用意し、旧バイナリを救済する自動判定や互換 wrapper を追加しない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "シェルを実行できる環境で `cargo make build-sotp` により新バイナリを構築し、新接続設定と一組で切り替える。旧バイナリ向けの自動判定や wrapper の JSON 加工による互換経路は追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ce335fb924b3b4053d56291ab90c6fc1407e284c163eaa172fae4f2274808bd9",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "root .cache の限定除外によって、除外対象外の入力に対する既存の件数・サイズ・path・環境値・時間上限、symlink・I/O error・途中変更・metadata 取得失敗の拒否、または fail-closed を弱めない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "1 file 64 MiB、総 bytes 512 MiB を含む既存の件数・サイズ・path・環境値の上限と、評価開始時の実行・drain 時間上限を維持する。対象入力の symlink、I/O error、途中変更、toolchain や Cargo metadata の取得失敗に対する既存の拒否規則も維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "013e7239caeaaa0ac58c3a40392680dbb243076c498ec4bbc23622c968cbb7c3",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "評価開始時と終端の入力確認には同じ root .cache 除外規則を適用し、規則変更前の fingerprint または型シグナルを新規則の成功結果として流用しない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "除外規則の変更前に得た fingerprint や型シグナルを、変更後の規則で取得・検証した結果として流用しない。新しい規則で入力 identity を取得し直し、その identity に対して再利用可否を判定する。評価開始時と終端の確認には同じ除外規則を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8e820f463a780abbbea465c84cb8f9479ace8435962a2892f951f40f7ab1de7",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "PreToolUse と UserPromptSubmit の `sotp hook dispatch` は `--host claude|codex|grok` を必須とする。未指定と不正値は CLI エラーとして終了コード 2 を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3349d790c03d5b503f8eb1bcd79898b679653b03d091cb077dd96945ef616074",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Claude の設定、Codex wrapper、Grok wrapper の PreToolUse と skill-compliance 呼び出しが、それぞれの固定 host を --host で渡す"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude の接続設定、Codex と Grok の wrapper は固定の host を渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3349d790c03d5b503f8eb1bcd79898b679653b03d091cb077dd96945ef616074",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Claude の設定、Codex wrapper、Grok wrapper の PreToolUse と skill-compliance 呼び出しが、それぞれの固定 host を --host で渡す"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`skill-compliance` にも host を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "edf643340d000092dc492f3a674093e46f97eaf7bf7860aed47ca864ece73754",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "grok host で toolName、toolInput、および Claude 互換別名が同居する PreToolUse envelope は、camelCase の Grok 値だけを用いて既存 terminal または search_replace の処理へ到達する。別名の一致は要求されない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Grok の PreToolUse は `toolName` と `toolInput` を読み、Claude 互換の別名フィールドを無視する。別名との一致は要求しない。Grok の既存の terminal と `search_replace` の写像を維持し、未知の Grok ツール、必須値の欠落や型不正は拒否する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "48c119e3166d12713db3488a767089a4ec8a8a74ecee0cbbc9f0b6c012373f58",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "grok host の未知 tool、必須値欠落、または型不正は拒否され、Claude/Codex 形式へのフォールバックを起こさない。Claude と Codex は既存 snake_case PreToolUse を処理し、Codex の apply_patch 処理を維持する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "未知の Grok ツール、必須値の欠落や型不正は拒否する。選択した形式を解釈できないとき、別形式へフォールバックしない。\n\nClaude と Codex の PreToolUse は既存の snake_case 入力処理を共有し、Codex の `apply_patch` 処理を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c0319b12f75855b7b9ec01cb6c98aceeb5c136bc885c9a39ae20062087cba81c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "skill-compliance の入力パース失敗、host 指定ミス、または CLI 起動失敗は接続設定で advisory として吸収され、UserPromptSubmit をブロックしない"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "入力パース失敗時の advisory 動作を維持する。接続設定の `|| exit 0` を維持し、host 指定ミスや CLI 起動失敗でも UserPromptSubmit をブロックしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2eda59a762bee243f3bb2ed997e0f839863ed808ae1052672c31651546fd2528",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "wrapper は入力 JSON を加工せず、選択済み host の入力境界で正規化された処理が既存の共通ハンドラーとガードポリシーへ合流する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "正規化後の共通ハンドラーとガードポリシーを維持し、wrapper で JSON を加工しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8c6ec10bbb80a2a6a438aa6ad9830544a846c7ffec6fa0db1be05c266064750d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "シェル実行可能な検証環境で cargo make build-sotp により構築した新バイナリと host 明示済み接続設定の組み合わせで、hook dispatch の自動テストが通る"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "シェルを実行できる環境で `cargo make build-sotp` により新バイナリを構築し、新接続設定と一組で切り替える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "de8abcaa3b52e69d7c2756328c3b1b70e4e5fcbade9242a6678f8a0cba007c89",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "固定した正常な UserPromptSubmit envelope（通常文と skill guidance 対象の prompt）を claude、codex、grok の各 --host で skill-compliance dispatch に与え、各 host の Allow 判定と additionalContext の有無・内容が、同じ入力を既存の共通 prompt 処理へ与えた結果と一致することを自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "318f8693a0ec955c45dbe9d6be12c5c4ea72e50a409bbb9ecc2438e367ba7e0b",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`skill-compliance` にも host を明示する。各 host の現在の共通 `prompt` 処理を再利用し、入力パース失敗時の advisory 動作を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "764e312e4ac3299da3b87b4959c7cb7deaeb1081514db6b5bdb2fb3fa6b77ece",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "workspace root 直下の .cache 配下だけを変更し、そこに 64 MiB を超える生成ファイルが存在しても、実装 fingerprint の取得はその内容を読取・hash・予算計上せず成功し、入力 identity は変化しないことを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "配下を列挙・読取・内容 hash 化せず、その内容を入力ファイル件数と bytes の予算に含めない。配下の生成ファイルの作成・更新・削除や、64 MiB を超える生成ファイルの存在だけでは、実装 fingerprint を変更したり取得を失敗させたりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "764e312e4ac3299da3b87b4959c7cb7deaeb1081514db6b5bdb2fb3fa6b77ece",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "workspace root 直下の .cache 配下だけを変更し、そこに 64 MiB を超える生成ファイルが存在しても、実装 fingerprint の取得はその内容を読取・hash・予算計上せず成功し、入力 identity は変化しないことを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "除外規則の変更前に得た fingerprint や型シグナルを、変更後の規則で取得・検証した結果として流用しない。新しい規則で入力 identity を取得し直し、その identity に対して再利用可否を判定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a9673c7d9906f3c1f88ec333dc59f5da0bc78d1da4b32ae26f8b1c0f69056d34",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "root 直下ではない同名 .cache directory と任意の非除外 regular file は入力として扱い、後者が 64 MiB 上限を超えると authoritative-input error で失敗することを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "追加する除外はこの固定された領域に限る。深い階層の同名 directory、任意の Git ignored path、拡張子が `.a` や `.bin` のファイル一般へ拡張しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a9673c7d9906f3c1f88ec333dc59f5da0bc78d1da4b32ae26f8b1c0f69056d34",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "root 直下ではない同名 .cache directory と任意の非除外 regular file は入力として扱い、後者が 64 MiB 上限を超えると authoritative-input error で失敗することを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "除外対象外の入力が上限を超えた場合は、引き続き authoritative-input error として失敗させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d324114e0b9f1cf27f8ddb597bb49965117ae4f74706d0835ce8d840ced02bfa",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "新しい除外規則で fingerprint を取得し直し、root .cache 以外の記録対象である Rust source、Cargo manifest、または lockfile の内容変更は入力 identity を変化させ、取得失敗時に旧結果へ fallback しないことを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。…失敗した評価の旧結果への fallback は許さない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

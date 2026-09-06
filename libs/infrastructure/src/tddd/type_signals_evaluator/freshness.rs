@@ -554,7 +554,16 @@ fn is_excluded_rustdoc_directory(
         || (path.parent() == Some(workspace_root)
             && matches!(
                 path.file_name().and_then(OsStr::to_str),
-                Some(".git" | ".harness" | ".codex" | ".claude" | ".agents" | "track" | "tmp",)
+                Some(
+                    ".git"
+                        | ".harness"
+                        | ".codex"
+                        | ".claude"
+                        | ".agents"
+                        | ".cache"
+                        | "track"
+                        | "tmp",
+                )
             ))
 }
 

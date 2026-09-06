@@ -1,0 +1,21 @@
+{
+  "catalogue_declaration_hash": "208944506446a6e765400e239157d2e38622c07d074b00745ee754e6eeec18d4",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "6616721b9e4e1444a0f04ab184a482bcbad5fdba71a1e7b2b7847ac0a47c4144",
+      "signal": "blue",
+      "type_name": "CliHookHost"
+    },
+    {
+      "entry_hash": "9384054e5e38b8bc8a6a8075d5e5ef927f7288822b86d0bfd4fbce52cd9f9d45",
+      "signal": "blue",
+      "type_name": "cli::commands::hook::CliHookName"
+    },
+    {
+      "entry_hash": "322d72559f1642dd545e80192d0de385e161b80ecb44a583c51799730550c698",
+      "signal": "blue",
+      "type_name": "cli::commands::hook::HookCommand"
+    }
+  ]
+}

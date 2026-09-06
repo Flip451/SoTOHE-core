@@ -1,0 +1,212 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CliHookName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliHookName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliHookName",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliHookName",
+      "trait_ref": "clap_builder::derive::ValueEnum"
+    },
+    {
+      "action": "reference",
+      "for_type": "HookCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "HookCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "HookCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "for_type": "CliHookHost",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CliHookHost",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CliHookHost",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CliHookHost",
+      "trait_ref": "clap_builder::derive::ValueEnum"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CliHookHost": {
+      "action": "add",
+      "docs": "CLI-owned finite hook-host boundary value.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Claude",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Codex",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Grok",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli::commands::hook::CliHookName": {
+      "action": "reference",
+      "docs": "Baseline-identical Clap hook selector carried for the modified dispatch DTO; hook_name returns its fixed wire spelling rather than accepting unconstrained text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "HooksPathSetup",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockDirectGitOps",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockTestFileDeletion",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitPrePush",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SkillCompliance",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "hook_name",
+          "params": [],
+          "receiver": "self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "commands::hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli::commands::hook::HookCommand": {
+      "action": "modify",
+      "docs": "Clap hook dispatch DTO; Vec<String> is opaque process-argument payload without a narrower domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Dispatch",
+            "payload": {
+              "fields": [
+                "CliHookName",
+                "Option<CliHookHost>",
+                "Vec<String>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    }
+  }
+}
