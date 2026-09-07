@@ -326,14 +326,7 @@ fn property_evaluator_excludes_root_cache_and_resolved_target_directory() {
             fs::create_dir_all(&target_dir).expect("custom target directory");
             fs::write(&generated, b"cargo output a").expect("generated output");
             let cache_source = workspace.path().join(".cache/semantic.rs");
-            fs::create_dir_all(cache_source.parent().expect("cache source directory"))
-                .expect("cache source directory");
-            fs::write(&cache_source, b"cache semantic input a").expect("cache source");
             let cache_generated = workspace.path().join(".cache/generated.a");
-            fs::File::create(&cache_generated)
-                .expect("oversized cache output")
-                .set_len(64 * 1024 * 1024 + 1)
-                .expect("oversized cache output length");
             let nested_cache_source = workspace.path().join("src/.cache/semantic.rs");
             fs::create_dir_all(
                 nested_cache_source.parent().expect("nested cache source directory"),
@@ -344,8 +337,21 @@ fn property_evaluator_excludes_root_cache_and_resolved_target_directory() {
             let included_source = workspace.path().join("src/lib.rs");
 
             temp_env::with_var("CARGO_TARGET_DIR", Some(target_dir.as_os_str()), || {
+                let without_root_cache = freshness::rustdoc_input_fingerprint(workspace.path())
+                    .expect("a workspace without a root cache must be fingerprintable");
+                fs::create_dir_all(cache_source.parent().expect("cache source directory"))
+                    .expect("cache source directory");
+                fs::write(&cache_source, b"cache semantic input a").expect("cache source");
+                fs::File::create(&cache_generated)
+                    .expect("oversized cache output")
+                    .set_len(64 * 1024 * 1024 + 1)
+                    .expect("oversized cache output length");
                 let first = freshness::rustdoc_input_fingerprint(workspace.path())
                     .expect("custom target and root cache directories must be excluded");
+                assert_eq!(
+                    without_root_cache, first,
+                    "creating root .cache contents must not change the fingerprint domain"
+                );
                 fs::write(&generated, b"cargo output b").expect("changed generated output");
                 fs::write(&cache_source, b"cache semantic input b").expect("changed cache source");
                 let second = freshness::rustdoc_input_fingerprint(workspace.path())
@@ -367,6 +373,48 @@ fn property_evaluator_excludes_root_cache_and_resolved_target_directory() {
                     .expect("nested .cache source remains authoritative");
                 assert_ne!(third, fourth, "a nested directory named .cache must remain an input");
             });
+        });
+    });
+}
+
+#[test]
+fn property_evaluator_bumps_domain_for_root_cache_exclusion_without_cache_content() {
+    super::with_process_environment_lock(|| {
+        with_fingerprint_test_toolchain(|| {
+            let workspace = tempfile::tempdir().expect("workspace tempdir");
+            write_fingerprint_fixture(workspace.path());
+
+            let current = freshness::rustdoc_input_fingerprint(workspace.path())
+                .expect("current fingerprint must be available");
+            let current_domain = freshness::rustdoc_input_fingerprint_with_version(
+                workspace.path(),
+                b"sotohe-rustdoc-input-fingerprint-v4\0",
+            )
+            .expect("current domain fingerprint must be available");
+            let previous_domain = freshness::rustdoc_input_fingerprint_with_version(
+                workspace.path(),
+                b"sotohe-rustdoc-input-fingerprint-v3\0",
+            )
+            .expect("previous domain fingerprint must be available");
+
+            assert_eq!(
+                current, current_domain,
+                "the production fingerprint must use the current input-domain version"
+            );
+            assert_ne!(
+                current, previous_domain,
+                "changing the input set requires a new domain even when .cache is absent"
+            );
+
+            let cache = workspace.path().join(".cache");
+            fs::create_dir_all(&cache).expect("root cache directory");
+            fs::write(cache.join("generated.bin"), b"cache contents").expect("cache contents");
+            let with_cache = freshness::rustdoc_input_fingerprint(workspace.path())
+                .expect("root cache contents must remain excluded");
+            assert_eq!(
+                current, with_cache,
+                "the new domain must remain independent of root .cache contents"
+            );
         });
     });
 }

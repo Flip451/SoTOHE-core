@@ -101,7 +101,7 @@ const MAX_RUSTDOC_INPUT_FILE_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_RUSTDOC_INPUT_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
 const MAX_RUSTDOC_INPUT_PATH_BYTES: usize = 16 * 1024;
 const MAX_CARGO_METADATA_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
-const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerprint-v3\0";
+const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerprint-v4\0";
 
 #[derive(Default)]
 struct FingerprintBudget {
@@ -215,6 +215,23 @@ fn rustdoc_input_digest(
     workspace_root: &Path,
     timeouts: EvaluationStartTimeouts,
 ) -> Result<Sha256Digest, RustdocInputFingerprintError> {
+    rustdoc_input_digest_with_version(workspace_root, timeouts, RUSTDOC_INPUT_FINGERPRINT_VERSION)
+}
+
+#[cfg(test)]
+pub(crate) fn rustdoc_input_fingerprint_with_version(
+    workspace_root: &Path,
+    version: &[u8],
+) -> Result<String, RustdocInputFingerprintError> {
+    rustdoc_input_digest_with_version(workspace_root, EvaluationStartTimeouts::default(), version)
+        .map(|digest| digest.as_str().to_owned())
+}
+
+fn rustdoc_input_digest_with_version(
+    workspace_root: &Path,
+    timeouts: EvaluationStartTimeouts,
+    version: &[u8],
+) -> Result<Sha256Digest, RustdocInputFingerprintError> {
     let deadline = FingerprintDeadline::new(timeouts.execution);
     deadline.check("authoritative input capture")?;
     workspace_root::validate_workspace_root_for_fingerprint(workspace_root, &deadline)?;
@@ -231,7 +248,7 @@ fn rustdoc_input_digest(
         &mut budget,
         &deadline,
     )?;
-    let mut canonical = Vec::from(RUSTDOC_INPUT_FINGERPRINT_VERSION);
+    let mut canonical = Vec::from(version);
     append_len_prefixed_bytes(&mut canonical, b"cargo-metadata-no-deps-locked");
     append_len_prefixed_bytes(&mut canonical, &cargo_inputs.metadata_bytes);
     for input in paths {
