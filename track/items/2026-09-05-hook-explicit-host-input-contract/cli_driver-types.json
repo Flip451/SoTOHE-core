@@ -54,6 +54,15 @@
             }
           },
           {
+            "name": "InternalError",
+            "payload": {
+              "fields": [
+                "CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
             "name": "HookBlock",
             "payload": {
               "fields": [

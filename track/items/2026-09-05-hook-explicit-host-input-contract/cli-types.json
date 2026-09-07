@@ -166,6 +166,15 @@
             }
           },
           {
+            "name": "InternalError",
+            "payload": {
+              "fields": [
+                "cli_driver::render::CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
             "name": "HookBlock",
             "payload": {
               "fields": [
@@ -293,6 +302,12 @@
         "variants": [
           {
             "name": "InputError",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InternalError",
             "payload": {
               "kind": "unit"
             }

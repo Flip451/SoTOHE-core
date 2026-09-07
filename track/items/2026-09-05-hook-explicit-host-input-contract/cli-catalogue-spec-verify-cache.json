@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "2e24c383e199f697c8f80e9e817fe40f57c480117d2a1ea3636240bed71b4646",
+      "claim_hash": "3176d3ac008d1d7ec8a84ccdb275dad1eedd412ba2d59af1d5b0fd9359c1a8b1",
       "claim_origin": {
         "data": {
           "entry_key": "CliHookExecution",
@@ -97,7 +97,7 @@
       }
     },
     {
-      "claim_hash": "b4fd8e21efaa47e074beb302f391a095273154b29ba592ab26313e2b4275de23",
+      "claim_hash": "0a33b765f03d5ec65963526c047472be41ec9d6d0e5cf0004b7a24a75ceec1a6",
       "claim_origin": {
         "data": {
           "entry_key": "HookExecutionDisposition",
@@ -121,7 +121,7 @@
       }
     },
     {
-      "claim_hash": "b4fd8e21efaa47e074beb302f391a095273154b29ba592ab26313e2b4275de23",
+      "claim_hash": "0a33b765f03d5ec65963526c047472be41ec9d6d0e5cf0004b7a24a75ceec1a6",
       "claim_origin": {
         "data": {
           "entry_key": "HookExecutionDisposition",

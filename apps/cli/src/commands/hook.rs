@@ -99,6 +99,7 @@ pub enum HookCommand {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookExecutionDisposition {
     InputError,
+    InternalError,
     HookBlock,
     AdvisoryFired,
     Allow,
@@ -107,6 +108,7 @@ pub enum HookExecutionDisposition {
 /// CLI emission sum type for hook execution.
 pub enum CliHookExecution {
     InputError(CommandOutcome),
+    InternalError(CommandOutcome),
     HookBlock(CommandOutcome),
     AdvisoryFired(CommandOutcome),
     Allow(CommandOutcome),
@@ -117,6 +119,7 @@ impl CliHookExecution {
     pub fn outcome(&self) -> &CommandOutcome {
         match self {
             Self::InputError(outcome)
+            | Self::InternalError(outcome)
             | Self::HookBlock(outcome)
             | Self::AdvisoryFired(outcome)
             | Self::Allow(outcome) => outcome,
@@ -127,6 +130,7 @@ impl CliHookExecution {
     pub fn disposition(&self) -> HookExecutionDisposition {
         match self {
             Self::InputError(_) => HookExecutionDisposition::InputError,
+            Self::InternalError(_) => HookExecutionDisposition::InternalError,
             Self::HookBlock(_) => HookExecutionDisposition::HookBlock,
             Self::AdvisoryFired(_) => HookExecutionDisposition::AdvisoryFired,
             Self::Allow(_) => HookExecutionDisposition::Allow,
@@ -138,6 +142,7 @@ impl From<DriverHookExecution> for CliHookExecution {
     fn from(execution: DriverHookExecution) -> Self {
         match execution {
             DriverHookExecution::InputError(outcome) => Self::InputError(outcome),
+            DriverHookExecution::InternalError(outcome) => Self::InternalError(outcome),
             DriverHookExecution::HookBlock(outcome) => Self::HookBlock(outcome),
             DriverHookExecution::AdvisoryFired(outcome) => Self::AdvisoryFired(outcome),
             DriverHookExecution::Allow(outcome) => Self::Allow(outcome),
@@ -221,6 +226,23 @@ mod tests {
             assert_eq!(execution.outcome().stdout.as_deref(), Some(expected_stdout));
             assert_eq!(execution.outcome().exit_code, 0);
         }
+    }
+
+    #[test]
+    fn test_cli_hook_execution_preserves_internal_error_outcome_losslessly() {
+        let driver = DriverHookExecution::InternalError(CommandOutcome {
+            stdout: Some("partial output".to_owned()),
+            stderr: Some("handler failure".to_owned()),
+            exit_code: 19,
+        });
+
+        let execution = CliHookExecution::from(driver);
+
+        assert!(matches!(execution, CliHookExecution::InternalError(_)));
+        assert_eq!(execution.disposition(), HookExecutionDisposition::InternalError);
+        assert_eq!(execution.outcome().stdout.as_deref(), Some("partial output"));
+        assert_eq!(execution.outcome().stderr.as_deref(), Some("handler failure"));
+        assert_eq!(execution.outcome().exit_code, 19);
     }
 
     #[test]

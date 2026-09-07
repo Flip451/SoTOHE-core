@@ -90,6 +90,8 @@ pub struct HookInput {
 pub enum HookExecution {
     /// The input failed validation, parsing, or I/O handling.
     InputError(CommandOutcome),
+    /// The post-dispatch service or handler failed after valid input reached the use case.
+    InternalError(CommandOutcome),
     /// The use-case handler deliberately blocked the hook operation.
     HookBlock(CommandOutcome),
     /// An advisory hook produced context for the host.
@@ -349,8 +351,8 @@ impl HookDriver {
     /// Validate the hook-kind/host/argv combination and dispatch it.
     ///
     /// Exit code 0 = allow, exit code 2 = block or input error (Claude Code
-    /// hook protocol). The typed return keeps input failures distinct from an
-    /// actual use-case block for callers such as telemetry.
+    /// hook protocol). The typed return keeps input failures, internal service
+    /// failures, and actual use-case blocks distinct for callers such as telemetry.
     pub fn handle(&self, input: HookInput) -> HookExecution {
         let HookInput { hook, host, git_hook_args } = input;
 
@@ -514,7 +516,7 @@ impl HookDriver {
                 }
             }
             Err(e) => {
-                HookExecution::InputError(make_hook_error(is_post, &format!("hook error: {e}")))
+                HookExecution::InternalError(make_hook_error(is_post, &format!("hook error: {e}")))
             }
         }
     }
@@ -870,7 +872,7 @@ mod tests {
     }
 
     #[test]
-    fn test_hook_driver_service_failure_is_input_error() {
+    fn test_hook_driver_service_failure_is_internal_error() {
         let (driver, _) = driver_with(Response::Error);
         let execution = driver.dispatch_agent_input(
             HookName::BlockDirectGitOps,
@@ -878,7 +880,7 @@ mod tests {
             r#"{"tool_name":"Bash","tool_input":{"command":"printf ok"}}"#,
         );
 
-        assert!(matches!(execution, HookExecution::InputError(_)));
+        assert!(matches!(execution, HookExecution::InternalError(_)));
         assert_eq!(outcome(&execution).exit_code, 2);
         assert!(outcome(&execution).stderr.as_deref().unwrap().contains("hook error"));
     }
@@ -895,6 +897,7 @@ mod tests {
     fn outcome(execution: &HookExecution) -> &CommandOutcome {
         match execution {
             HookExecution::InputError(outcome)
+            | HookExecution::InternalError(outcome)
             | HookExecution::HookBlock(outcome)
             | HookExecution::AdvisoryFired(outcome)
             | HookExecution::Allow(outcome) => outcome,

@@ -745,7 +745,7 @@
       },
       "key": {
         "anchor_text_hash": "aa7a4250ed90a45c5a0b8982daff7e5d786ec790a77be49a3cbb5b911850e76e",
-        "bound_tests_set_hash": "b068d690c32af94a9a4f46e234e540bfadd591a6fdea2e897dbfc52e024064ab",
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
         "declaration_hash": "ce5480c41776ae18b8ac3a6893483f0b17757ddfcb62bb6026653dcfc31fe18b"
       },
       "obligation_id": {
@@ -754,7 +754,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::Allow));",
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));\n        assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -776,7 +776,7 @@
       },
       "key": {
         "anchor_text_hash": "72d2ec7c21e2e498b337423209b7f2b162f1245de954f99b5634183b0a90c05a",
-        "bound_tests_set_hash": "b068d690c32af94a9a4f46e234e540bfadd591a6fdea2e897dbfc52e024064ab",
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
         "declaration_hash": "ce5480c41776ae18b8ac3a6893483f0b17757ddfcb62bb6026653dcfc31fe18b"
       },
       "obligation_id": {
@@ -785,7 +785,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));",
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -854,7 +854,7 @@
       "key": {
         "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
         "bound_tests_set_hash": "b7c512f73fd3eb88ae0577507ad69142332a3761ad2e9e177ed4521e54940c54",
-        "declaration_hash": "cea42e5f52280d4dff6e5a8e00aaf3bbf8103c993268546428b398c8c3acd859"
+        "declaration_hash": "5932cffca5f870f3f6bb8c2c0d83e44200e29f6f4bf1e0e6aba0638ec85b7ac6"
       },
       "obligation_id": {
         "entry_key": "HookExecution",
@@ -862,7 +862,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "for host in [HookHost::Claude, HookHost::Codex] {\n            let (driver, service) = driver_with(Response::Block);\n            let execution = driver.dispatch_agent_input(HookName::BlockDirectGitOps, host, raw);\n\n            assert!(matches!(execution, HookExecution::HookBlock(_)));\n            assert_eq!(outcome(&execution).exit_code, 2);\n            assert_eq!(outcome(&execution).stderr.as_deref(), Some(\"blocked by test service\"));\n\n            let (hook_name, command) = service.calls.lock().unwrap().pop().expect(\"dispatch call\");\n            assert_eq!(hook_name, \"block-direct-git-ops\");\n            assert_eq!(command.tool_name, \"Bash\");\n            assert_eq!(command.command.as_deref(), Some(\"git add safe.txt\"));\n        }",
+        "citation": "let raw = r#\"{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git add safe.txt\"}}\"#;\n\n        for host in [HookHost::Claude, HookHost::Codex] {\n            let (driver, service) = driver_with(Response::Block);\n            let execution = driver.dispatch_agent_input(HookName::BlockDirectGitOps, host, raw);\n\n            assert!(matches!(execution, HookExecution::HookBlock(_)));\n            assert_eq!(outcome(&execution).exit_code, 2);\n            assert_eq!(outcome(&execution).stderr.as_deref(), Some(\"blocked by test service\"));\n\n            let (hook_name, command) = service.calls.lock().unwrap().pop().expect(\"dispatch call\");\n            assert_eq!(hook_name, \"block-direct-git-ops\");\n            assert_eq!(command.tool_name, \"Bash\");\n            assert_eq!(command.command.as_deref(), Some(\"git add safe.txt\"));\n        }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -920,8 +920,8 @@
       },
       "key": {
         "anchor_text_hash": "72d2ec7c21e2e498b337423209b7f2b162f1245de954f99b5634183b0a90c05a",
-        "bound_tests_set_hash": "d3aa31bc7a50e5c0589418ae07da579a550f5156b214484fe6e86e4921fbf4dc",
-        "declaration_hash": "6c6c40a76ab3f94a4d3836ba47194bdb305ad63601486197c2e2c685a051aba8"
+        "bound_tests_set_hash": "a8d6a27d756ca7053dbe5af5e64c3f2e50a627e77f1895371da5dde64872cc83",
+        "declaration_hash": "4397db0a6d14430f90207a5ba70a2cb788f779f7f5320964230b3fef2716d178"
       },
       "obligation_id": {
         "entry_key": "CliHookExecution",
@@ -929,7 +929,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));",
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));\n        assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -951,8 +951,8 @@
       },
       "key": {
         "anchor_text_hash": "aa7a4250ed90a45c5a0b8982daff7e5d786ec790a77be49a3cbb5b911850e76e",
-        "bound_tests_set_hash": "b068d690c32af94a9a4f46e234e540bfadd591a6fdea2e897dbfc52e024064ab",
-        "declaration_hash": "ae8c1026cff91a9656e8dffa74c92adf04778cdd2e52a5a48580339b7b7410b4"
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
+        "declaration_hash": "9b29fb9cb9380af3241ac4738932545251f6187fbfd4c88684ac0b9e3922907b"
       },
       "obligation_id": {
         "entry_key": "HookExecutionDisposition",
@@ -960,7 +960,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));",
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -982,8 +982,8 @@
       },
       "key": {
         "anchor_text_hash": "72d2ec7c21e2e498b337423209b7f2b162f1245de954f99b5634183b0a90c05a",
-        "bound_tests_set_hash": "b068d690c32af94a9a4f46e234e540bfadd591a6fdea2e897dbfc52e024064ab",
-        "declaration_hash": "00f52e1ac1218f9b891a221b1f7cde54fff1e3a31e6044d056e66bad5aa1a33a"
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
+        "declaration_hash": "9e038cb6fd371aba74ec669592dffb83862cc1f8f5c9e59365e1d912b51db87b"
       },
       "obligation_id": {
         "entry_key": "HookExecutionDisposition",
@@ -991,7 +991,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::Allow));",
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

@@ -265,6 +265,35 @@
           "hash": "rvw1:sha256:3e75342645f77935b466178d6d1ec5d8054818eabdcfcb1e08870b7eb987d415",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T06:07:54Z",
+          "findings": [
+            {
+              "category": "telemetry classification",
+              "file": "apps/cli/src/main.rs",
+              "line": 389,
+              "message": "`InternalError` is emitted through `emit_hook_block`, producing the same persisted `TelemetryEvent::HookBlock` as an intentional policy block. This loses the newly introduced distinction and causes internal service failures to be counted/reported as actual hook blocks, contrary to the telemetry classification requirement. Add a distinct telemetry event/classification or avoid recording internal errors as `HookBlock`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:366bd0a6704488109a6f8b15d5b884d5622e979cdde73db6c15e1d3e1274ff10",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T06:16:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a77a54d49a8dac9b8675a86455dcf4be0bdd3187c2969936078106f469a8687b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T06:28:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a77a54d49a8dac9b8675a86455dcf4be0bdd3187c2969936078106f469a8687b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -362,6 +391,20 @@
           "at": "2026-09-06T12:50:53Z",
           "findings": [],
           "hash": "rvw1:sha256:732ea93fc7e631f70af3974adff814aa6c537ed599bb890a908321ea685aa4c2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T06:07:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00e5dd4819e482c13c1e47706a592de302bd9748bc2641f6f86e240d4bb8a242",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T06:19:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00e5dd4819e482c13c1e47706a592de302bd9748bc2641f6f86e240d4bb8a242",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1291,6 +1334,35 @@
           "at": "2026-09-07T02:30:58Z",
           "findings": [],
           "hash": "rvw1:sha256:e8bc1b685e9977c926c17f2efcd16ec687297b2ae6f868386dc813c99bc31131",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T05:29:12Z",
+          "findings": [
+            {
+              "category": "implementation/catalogue mismatch",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/cli_driver-types.json",
+              "line": 57,
+              "message": "The added `InternalError` variants are absent from the current Rust implementation in both layers. `HookExecution`, `HookExecutionDisposition`, and `CliHookExecution` expose no such variant, so the catalogues declare an unimplemented cross-layer contract.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:1b7015c15eae96d5259d11fb078c4310ec2bd949dbef6cbfbbc98fa9351ddf58",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T05:30:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1b7015c15eae96d5259d11fb078c4310ec2bd949dbef6cbfbbc98fa9351ddf58",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T05:34:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1b7015c15eae96d5259d11fb078c4310ec2bd949dbef6cbfbbc98fa9351ddf58",
           "type": "final",
           "verdict": "zero_findings"
         }

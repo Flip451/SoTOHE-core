@@ -344,6 +344,7 @@ fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
 ///
 /// Hooks are instrumented per AC-04 / OS-03:
 /// - A typed `HookBlock` result → emit `TelemetryEvent::HookBlock`.
+/// - A non-zero typed `InternalError` result → emit `TelemetryEvent::NonZeroExit`.
 /// - A typed `AdvisoryFired` result that produces a non-empty stdout injection
 ///   → emit `TelemetryEvent::AdvisoryHookFired`.
 /// - All allow / pass-through paths emit NOTHING and have no file IO (OS-03 /
@@ -353,7 +354,7 @@ fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
 /// relative to CWD), consistent with the hook execution context.
 fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
     use cli_composition::telemetry_wiring::{
-        emit_advisory_hook_fired, emit_hook_block, resolve_telemetry_writer,
+        emit_advisory_hook_fired, emit_hook_block, emit_non_zero_exit, resolve_telemetry_writer,
     };
 
     // Capture the hook name before consuming the command.
@@ -374,6 +375,25 @@ fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
                 let items_dir = std::path::PathBuf::from("track/items");
                 if let Some((ref w, ref track_id)) = resolve_telemetry_writer(&items_dir) {
                     emit_hook_block(w, track_id, &hook_name);
+                }
+            } else if matches!(
+                execution.disposition(),
+                commands::hook::HookExecutionDisposition::InternalError
+            ) && outcome.exit_code != 0
+            {
+                // Preserve failure visibility without counting the internal
+                // error as an intentional hook block. Advisory
+                // UserPromptSubmit failures retain exit 0 and remain
+                // non-blocking.
+                let items_dir = std::path::PathBuf::from("track/items");
+                if let Some((ref w, ref track_id)) = resolve_telemetry_writer(&items_dir) {
+                    emit_non_zero_exit(
+                        w,
+                        track_id,
+                        &hook_name,
+                        i32::from(outcome.exit_code),
+                        outcome.stderr.as_deref().unwrap_or("internal hook error"),
+                    );
                 }
             } else if matches!(
                 execution.disposition(),
@@ -412,7 +432,7 @@ fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
     }
 }
 
-/// Returns whether a typed execution result represents a hook block.
+/// Returns whether a typed execution result is an intentional hook block.
 fn is_hook_block_outcome(disposition: commands::hook::HookExecutionDisposition) -> bool {
     matches!(disposition, commands::hook::HookExecutionDisposition::HookBlock)
 }
@@ -1423,6 +1443,7 @@ mod tests {
         use crate::commands::hook::HookExecutionDisposition;
 
         assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));
+        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));
         assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));
         assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));
         assert!(!super::is_hook_block_outcome(HookExecutionDisposition::Allow));

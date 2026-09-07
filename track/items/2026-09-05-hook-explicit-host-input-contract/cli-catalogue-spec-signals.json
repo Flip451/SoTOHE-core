@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "b3cea026b1966221457a6feb25eb53e482b0d8a54f36e23d8c489139fd59a8e9",
+  "catalogue_declaration_hash": "664a80e69970cebbd05c9cb7f69f494d249519cc1c8ad52e4fd941c19db1749b",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "2e24c383e199f697c8f80e9e817fe40f57c480117d2a1ea3636240bed71b4646",
+      "entry_hash": "3176d3ac008d1d7ec8a84ccdb275dad1eedd412ba2d59af1d5b0fd9359c1a8b1",
       "signal": "blue",
       "type_name": "CliHookExecution"
     },
@@ -13,7 +13,7 @@
       "type_name": "CliHookHost"
     },
     {
-      "entry_hash": "b4fd8e21efaa47e074beb302f391a095273154b29ba592ab26313e2b4275de23",
+      "entry_hash": "0a33b765f03d5ec65963526c047472be41ec9d6d0e5cf0004b7a24a75ceec1a6",
       "signal": "blue",
       "type_name": "HookExecutionDisposition"
     },

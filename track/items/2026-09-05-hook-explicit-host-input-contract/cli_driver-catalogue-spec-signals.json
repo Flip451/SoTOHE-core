@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "74c8be7f44cd2ba174751dd230b2aba3fc2cee044cf85775a51d5325a00ed4cb",
+  "catalogue_declaration_hash": "dc01d4b1360c0951709c2fcebe886222aeed6fb600c83a915c07065ac9d88f42",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "e3d905e287423e870fd3cfdf3e92abae38a5b0329581fb3c4aaa5d8c700277fb",
+      "entry_hash": "5d7878e25b84bf0d0bd4288da2e9600ce0501492c918b94617cd8d40f5d08cf3",
       "signal": "blue",
       "type_name": "HookExecution"
     },

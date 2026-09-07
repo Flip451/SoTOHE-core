@@ -4,9 +4,9 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CliHookExecution | enum | add | InputError, HookBlock, AdvisoryFired, Allow | 🔵 | 🔵 |
+| CliHookExecution | enum | add | InputError, InternalError, HookBlock, AdvisoryFired, Allow | 🔵 | 🔵 |
 | CliHookHost | enum | add | Claude, Codex, Grok | 🔵 | 🔵 |
-| HookExecutionDisposition | enum | add | InputError, HookBlock, AdvisoryFired, Allow | 🔵 | 🔵 |
+| HookExecutionDisposition | enum | add | InputError, InternalError, HookBlock, AdvisoryFired, Allow | 🔵 | 🔵 |
 | cli::commands::hook::CliHookName | enum | modify | HooksPathSetup, BlockDirectGitOps, BlockTestFileDeletion, GitRefUpdate, GitPrePush, SkillCompliance | 🔵 | 🔵 |
 | cli::commands::hook::HookCommand | enum | modify | Dispatch | 🔵 | 🔵 |
 
