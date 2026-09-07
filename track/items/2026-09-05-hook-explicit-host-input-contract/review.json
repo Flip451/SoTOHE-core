@@ -77,6 +77,310 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-09-06T06:11:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16e575a651af6722269862c9569669adbe49ddc689fd241e2ed49a702cc834ac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T06:45:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b58955276d3cd5ebc5760f63992206f9f08d6353afc2d503c4ce82b78778e13e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T07:59:52Z",
+          "findings": [
+            {
+              "category": "Clap/API shape",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 98,
+              "message": "`trailing_var_arg = true` stops Clap option parsing after the first Git argument. Consequently, `sotp hook dispatch git-ref-update committed --host claude` treats `--host claude` as opaque Git argv and exits 0 instead of rejecting the forbidden host with exit 2. Keep `--host` recognizable until an explicit `--` delimiter and add this argument-order case to the built-binary tests.",
+              "severity": "P1"
+            },
+            {
+              "category": "business logic in bin",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 114,
+              "message": "`execute_inner` now owns the hook-kind classification, host/argument compatibility rules, error rendering, and driver-input routing. This duplicates policy already enforced by `HookDriver` and violates the thin-bin parse → driver.handle → emit boundary. Pass a driver-owned typed input containing the parsed values and perform conditional validation behind the driver boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "telemetry correctness",
+              "file": "apps/cli/src/main.rs",
+              "line": 376,
+              "message": "The telemetry wrapper equates every non-advisory exit code 2 with an actual hook block. The new missing/forbidden-host validation returns the same undifferentiated outcome before hook dispatch, so invalid invocations such as a host-bearing Git hook are recorded as `HookBlock`; missing-host `skill-compliance` is instead silently omitted because it is classified as advisory. Preserve a typed disposition so CLI-input errors and real hook verdicts produce the intended telemetry, and cover these new failure paths.",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "apps/cli/tests/hook_connections.rs",
+              "line": 66,
+              "message": "The connection test relies on `include_str!` plus substring checks. For example, a Claude command with only one correctly hosted resolution branch still satisfies line 67, and the Git checks pass whenever `\"$@\"` merely appears anywhere. This violates the testing convention’s source-substring prohibition and does not prove every shipped resolution path selects the fixed host or forwards argv. Execute the configured commands/scripts against recorders, as the wrapper test already does.",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 280,
+              "message": "未宣言の前提への依存: this unit test assumes a current production binary exists exactly two directories above the hashed test executable under the suffix-less name `sotp`. Cargo does not guarantee that artifact for an isolated unit-test build, and an incidental stale binary can produce a false pass. The spec and environment declaration do not establish this layout. Keep built-binary coverage in the integration test using `CARGO_BIN_EXE_sotp`, or assert Clap’s error exit code directly here.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b58955276d3cd5ebc5760f63992206f9f08d6353afc2d503c4ce82b78778e13e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T12:13:40Z",
+          "findings": [
+            {
+              "category": "concurrency",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 224,
+              "message": "`copy_workspace_input_tree` now treats `symlink_metadata`'s `NotFound` as a transient disappearance, but still unconditionally panics when the same directory disappears between that metadata check and `fs::read_dir(&source)`. This leaves the advertised concurrency fix incomplete: a concurrently vanished fixture directory still aborts the scaffold export instead of being tolerated, while the intended behavior is to ignore only `NotFound` and preserve panics for other I/O errors.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:56984f4347a3ec0a55817f621a471d3d6895e2ab38470ad27e76d03686b63ae0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T12:20:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:24143c4b11777db1d8abd689b1e0ea3da2b5d103520dacc36c309e96a1021303",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:22:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:24143c4b11777db1d8abd689b1e0ea3da2b5d103520dacc36c309e96a1021303",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:44:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:24143c4b11777db1d8abd689b1e0ea3da2b5d103520dacc36c309e96a1021303",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T14:33:22Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "apps/cli/tests/hook_connections.rs",
+              "line": 274,
+              "message": "`GitBinaryResolution::WorktreeList` still does not exercise the `git worktree list` fallback. In this separate-git-dir fixture, `${common%/.git}` remains `<root>/common.git`, and the recorder is installed at `<root>/common.git/bin/sotp`, so the script succeeds through the earlier common-directory probe. Install the recorder under `<root>/main/bin/sotp` while leaving the preceding candidate locations empty; otherwise a broken final fallback continues to pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:24143c4b11777db1d8abd689b1e0ea3da2b5d103520dacc36c309e96a1021303",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T14:43:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ff63a7d3b4f0fc47853aa91309d6ff675062c4cb77107c5acda2cf669dc4190e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-06T06:40:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f90218a00535cc7972025cd52451115ae999a4dd07a5e77ca59add4eb9419e9f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T07:04:38Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 385,
+              "message": "未宣言の前提への依存: host-selected agent path reads process stdin to an unbounded `String` before parsing. This assumes the stream reaches EOF, the complete envelope is valid UTF-8 and fits memory, and only one invocation consumes stdin; a non-terminating or oversized stream can hang or abort before fail-closed rendering. The spec declares host/field semantics, but the environment declaration leaves input encoding and concurrency as TODO and documents resource behavior only for `gate-output`. Declare the hook-stdin encoding, invocation model, size/time/EOF constraints and failure behavior, or enforce bounded reading.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f90218a00535cc7972025cd52451115ae999a4dd07a5e77ca59add4eb9419e9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T07:14:00Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 28,
+              "message": "未宣言の前提への依存: this introduces a 10 MiB hook-stdin limit, while `read_bounded_hook_input` also accepts only UTF-8 and waits indefinitely for EOF when the stream stays below the cap. Neither the spec nor the environment declaration defines these hook-input constraints—the encoding/concurrency fields remain TODO and the resource section covers only `gate-output`. Consequently, otherwise-valid envelopes above 10 MiB are rejected (or silently discarded for advisory skill-compliance), and a stalled producer can hang dispatch, without a declared contract. Record the byte limit, encoding/error behavior, EOF/timeout policy, and single-consumer invocation model in the spec/environment declaration, or align the implementation with a declared contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fb4d3d3a527fae0e165a9a5958e2ed83bd4ced8be437511c91e5a9f1d5758ccf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T07:31:52Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 385,
+              "message": "未宣言の前提への依存: the changed host-selected path directly reaches both `stdin().read_to_string` calls before parsing. It therefore assumes one complete EOF-terminated UTF-8 envelope, a single stdin consumer, and enough unbounded memory/time to buffer the entire stream. The spec declares host and field semantics only; the environment declaration leaves input encoding and concurrency as TODO and documents resource behavior only for `gate-output`. An oversized or non-terminating hook stream can therefore OOM or hang before the PreToolUse path renders its promised fail-closed `CommandOutcome`. Declare the hook-stdin encoding, size/no-limit policy, EOF/timeout behavior, and invocation model in the owning spec/environment declaration before relying on them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f90218a00535cc7972025cd52451115ae999a4dd07a5e77ca59add4eb9419e9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T07:39:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f90218a00535cc7972025cd52451115ae999a4dd07a5e77ca59add4eb9419e9f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:13:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:732ea93fc7e631f70af3974adff814aa6c537ed599bb890a908321ea685aa4c2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:37:21Z",
+          "findings": [
+            {
+              "category": "non-CommandOutcome return",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 354,
+              "message": "`HookDriver::handle` returns `HookExecution` instead of the required `CommandOutcome` (`apps/cli-driver/src/hook.rs:354`). Although each variant wraps a `CommandOutcome`, this changes the public primary-adapter contract and requires callers to unwrap/classify the result before receiving rendered output, violating the cli_driver severity policy for non-CommandOutcome driver operations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:732ea93fc7e631f70af3974adff814aa6c537ed599bb890a908321ea685aa4c2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T12:40:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:732ea93fc7e631f70af3974adff814aa6c537ed599bb890a908321ea685aa4c2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:50:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:732ea93fc7e631f70af3974adff814aa6c537ed599bb890a908321ea685aa4c2",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-09-06T06:11:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:12:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:30:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:54:27Z",
+          "findings": [
+            {
+              "category": "domain invariant / external-owner identity coherence",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 137,
+              "message": "`trait_impl.for_type()` と `entry_key` の raw 文字列が完全一致する場合しか external owner と認めていませんが、signal producer は有効な外部型を rustdoc の定義パスへ canonicalize してから namespace-less label として永続化します。例えば catalogue の `std::vec::Vec<i32>` は signal 側で `alloc::vec::Vec<i32>` になり得るため、raw key では signal に結合できず、canonical key ではこの resolver が `UnresolvedIdentifier` を返します。これでは schema-valid な外部 self type の task を帰属できません。resolver と signal producer で永続 identity を共通化し、標準ライブラリ re-export の回帰テストを追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T14:28:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-09-06T04:43:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T06:07:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T06:09:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:09:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:47:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -121,6 +425,186 @@
           "hash": "rvw1:sha256:04ef1aa6c5e073c15d149c5f4d1fde9a0154416e166050a5e8cd2223dbd1c385",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T04:44:48Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 29,
+              "message": "`plan.summary` is empty, so GO-01, GO-02, and GO-03 have no goal-to-task traceability in the impl-plan SSoT; the GO references in section descriptions do not satisfy the required `plan.summary` location.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 64,
+              "message": "T005 names “Claude settings and Codex/Grok hook wrappers” but does not identify target files or symbols. An executor must discover the concrete edit boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 72,
+              "message": "T006 names “Existing hook integration and automation tests” without identifying target files or symbols. An executor must invent the concrete test boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 39,
+              "message": "T002 restates the upstream behavior contract in “retain HookName conformance at the hook input boundary”; the permitted description form is target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 47,
+              "message": "T003 restates the upstream behavior contract in “retain CliHookName conformance in CLI parsing and dispatch mapping”; the permitted description form is target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:e8ef8344d3fb3b337f0b7c1dfe80661098cf2bb3336498b6b0bd88e4cc0cedca",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T06:07:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:140fa6af9d3e7e8f0a2190395a9bb3f154219dbf383b9da371acc5e2283757c4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T09:20:56Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 97,
+              "message": "T007 の説明は `domain/usecase external trait-impl identity resolver` としか対象を示しておらず、対象ファイルまたは具体的なシンボルがありません。実装者が編集境界を推測する必要があるため、対象ファイル／シンボルを明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:980ab26ed5cd5ba70a7ac98af7f4675a42057a2206e3b62086da2779b33bc1c4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T09:29:26Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/task-coverage.json",
+              "line": 4,
+              "message": "T007 is mapped to IN-01, CN-03, and AC-01, but its described work only retains identity-resolution source changes and exact/collision regression tests. It does not validate explicit host parsing, dispatch behavior, or wrapper JSON handling, so this mapping is implausible and falsely claims coverage of the hook contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8e6b9f91457ca6181397dd7c2687031b465045489559dcfa35b8b2d85af10624",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T10:53:29Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/task-contract.json",
+              "line": 50,
+              "message": "T009 の CLI catalogue attribution が `entry_key: HookExecution` になっていますが、現在の CLI-local execution wrapper は `CliHookExecution` です。存在しない CLI catalogue entry を帰属しており、T009 の最終形との attribution が不一致です。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 105,
+              "message": "T009 の説明が CLI 側の対象を `HookExecution` と記載していますが、現在の canonical symbol は `CliHookExecution` です。誤った symbol 名では実装対象を正しく特定できません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a5605f872f1183d53954cccd67a36fe72cba5015847c91be910e95e0fd04c181",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T11:01:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93991ca263c229ead24c07a54fa2cf515199eab65a2383acc02d798636b025d1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T11:10:09Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 96,
+              "message": "T008 is still `todo` but bundles two independently verifiable behavior units: selected-host input compatibility and envelope normalization (`IN-01`, `IN-03`, `IN-04`, `AC-01`, `AC-03`, `AC-04`, `AC-06`), and `HookExecution` result/advisory classification (`CN-04`, `AC-05`). Split these into dependency-ordered tasks with focused tests, then repartition coverage, contract ownership, estimates, and batch membership.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 105,
+              "message": "T009 is still `todo` but combines an independently testable input-side unit (`HookCommand`, CLI parsing, and `From<HookCommand> for HookInput`, primarily `IN-01`/`CN-01`/`AC-01`) with an output-side execution unit (`CliHookExecution`, `HookExecutionDisposition`, `execute_inner`, and main telemetry, `CN-04`/`AC-05`). Split the ingress and execution/emission units before implementation and redistribute their catalogue attributions, coverage, estimates, dependencies, and batch placement.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/impl-plan.json",
+              "line": 115,
+              "message": "T010 is still `todo` but bundles distinct validation units: shipped provider-connection argv/advisory execution in `hook_connections.rs` (`AC-02`, `AC-05`, `AC-07`), direct host-option parser/rejection coverage in `hook_dispatch.rs` (`AC-01`), and cross-host skill-compliance result parity (`AC-08`). Each can be verified independently; split them into focused validation tasks and repartition coverage, estimates, dependencies, and B002 membership.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:93991ca263c229ead24c07a54fa2cf515199eab65a2383acc02d798636b025d1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T11:16:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:292243ea760f4df9a2650a1c686e0feeca1dbe90fcfaee1bf4dc28b9e4696b88",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T11:19:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:292243ea760f4df9a2650a1c686e0feeca1dbe90fcfaee1bf4dc28b9e4696b88",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:09:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ccf5dddfd6bb46bc680291fdf9835b25b39e67a03f5b55c2e06d90ca473dd93",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:45:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ccf5dddfd6bb46bc680291fdf9835b25b39e67a03f5b55c2e06d90ca473dd93",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T15:18:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ccf5dddfd6bb46bc680291fdf9835b25b39e67a03f5b55c2e06d90ca473dd93",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T15:19:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ccf5dddfd6bb46bc680291fdf9835b25b39e67a03f5b55c2e06d90ca473dd93",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -139,6 +623,65 @@
           "hash": "rvw1:sha256:73403cb969e04f1b13be537ad3c3b3d05deb21c2cea2953d79f42f16224bc733",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T13:22:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:874602a51fd9eb3ace69cd38bbb227dab06e85875dd756be7ccb114185752f35",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T13:29:07Z",
+          "findings": [
+            {
+              "category": "external-owner identity / canonical generic alias",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder/identity_index.rs",
+              "line": 197,
+              "message": "`impl_generics` を持つ external owner の rustdoc-canonical・generic-stripped alias が登録されていません。例えば `for_type = \"std::vec::Vec<T>\"`（`T` は impl generic）はここで canonical `alloc::vec::Vec<T>`、raw `std::vec::Vec<T>`、raw の全 suffix を落とした `std::vec::Vec`、`Vec` だけを登録しますが、signal evaluator は impl parameter を除去して `alloc::vec::Vec` を report owner として出力します。この qualified label は short fallback されないため exact catalogue key に戻らず、namespace-less signal が `alloc::vec::Vec` として永続化され、task-contract の `std::vec::Vec<T>` に帰属できません。追加テストの concrete `i32` はこの経路を通りません。canonicalized owner に evaluator と同じ impl-parameter stripping を適用した aliasを登録し、`impl<T>`（可能なら generic と concrete argument の混在）で回帰テストしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:874602a51fd9eb3ace69cd38bbb227dab06e85875dd756be7ccb114185752f35",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T13:49:25Z",
+          "findings": [
+            {
+              "category": "external-owner identity / generic normalization",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder/identity_index.rs",
+              "line": 198,
+              "message": "追加された canonical suffix alias は generic 引数をすべて切り捨てるため、signal evaluator が行う「impl parameter だけを除去する」正規化とは一致しません。例えば有効な `impl<K> LocalTrait for std::collections::HashMap<K, String>` では、catalogue canonical は `...HashMap<K, alloc::string::String>`、この index の alias はそれと bare `...HashMap` だけですが、report owner は `...HashMap<alloc::string::String>` になります。その qualified label は short fallback されず exact `for_type` key に戻らないため、signal identity と task-contract identity が再び分離します。const generic も evaluator 側では `_` に置換されるため同様です。impl parameter と concrete argument が混在する canonical ownerを evaluator と同じ構造的規則で alias 化し、そのケースの回帰テストを追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f9db752f6157598f0055fe58d962e0c55c5ea4af74853c91e15dfaa51a73b9d5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T14:16:10Z",
+          "findings": [
+            {
+              "category": "test correctness / unsupported generic kind",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 1047,
+              "message": "このテストの `N` は const parameter として表現されていません。`TraitImplDeclV2::impl_generics` の `MethodGenericParam` は type parameter 専用で、`syn` も generic argument の bare identifier `N` を `GenericArgument::Type` として解析します。そのため共有 normalization は `Type::Generic(\"N\")` を引数ごと除去し、alias は `external::Array<u8>` になります。期待している `external::Array<u8, _>` は登録されず、line 1052 の assertion が必ず失敗します。未対応の const generic ケースをこの型で擬装せず、テストを supported type-generic contract に合わせるか、const support が必要なら parameter kind を保持する schema から実装してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0807a5fda769d7bb729fe2e0f844fc1f40477b52d9d60110fb98bb775a3bd335",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T14:24:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:34637cd9147191f2b351a5cee7d3dbcd61c39fa37c9373fd4d6aa8f55d55650b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -155,6 +698,144 @@
           "at": "2026-09-05T08:09:34Z",
           "findings": [],
           "hash": "rvw1:sha256:05aa5210ff95e19452f0dc1e88b080561c4b083e1c995f7d46af4ee842027743",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T04:45:10Z",
+          "findings": [
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 347,
+              "message": "The CliHookHost IN-01 binding overclaims `test_execute_agent_hook_without_host_returns_exit_2`: the test only constructs `host: None` and never exercises CliHookHost or its conversion. Keep only evidence that actually covers the edge.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 438,
+              "message": "The HookCommand IN-02 binding overclaims `test_cli_hook_host_converts_exhaustively_to_driver_host`: this test exercises CliHookHost-to-HookHost conversion and does not construct or dispatch a HookCommand. Remove it from this edge.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:101bbeef1a782a6177258db4c024876203037e73ffa56239f491450016c04f0d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T04:48:52Z",
+          "findings": [
+            {
+              "category": "out-of-scope-gate",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 333,
+              "message": "The bindings themselves now identify 15 real plain-Rust tests with edge-local coverage, but the current test-obligation gate remains blocked by frozen-verdict TestChanged drift for CliHookHost IN-01 and HookCommand IN-02. This requires out-of-scope obligation evaluation/cache repair; do not modify this bindings file to address it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:23a93b78c4ef19d1c0c17907a0a26d908c50d85c583dacc322a457784f81708b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T06:09:25Z",
+          "findings": [
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 347,
+              "message": "The CliHookHost IN-01 binding still overclaims `test_execute_agent_hook_without_host_returns_exit_2` and `test_hook_dispatch_invalid_host_returns_exit_2`: both exercise absence/invalidity before a CliHookHost value is constructed and do not cover the enum's IN-01 behavior. Remove these tests from this edge; retain them only on the HookCommand/constraint edges where their assertions apply.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:6975d7d250ae89391d41bdac0388a1518f2c019723823fa85b5db3e5317fc468",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T06:12:01Z",
+          "findings": [
+            {
+              "category": "out-of-scope-gate",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 333,
+              "message": "The 15 bindings and referenced tests are present and edge-local, but the current read-only `test-obligation check` still fails with TestChanged frozen-verdict drift for CliHookHost IN-01. This requires out-of-scope obligation evaluation/cache repair; do not edit verdict caches or alter this bindings file to address it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dab993306e67f62e6aaadf9075a94f4f389183c7aa0d0c639ad4d745ef057f4c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T06:53:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3d438caa276a154fad2ab42af993209cd4b49d958011bdd6c1b19fe8d209c875",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T14:45:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ffcb00ac928b3c30a8af890bae98b1a73c032f1b39eda18d81d851e4665f6f4d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T14:53:56Z",
+          "findings": [
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 32,
+              "message": "The HookHost/IN-01 binding overclaims five CLI tests: `test_dispatch_invalid_host_value_is_rejected_by_clap`, `test_dispatch_hooks_path_setup_parses`, `test_dispatch_agent_host_parses_as_optional_clap_field`, `test_dispatch_git_pre_push_with_remote_args_parses`, and `test_execute_agent_hook_without_host_returns_exit_2`. The parsing tests stop at CliHookHost, while the Git/missing-host cases carry no HookHost value; none exercises the driver HookHost entry. Remove them from this edge.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 209,
+              "message": "The HookInput/IN-03 binding overclaims `test_hook_driver_git_dispatch_preserves_argv_and_allows`: it uses `host: None` and the Git process-hook path, so it never selects Grok or exercises Grok envelope normalization. Remove it from this edge.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 241,
+              "message": "The HookInput/IN-04 binding overclaims `test_hook_driver_git_dispatch_preserves_argv_and_allows` and `test_hook_input_is_raw_record_with_optional_host_and_ordered_git_argv`. Both use a hostless Git input and therefore do not exercise the Claude/Codex snake-case contract promised by IN-04. Remove them from this edge.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 278,
+              "message": "The HookInput/CN-02 binding overclaims `test_hook_driver_git_dispatch_preserves_argv_and_allows`: the hostless Git path does not test selected-host parsing, fallback rejection, or Grok alias handling. Remove it from this edge.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 477,
+              "message": "The CliHookHost/CN-03 binding overclaims `test_hook_command_converts_to_driver_input_without_cli_policy`: that test constructs `host: None` and never exercises CliHookHost or its conversion. Keep only evidence that actually covers the host boundary.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-binding",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/test-bindings.json",
+              "line": 509,
+              "message": "The CliHookName/IN-01 binding overclaims `test_dispatch_invalid_host_value_is_rejected_by_clap`: parsing fails on the invalid host option without producing or asserting any CliHookName value. Retain this test on the HookCommand edge, where its assertion applies, but remove it here.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:ffcb00ac928b3c30a8af890bae98b1a73c032f1b39eda18d81d851e4665f6f4d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-06T15:21:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:da5efd502cc88573706b2772b32a6fd5b63706bc19258a303350c2233848b280",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -328,6 +1009,108 @@
           "at": "2026-09-05T12:35:23Z",
           "findings": [],
           "hash": "rvw1:sha256:c313d3204ed2785bda4ef2628505b2d5a80bde0ac59367a5d51d76d9ba5f28db",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T05:08:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97d635501639181831424e3fcf3ebc1e57a1615da43b540d2f8ac3a3e43c5dd5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T05:14:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97d635501639181831424e3fcf3ebc1e57a1615da43b540d2f8ac3a3e43c5dd5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T09:00:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4a1e8b0043090469a7f5952029f3d620e71f5b8b480f9e395693d1f1ef1e12b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T09:06:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4a1e8b0043090469a7f5952029f3d620e71f5b8b480f9e395693d1f1ef1e12b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T10:48:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:782917966ccc3dba701472460d3927446c31c86d3e00f906cc1695ef1593c9a2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T10:52:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:782917966ccc3dba701472460d3927446c31c86d3e00f906cc1695ef1593c9a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:08:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:782917966ccc3dba701472460d3927446c31c86d3e00f906cc1695ef1593c9a2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:45:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:782917966ccc3dba701472460d3927446c31c86d3e00f906cc1695ef1593c9a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T15:08:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b906c0aba45839d72581234592265bdb2be7667ffba1553bcf0e0cd1f4fe634c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T15:12:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b906c0aba45839d72581234592265bdb2be7667ffba1553bcf0e0cd1f4fe634c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-09-06T06:51:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:410912745a27281368c282ab7585ee0cce3c2fb434fe72f92f8b94002029abcb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:11:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:410912745a27281368c282ab7585ee0cce3c2fb434fe72f92f8b94002029abcb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:33:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:410912745a27281368c282ab7585ee0cce3c2fb434fe72f92f8b94002029abcb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-06T12:52:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:410912745a27281368c282ab7585ee0cce3c2fb434fe72f92f8b94002029abcb",
           "type": "final",
           "verdict": "zero_findings"
         }

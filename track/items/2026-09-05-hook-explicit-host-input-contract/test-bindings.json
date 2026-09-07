@@ -1,4 +1,459 @@
 {
   "track_id": "2026-09-05-hook-explicit-host-input-contract",
-  "records": []
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "HookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_cli_hook_host_converts_exhaustively_to_driver_host"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "HookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_search_replace_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_unknown_and_invalid_values"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_missing_required_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "HookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_codex_apply_patch_remains_snake_case"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "HookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_uses_only_the_selected_host_contract"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "HookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_uses_only_the_selected_host_contract"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_git_dispatch_preserves_argv_and_allows"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_git_argv_on_agent_hook"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_host_on_git_process_hook"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_missing_agent_host_is_input_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_search_replace_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_unknown_and_invalid_values"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_missing_required_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_codex_apply_patch_remains_snake_case"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_claude_and_codex_share_pretool_use_normalization_and_guard_behavior"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_uses_only_the_selected_host_contract"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_search_replace_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_input_is_raw_record_with_optional_host_and_ordered_git_argv"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_git_dispatch_preserves_argv_and_allows"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_git_argv_on_agent_hook"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_host_on_git_process_hook"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CliHookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_all_cli_values"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CliHookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_all_cli_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_agent_hook_without_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_invalid_host_value_is_rejected_by_clap"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_hooks_path_setup_parses"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_git_pre_push_with_remote_args_parses"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_all_cli_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_git_pre_push_with_remote_args_parses"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CliHookHost",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_cli_hook_host_converts_exhaustively_to_driver_host"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli::commands::hook::CliHookName",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_hook_command_converts_to_driver_input_without_cli_policy"
+        }
+      ]
+    }
+  ]
 }

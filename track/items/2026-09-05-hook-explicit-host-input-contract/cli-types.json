@@ -1,6 +1,85 @@
 {
   "crate_name": "cli",
-  "functions": {},
+  "functions": {
+    "cli::commands::hook::execute_inner": {
+      "action": "modify",
+      "docs": "Typed hook-command execution entrypoint.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "cmd",
+          "ty": "HookCommand"
+        }
+      ],
+      "returns": "Result<CliHookExecution, CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli::is_advisory_hook_command": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli::is_hook_block_outcome": {
+      "action": "add",
+      "docs": "Typed hook-block disposition predicate.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "disposition",
+          "ty": "HookExecutionDisposition"
+        }
+      ],
+      "returns": "bool",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    }
+  },
   "layer": "cli",
   "schema_version": 5,
   "trait_impls": [
@@ -54,10 +133,158 @@
     {
       "for_type": "CliHookHost",
       "trait_ref": "clap_builder::derive::ValueEnum"
+    },
+    {
+      "for_type": "cli_driver::hook::HookHost",
+      "trait_ref": "core::convert::From<CliHookHost>"
+    },
+    {
+      "for_type": "cli_driver::hook::HookInput",
+      "trait_ref": "core::convert::From<HookCommand>"
+    },
+    {
+      "for_type": "CliHookExecution",
+      "trait_ref": "core::convert::From<cli_driver::hook::HookExecution>"
+    },
+    {
+      "for_type": "HookExecutionDisposition",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "HookExecutionDisposition",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "HookExecutionDisposition",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "HookExecutionDisposition",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "HookExecutionDisposition",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {},
   "types": {
+    "CliHookExecution": {
+      "action": "add",
+      "docs": "CLI emission sum type for hook execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InputError",
+            "payload": {
+              "fields": [
+                "cli_driver::render::CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "HookBlock",
+            "payload": {
+              "fields": [
+                "cli_driver::render::CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AdvisoryFired",
+            "payload": {
+              "fields": [
+                "cli_driver::render::CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Allow",
+            "payload": {
+              "fields": [
+                "cli_driver::render::CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "outcome",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&cli_driver::render::CommandOutcome",
+          "spec_refs": [
+            {
+              "anchor": "CN-04",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "disposition",
+          "params": [],
+          "receiver": "&self",
+          "returns": "HookExecutionDisposition",
+          "spec_refs": [
+            {
+              "anchor": "CN-04",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "commands::hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
     "CliHookHost": {
       "action": "add",
       "docs": "CLI-owned finite hook-host boundary value.",
@@ -98,12 +325,73 @@
         {
           "anchor": "CN-01",
           "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "HookExecutionDisposition": {
+      "action": "add",
+      "docs": "CLI telemetry classification for hook execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InputError",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "HookBlock",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AdvisoryFired",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Allow",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
         }
       ]
     },
     "cli::commands::hook::CliHookName": {
-      "action": "reference",
-      "docs": "Baseline-identical Clap hook selector carried for the modified dispatch DTO; hook_name returns its fixed wire spelling rather than accepting unconstrained text.",
+      "action": "modify",
+      "docs": "CLI-owned finite hook selector; hook_name returns its fixed wire spelling rather than unconstrained text.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -154,7 +442,16 @@
           "name": "hook_name",
           "params": [],
           "receiver": "self",
-          "returns": "&str"
+          "returns": "&'static str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "driver_name",
+          "params": [],
+          "receiver": "self",
+          "returns": "cli_driver::hook::HookName"
         }
       ],
       "module_path": "commands::hook",
@@ -163,7 +460,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "CN-03",
           "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
         }
       ]
@@ -179,11 +476,20 @@
             "name": "Dispatch",
             "payload": {
               "fields": [
-                "CliHookName",
-                "Option<CliHookHost>",
-                "Vec<String>"
+                {
+                  "name": "hook",
+                  "ty": "CliHookName"
+                },
+                {
+                  "name": "host",
+                  "ty": "Option<CliHookHost>"
+                },
+                {
+                  "name": "git_hook_args",
+                  "ty": "Vec<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           }
         ]
@@ -204,6 +510,10 @@
         },
         {
           "anchor": "CN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-03",
           "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
         }
       ]

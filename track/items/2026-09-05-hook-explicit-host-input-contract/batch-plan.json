@@ -61,12 +61,90 @@
           "test_lines": 240
         }
       ]
+    },
+    {
+      "task_id": "T008",
+      "scope_estimates": [
+        {
+          "scope": "cli_driver",
+          "production_lines": 35,
+          "test_lines": 50
+        }
+      ]
+    },
+    {
+      "task_id": "T009",
+      "scope_estimates": [
+        {
+          "scope": "cli_driver",
+          "production_lines": 45,
+          "test_lines": 60
+        }
+      ]
+    },
+    {
+      "task_id": "T010",
+      "scope_estimates": [
+        {
+          "scope": "cli",
+          "production_lines": 45,
+          "test_lines": 45
+        }
+      ]
+    },
+    {
+      "task_id": "T011",
+      "scope_estimates": [
+        {
+          "scope": "cli",
+          "production_lines": 70,
+          "test_lines": 100
+        }
+      ]
+    },
+    {
+      "task_id": "T012",
+      "scope_estimates": [
+        {
+          "scope": "cli",
+          "production_lines": 0,
+          "test_lines": 60
+        }
+      ]
+    },
+    {
+      "task_id": "T013",
+      "scope_estimates": [
+        {
+          "scope": "cli",
+          "production_lines": 0,
+          "test_lines": 50
+        }
+      ]
+    },
+    {
+      "task_id": "T014",
+      "scope_estimates": [
+        {
+          "scope": "cli",
+          "production_lines": 0,
+          "test_lines": 60
+        }
+      ]
     }
   ],
   "batches": [
     {
       "id": "B001",
       "task_ids": ["T001", "T002", "T003", "T004", "T005", "T006"]
+    },
+    {
+      "id": "B002",
+      "task_ids": ["T008", "T010", "T013"]
+    },
+    {
+      "id": "B003",
+      "task_ids": ["T009", "T011", "T012", "T014"]
     }
   ]
 }

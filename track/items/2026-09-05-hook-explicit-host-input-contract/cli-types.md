@@ -4,7 +4,16 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CliHookHost | enum | add | Claude, Codex, Grok | 🟡 | 🔵 |
-| cli::commands::hook::CliHookName | enum | reference | HooksPathSetup, BlockDirectGitOps, BlockTestFileDeletion, GitRefUpdate, GitPrePush, SkillCompliance | 🔵 | 🔵 |
-| cli::commands::hook::HookCommand | enum | modify | Dispatch | 🟡 | 🔵 |
+| CliHookExecution | enum | add | InputError, HookBlock, AdvisoryFired, Allow | 🔵 | 🔵 |
+| CliHookHost | enum | add | Claude, Codex, Grok | 🔵 | 🔵 |
+| HookExecutionDisposition | enum | add | InputError, HookBlock, AdvisoryFired, Allow | 🔵 | 🔵 |
+| cli::commands::hook::CliHookName | enum | modify | HooksPathSetup, BlockDirectGitOps, BlockTestFileDeletion, GitRefUpdate, GitPrePush, SkillCompliance | 🔵 | 🔵 |
+| cli::commands::hook::HookCommand | enum | modify | Dispatch | 🔵 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| cli::commands::hook::execute_inner | free_function | modify | fn(cmd: HookCommand) -> Result<CliHookExecution, CliError> | 🔵 | 🔵 |
+| cli::is_hook_block_outcome | free_function | add | fn(disposition: HookExecutionDisposition) -> bool | 🔵 | 🔵 |
 

@@ -95,15 +95,18 @@ pub fn resolve_catalogue_identity(
 /// that declares it.
 ///
 /// Type and trait entries are distinct identities even when their keys are the
-/// same. Function entries and deletion records for functions retain the
-/// report-label identity and therefore return `None`. A key declared in more
-/// than one live or deletion section, or in no section, is rejected instead of
-/// being assigned a namespace by convention.
+/// same. Function entries, deletion records for functions, and external
+/// top-level trait-impl owners retain the report-label identity and therefore
+/// return `None`. A key declared in more than one live, deletion, or distinct
+/// identity section, or in no section, is rejected instead of being assigned a
+/// namespace by convention.
 ///
 /// # Errors
 ///
 /// Returns [`CatalogueIdentityResolutionError::ClassificationFailed`] when the
-/// key has more than one matching live or deletion declaration. Returns
+/// key has more than one matching live, deletion, or identity declaration.
+/// Multiple trait-impl declarations for one external `for_type` are one
+/// report-label identity and are therefore counted once. Returns
 /// [`CatalogueIdentityResolutionError::UnresolvedIdentifier`] when it is not
 /// declared in any catalogue section.
 pub fn resolve_contract_entry_namespace(
@@ -123,6 +126,17 @@ pub fn resolve_contract_entry_namespace(
         .keys()
         .any(|function_path| function_path.to_string() == entry_key.as_str())
     {
+        matches.push(None);
+    }
+    // Schema-v5 top-level trait_impl entries for an external self type do not
+    // have a type declaration in the implementing catalogue. The signal
+    // producer persists that owner as the exact, namespace-less report label
+    // (`for_type`), so join it only on the exact spelling. Several impl blocks
+    // may share one external owner; they still produce one signal identity.
+    if document.trait_impls().iter().any(|trait_impl| {
+        trait_impl.for_type().as_str() == entry_key.as_str()
+            && is_external_trait_impl_owner(document, trait_impl.for_type())
+    }) {
         matches.push(None);
     }
     for deletion in document.deletions() {
@@ -147,6 +161,20 @@ pub fn resolve_contract_entry_namespace(
         [] => Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference)),
         [..] => Err(CatalogueIdentityResolutionError::ClassificationFailed { location: reference }),
     }
+}
+
+/// Returns whether a top-level trait-impl owner uses the schema's external
+/// self-type spelling rather than local/bare type notation.
+///
+/// Self-crate owners are bare names (or explicitly rooted through the current
+/// crate / relative prefixes). Any remaining crate-qualified spelling is an
+/// external owner and is persisted as a namespace-less signal label.
+fn is_external_trait_impl_owner(document: &CatalogueDocument, for_type: &TypeRef) -> bool {
+    let normalized = normalize_lookup(for_type.as_str(), document.crate_name());
+    let Some((root, _)) = normalized.split_once("::") else {
+        return false;
+    };
+    root != document.crate_name().as_str() && !matches!(root, "self" | "super")
 }
 
 /// Resolves a catalogue identity within one namespace.
@@ -603,6 +631,7 @@ mod tests {
     use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
     use crate::tddd::catalogue_v2::identifiers::{FunctionName, FunctionPath, ModulePath, TypeRef};
     use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
+    use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use crate::tddd::layer_id::LayerId;
 
     fn identity(crate_name: &str, module: &[&str], name: &str) -> FullyQualifiedItemPath {
@@ -941,6 +970,62 @@ mod tests {
             });
         }
         assert_contract_entry_classification_failed(&duplicate_deleted_types, &shared_key);
+    }
+
+    #[test]
+    fn test_resolve_contract_entry_namespace_resolves_exact_external_trait_impl_owner() {
+        let owner_key = CatalogueEntryKey::try_new("cli_driver::hook::HookHost".to_owned())
+            .expect("valid external owner key");
+        let mut document = CatalogueDocument::new(
+            5,
+            CrateName::new("cli").expect("valid catalogue crate"),
+            LayerId::try_new("cli").expect("valid layer id"),
+        );
+        document.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("core::convert::From<CliHookHost>").expect("valid trait reference"),
+            TypeRef::new(owner_key.as_str()).expect("valid external owner"),
+        ));
+        // Multiple impl blocks for the same external owner are still one
+        // namespace-less signal identity and must remain attributable.
+        document.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("core::fmt::Debug").expect("valid trait reference"),
+            TypeRef::new(owner_key.as_str()).expect("valid external owner"),
+        ));
+
+        assert_eq!(
+            resolve_contract_entry_namespace(&document, &owner_key),
+            Ok(None),
+            "the exact external for_type resolves to the namespace-less owner row"
+        );
+    }
+
+    #[test]
+    fn test_resolve_contract_entry_namespace_external_trait_impl_is_exact_and_collision_safe() {
+        let owner_key = CatalogueEntryKey::try_new("cli_driver::hook::HookHost".to_owned())
+            .expect("valid external owner key");
+        let mut document = CatalogueDocument::new(
+            5,
+            CrateName::new("cli").expect("valid catalogue crate"),
+            LayerId::try_new("cli").expect("valid layer id"),
+        );
+        document.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("core::convert::From<CliHookHost>").expect("valid trait reference"),
+            TypeRef::new(owner_key.as_str()).expect("valid external owner"),
+        ));
+
+        let wrong_owner_key = CatalogueEntryKey::try_new("cli_driver::hook::OtherHost".to_owned())
+            .expect("valid external owner key");
+        assert!(matches!(
+            resolve_contract_entry_namespace(&document, &wrong_owner_key),
+            Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference))
+                if reference.as_str() == wrong_owner_key.as_str()
+        ));
+
+        // A catalogue declaration under the same exact key is a distinct
+        // namespace-bearing identity, so the resolver must not guess which
+        // signal row a contract entry intended.
+        document.insert_type(owner_key.clone(), simple_type_entry());
+        assert_contract_entry_classification_failed(&document, &owner_key);
     }
 
     #[test]
