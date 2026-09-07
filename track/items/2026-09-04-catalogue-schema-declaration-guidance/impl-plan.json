@@ -40,16 +40,19 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "ba54804901b941896f4ec0f2e0c595733d025e62",
       "description": "Update .harness/reference/catalogue-schema.md with lifetime trait-implementation spelling, inherent-method placement, and single-trailing-private-tuple-field guidance; IN-01, CN-01, CN-02, AC-01, AC-02.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "ba54804901b941896f4ec0f2e0c595733d025e62",
       "description": "Update positional-key handling and add focused regression coverage in libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs; IN-03, IN-04, CN-03, CN-04, AC-04, AC-05, AC-06.",
       "id": "T002",
       "status": "done"
     },
     {
+      "commit_hash": "ba54804901b941896f4ec0f2e0c595733d025e62",
       "description": "Align the impl_generics DTO documentation in libs/domain/src/tddd/catalogue_v2/entries.rs and traits.rs with the supported lifetime declaration spelling; IN-02, CN-01, AC-03.",
       "id": "T003",
       "status": "done"
