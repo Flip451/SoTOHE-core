@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-09-05-hook-explicit-host-input-contract",
+  "entries": {
+    "T001": [],
+    "T002": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "HookHost"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::hook::HookName"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "cli",
+        "entry_key": "CliHookHost"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli_driver::hook::HookHost"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::hook::CliHookName"
+      }
+    ],
+    "T004": [],
+    "T005": [],
+    "T006": [],
+    "T008": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::hook::HookInput"
+      }
+    ],
+    "T009": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "HookExecution"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::hook::HookDriver"
+      }
+    ],
+    "T010": [
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::hook::HookCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli_driver::hook::HookInput"
+      }
+    ],
+    "T011": [
+      {
+        "layer": "cli",
+        "entry_key": "CliHookExecution"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "HookExecutionDisposition"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::hook::execute_inner"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::is_advisory_hook_command"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::is_hook_block_outcome"
+      }
+    ],
+    "T012": [],
+    "T013": [],
+    "T014": []
+  }
+}
