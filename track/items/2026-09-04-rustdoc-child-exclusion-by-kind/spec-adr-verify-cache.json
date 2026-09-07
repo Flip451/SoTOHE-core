@@ -1,0 +1,258 @@
+{
+  "entries": [
+    {
+      "claim_hash": "48199f03b9793b05da7eb091bc7e1643e479ccc1dc439eb882393db5b778026b",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "型シグナル評価器の構造照合が、通常の rustdoc child item を id の数値にかかわらず完全に参照し、`Id(0)` を持つ struct field を含む型を誤って 🟡 と判定しないようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`Id(0)` を struct field に割り当てた固定 fixture で、参照集合が全 field を含むことを回帰テストとして固定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d7188d8424a353305f1c0c80b119a06a3238cf6f229150b6d063a61aef3b23c4",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "構造照合の child-item traversal では、crate root を含む rustdoc の Module kind の item だけを除外し、id の特定値を除外条件にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "子アイテムの走査で除外するのは、`index` 上で kind が Module であるもの(crate root を含む)のみとする。id の特定値を番兵として扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ee46fcc6171246f4a909ff65d347628695ff6611f856e95d9a3fd684b8d31455",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "構造照合が作る実装側の参照集合に、`Id(0)` が割り当てられた struct field を含むすべての通常 field を含める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`Id(0)` を struct field に割り当てた固定 fixture で、参照集合が全 field を含むことを回帰テストとして固定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "856b0d87598e9c794f66f81c7aa76c75a470cd77d6a4508791e9c3bf17c2c285",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "rustdoc JSON の format_version ごとに child-item 除外規則を分岐させない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "rustdoc が id に与える意味は format ごとに変わりうるため、判定は rustdoc が明示する kind に委ねる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "50c95a47a4d755a30a62f1302a7374f13366f9f5c96c2fdba2378ccd32cebbb7",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "実装側の参照集合の欠落を隠すために、catalogue から該当 field の宣言を削除しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`Id(0)` を struct field に割り当てた固定 fixture で、参照集合が全 field を含むことを回帰テストとして固定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d70858ceb4bc5820fdd21ad77427c51b0c6345a23ce3bbbe485e1a98b1e4ee71",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "type-path placeholder として既存テストで使われる `Id(0)` の意味や、その child-item traversal と無関係な使用箇所を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "子アイテムの走査で除外するのは、`index` 上で kind が Module であるもの(crate root を含む)のみとする。id の特定値を番兵として扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4df64e3530ef21e3e9c384ce2dc5a36c8480805e27f874ec3dfeaea623e27a4e",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "child-item traversal の除外可否は rustdoc が明示する item kind から決め、id の数値へ特別な意味を与えない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "判定は rustdoc が明示する kind に委ねる。id の特定値を番兵として扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5308a3c9c767e6b5cc89d5ea4c24b91d322f4781e47b64066184a9ec968bf1bd",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "修正対象は型シグナル評価器の構造照合における child-item traversal に限定し、通常の field を失わせる fail-open な回避策を導入しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "子アイテムの走査で除外するのは、`index` 上で kind が Module であるもの(crate root を含む)のみとする。id の特定値を番兵として扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a7db8c6ca6b849d2b325a60b764e0e15421e3222a89da50c9e6d9006bc41d1f8",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "`Id(0)` を struct field に割り当てた固定 rustdoc fixture で、構造照合の実装側参照集合がその field を含む全 field を保持することを検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`Id(0)` を struct field に割り当てた固定 fixture で、参照集合が全 field を含むことを回帰テストとして固定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff416e0989c0602fe44f8dc6a01fe7563ae459fc2a8d6c6898bc676a7f9af959",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "child-item traversal が crate root を含む Module kind の item を除外しつつ、Module ではない `Id(0)` の item を除外しないことを検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "子アイテムの走査で除外するのは、`index` 上で kind が Module であるもの(crate root を含む)のみとする。id の特定値を番兵として扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "00bfc2419e916b3a5766ce979a11407194c7ba05e282cf7f329a59d459b0816c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue で field を省略せず、`Id(0)` field を持つ型の structural signal が実装側参照集合との完全な照合により 🔵 と評価され、誤って 🟡 にならないことを検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3608015282fd830bc8c8f9cd45e9223abdb537132640babc49ee57504877adf8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0049-rustdoc-child-exclusion-by-kind.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`Id(0)` を struct field に割り当てた固定 fixture で、参照集合が全 field を含むことを回帰テストとして固定する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

@@ -156,6 +156,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [hook 接続元の host 明示と入力契約の選択](2026-09-05-0600-hook-explicit-host-input-contract.md) | Proposed | 2026-09-05 |
 | [rustdoc の実装 fingerprint から workspace 直下の生成キャッシュを除外する](2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md) | Accepted | 2026-09-05 |
 | [カタログ型参照の静的検査と実装突合の責務を分離する](2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md) | Proposed | 2026-08-23 |
+| [rustdoc 子アイテムの除外は番兵 id ではなく kind で判定する](2026-09-04-0049-rustdoc-child-exclusion-by-kind.md) | Proposed | 2026-09-04 |
 
 ### トラック・ワークフロー
 
