@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "347a340efac61367f0254505cea2388615cdef00960af0c5e78441792e13f1f9",
+  "catalogue_declaration_hash": "b3cea026b1966221457a6feb25eb53e482b0d8a54f36e23d8c489139fd59a8e9",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "36410c7676457d8cb0a46319e820882d6bd17e27e6f3814d28779633b2a7fde0",
+      "entry_hash": "2e24c383e199f697c8f80e9e817fe40f57c480117d2a1ea3636240bed71b4646",
       "signal": "blue",
       "type_name": "CliHookExecution"
     },
@@ -13,7 +13,7 @@
       "type_name": "CliHookHost"
     },
     {
-      "entry_hash": "4372da95acd5668e0d0d9dce1976265c871f8d904825dc22b890da094bf20611",
+      "entry_hash": "b4fd8e21efaa47e074beb302f391a095273154b29ba592ab26313e2b4275de23",
       "signal": "blue",
       "type_name": "HookExecutionDisposition"
     },
@@ -28,12 +28,12 @@
       "type_name": "cli::commands::hook::HookCommand"
     },
     {
-      "entry_hash": "4585185c4b01ad3b1e6cb61cc4cb2da609fffcd66a9991b3bb21851765d040fb",
+      "entry_hash": "4178e3b597230a5437c3db328105b9d7181d33b48fc1fc49c5453b2c3f1a7d7e",
       "signal": "blue",
       "type_name": "cli::is_hook_block_outcome"
     },
     {
-      "entry_hash": "d6bcace45494695f2eb2cf1bfb480e9a54e77f654bc4aceaa5b8c003f38a0645",
+      "entry_hash": "788da1f2467a1a19936a2ac9740de0c7567ee71e8e0ef17df905cb01c5bb6d56",
       "signal": "blue",
       "type_name": "cli::commands::hook::execute_inner"
     },

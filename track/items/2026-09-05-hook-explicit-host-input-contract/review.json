@@ -193,6 +193,64 @@
           "hash": "rvw1:sha256:ff63a7d3b4f0fc47853aa91309d6ff675062c4cb77107c5acda2cf669dc4190e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:41:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:994edbde180382b8bee5b416611ccc2947544677d7580027fa0e4112269f8b0f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:52:01Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 439,
+              "message": "未宣言の前提への依存: このテストは実際の `HookCompositionRoot` を呼びますが、`SOTP_GUARDED_GIT` を隔離していません。この環境変数が周囲に存在すると、`git_hook_args` が誤って破棄されても GitRefUpdateHandler が `Allow` を返すため、`committed` の位置引数転送が壊れていてもテストが通ります。spec と environment declaration はテスト環境でこの変数が未設定であることを保証していません。`hook_dispatch.rs` の子プロセス helper と同様に変数を明示的に除去して実行するか、構造化された `HookInput` で転送を決定的に検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:994edbde180382b8bee5b416611ccc2947544677d7580027fa0e4112269f8b0f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T02:37:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:83731ad1ecb4f1eea277a1b45cb5e39a2684e434c3184fc50353a306f6ac7b7f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T02:44:35Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 445,
+              "message": "未宣言の前提への依存: `process_env_lock` は同じ mutex の利用者しか直列化しませんが、非 Windows 環境における `std::env::remove_var` / `set_var` の unsafe 契約は、マルチスレッドプロセスで他スレッドが環境を読み書きしないことを要求します。テストハーネス自体がマルチスレッドであり、環境宣言の concurrency model も TODO のため、この Safety コメントでは前提を立証できず Unix 上で未定義動作になり得ます。親プロセスの環境を変更せず、既存 integration helper と同様に子プロセスへ `Command::env_remove` を設定するか、注入した driver / 構造化 `HookInput` で転送を検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:83731ad1ecb4f1eea277a1b45cb5e39a2684e434c3184fc50353a306f6ac7b7f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T02:53:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e75342645f77935b466178d6d1ec5d8054818eabdcfcb1e08870b7eb987d415",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T02:58:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e75342645f77935b466178d6d1ec5d8054818eabdcfcb1e08870b7eb987d415",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -619,6 +677,20 @@
           "hash": "rvw1:sha256:eb575d39e4267d6202debb8e9167db65ad0ae6cfa003247362913b565e914089",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:38:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e4424f06c86e7a1c99ae69d9cf6eb9458f8ba7831685be8f724115d46cfb08c2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:43:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e4424f06c86e7a1c99ae69d9cf6eb9458f8ba7831685be8f724115d46cfb08c2",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -866,6 +938,20 @@
           "hash": "rvw1:sha256:3ac27a986ee5b71f24cf943f394c93b9411e7e5d7a565b8980efeb6eb6ec328e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:39:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aef4d6091f5d934cfca38a1be96fcddb618cd18eb68773d1c47fa2c00fb618b7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:45:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aef4d6091f5d934cfca38a1be96fcddb618cd18eb68773d1c47fa2c00fb618b7",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1107,6 +1193,76 @@
           "at": "2026-09-06T15:12:05Z",
           "findings": [],
           "hash": "rvw1:sha256:b906c0aba45839d72581234592265bdb2be7667ffba1553bcf0e0cd1f4fe634c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T00:31:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66470d2f49d7a1ab742457d726e5fc3bcb7081dc1a94ac233da1d0a7800e61ac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T00:37:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66470d2f49d7a1ab742457d726e5fc3bcb7081dc1a94ac233da1d0a7800e61ac",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:01:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:165a96bda0b12fb08cff82964d2c89705d25dcb4dbfbbfee6c804b1c0c5ba9ec",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:06:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:165a96bda0b12fb08cff82964d2c89705d25dcb4dbfbbfee6c804b1c0c5ba9ec",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:28:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:373da32c2379c52f8001dfbcda9e385eee2f03e051245723c3472c6e5e7c0afe",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T01:29:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:373da32c2379c52f8001dfbcda9e385eee2f03e051245723c3472c6e5e7c0afe",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T02:09:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fab24d6b683f39bd0f32bab4948d688b7d4f5dd0cbe243ff94a46e298832ec5d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T02:10:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fab24d6b683f39bd0f32bab4948d688b7d4f5dd0cbe243ff94a46e298832ec5d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T02:29:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e8bc1b685e9977c926c17f2efcd16ec687297b2ae6f868386dc813c99bc31131",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T02:30:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e8bc1b685e9977c926c17f2efcd16ec687297b2ae6f868386dc813c99bc31131",
           "type": "final",
           "verdict": "zero_findings"
         }

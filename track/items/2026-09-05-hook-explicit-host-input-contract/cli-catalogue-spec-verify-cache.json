@@ -1,79 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "36410c7676457d8cb0a46319e820882d6bd17e27e6f3814d28779633b2a7fde0",
-      "claim_origin": {
-        "data": {
-          "entry_key": "CliHookExecution",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "b0200fde5c568d25906a197a33bd8069edbff34c5dd87b9b3ab64d7a097082a2",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-01",
-          "section": "in_scope",
-          "text_label": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "36410c7676457d8cb0a46319e820882d6bd17e27e6f3814d28779633b2a7fde0",
-      "claim_origin": {
-        "data": {
-          "entry_key": "CliHookExecution",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "81b41eff3983b9aaf909b121e6b23fc0712695b9e05515cbb3391dff8f99245a",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-04",
-          "section": "constraint",
-          "text_label": "skill-compliance は各 host の既存 prompt 処理を再利用し、接続設定の || exit 0 を維持して、host 指定ミス・CLI 起動失敗・入力パース失敗が UserPromptSubmit を停止させない"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "skill-compliance は各 host の既存 prompt 処理を再利用し、接続設定の || exit 0 を維持して、host 指定ミス・CLI 起動失敗・入力パース失敗が UserPromptSubmit を停止させない",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "36410c7676457d8cb0a46319e820882d6bd17e27e6f3814d28779633b2a7fde0",
-      "claim_origin": {
-        "data": {
-          "entry_key": "CliHookExecution",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "e8e820f463a780abbbea465c84cb8f9479ace8435962a2892f951f40f7ab1de7",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-01",
-          "section": "acceptance_criteria",
-          "text_label": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "36410c7676457d8cb0a46319e820882d6bd17e27e6f3814d28779633b2a7fde0",
+      "claim_hash": "2e24c383e199f697c8f80e9e817fe40f57c480117d2a1ea3636240bed71b4646",
       "claim_origin": {
         "data": {
           "entry_key": "CliHookExecution",
@@ -169,31 +97,7 @@
       }
     },
     {
-      "claim_hash": "4372da95acd5668e0d0d9dce1976265c871f8d904825dc22b890da094bf20611",
-      "claim_origin": {
-        "data": {
-          "entry_key": "HookExecutionDisposition",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "b0200fde5c568d25906a197a33bd8069edbff34c5dd87b9b3ab64d7a097082a2",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-01",
-          "section": "in_scope",
-          "text_label": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "4372da95acd5668e0d0d9dce1976265c871f8d904825dc22b890da094bf20611",
+      "claim_hash": "b4fd8e21efaa47e074beb302f391a095273154b29ba592ab26313e2b4275de23",
       "claim_origin": {
         "data": {
           "entry_key": "HookExecutionDisposition",
@@ -212,36 +116,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "skill-compliance は各 host の既存 prompt 処理を再利用し、接続設定の || exit 0 を維持して、host 指定ミス・CLI 起動失敗・入力パース失敗が UserPromptSubmit を停止させない",
+        "citation": "host 指定ミス・CLI 起動失敗・入力パース失敗が UserPromptSubmit を停止させない",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "4372da95acd5668e0d0d9dce1976265c871f8d904825dc22b890da094bf20611",
-      "claim_origin": {
-        "data": {
-          "entry_key": "HookExecutionDisposition",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "e8e820f463a780abbbea465c84cb8f9479ace8435962a2892f951f40f7ab1de7",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-01",
-          "section": "acceptance_criteria",
-          "text_label": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "4372da95acd5668e0d0d9dce1976265c871f8d904825dc22b890da094bf20611",
+      "claim_hash": "b4fd8e21efaa47e074beb302f391a095273154b29ba592ab26313e2b4275de23",
       "claim_origin": {
         "data": {
           "entry_key": "HookExecutionDisposition",
@@ -385,7 +265,7 @@
       }
     },
     {
-      "claim_hash": "4585185c4b01ad3b1e6cb61cc4cb2da609fffcd66a9991b3bb21851765d040fb",
+      "claim_hash": "4178e3b597230a5437c3db328105b9d7181d33b48fc1fc49c5453b2c3f1a7d7e",
       "claim_origin": {
         "data": {
           "entry_key": "cli::is_hook_block_outcome",
@@ -409,31 +289,7 @@
       }
     },
     {
-      "claim_hash": "4585185c4b01ad3b1e6cb61cc4cb2da609fffcd66a9991b3bb21851765d040fb",
-      "claim_origin": {
-        "data": {
-          "entry_key": "cli::is_hook_block_outcome",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "e8e820f463a780abbbea465c84cb8f9479ace8435962a2892f951f40f7ab1de7",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-01",
-          "section": "acceptance_criteria",
-          "text_label": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "4585185c4b01ad3b1e6cb61cc4cb2da609fffcd66a9991b3bb21851765d040fb",
+      "claim_hash": "4178e3b597230a5437c3db328105b9d7181d33b48fc1fc49c5453b2c3f1a7d7e",
       "claim_origin": {
         "data": {
           "entry_key": "cli::is_hook_block_outcome",
@@ -457,31 +313,7 @@
       }
     },
     {
-      "claim_hash": "d6bcace45494695f2eb2cf1bfb480e9a54e77f654bc4aceaa5b8c003f38a0645",
-      "claim_origin": {
-        "data": {
-          "entry_key": "cli::commands::hook::execute_inner",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "b0200fde5c568d25906a197a33bd8069edbff34c5dd87b9b3ab64d7a097082a2",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-01",
-          "section": "in_scope",
-          "text_label": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "agent hook の PreToolUse および UserPromptSubmit dispatch で --host claude|codex|grok を必須にし、未指定または不正な値を CLI 入力エラー（終了コード 2）として扱う。Git process hook は従来の位置引数経路を維持し、--host との組み合わせを拒否する",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "d6bcace45494695f2eb2cf1bfb480e9a54e77f654bc4aceaa5b8c003f38a0645",
+      "claim_hash": "788da1f2467a1a19936a2ac9740de0c7567ee71e8e0ef17df905cb01c5bb6d56",
       "claim_origin": {
         "data": {
           "entry_key": "cli::commands::hook::execute_inner",
@@ -500,79 +332,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "入力契約の解釈は Rust の入力境界に集約し、wrapper は JSON を加工せず、正規化後の共通ハンドラーと既存ガードポリシーを変更しない",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "d6bcace45494695f2eb2cf1bfb480e9a54e77f654bc4aceaa5b8c003f38a0645",
-      "claim_origin": {
-        "data": {
-          "entry_key": "cli::commands::hook::execute_inner",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "81b41eff3983b9aaf909b121e6b23fc0712695b9e05515cbb3391dff8f99245a",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-04",
-          "section": "constraint",
-          "text_label": "skill-compliance は各 host の既存 prompt 処理を再利用し、接続設定の || exit 0 を維持して、host 指定ミス・CLI 起動失敗・入力パース失敗が UserPromptSubmit を停止させない"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "skill-compliance は各 host の既存 prompt 処理を再利用し、接続設定の || exit 0 を維持して、host 指定ミス・CLI 起動失敗・入力パース失敗が UserPromptSubmit を停止させない",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "d6bcace45494695f2eb2cf1bfb480e9a54e77f654bc4aceaa5b8c003f38a0645",
-      "claim_origin": {
-        "data": {
-          "entry_key": "cli::commands::hook::execute_inner",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "e8e820f463a780abbbea465c84cb8f9479ace8435962a2892f951f40f7ab1de7",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-01",
-          "section": "acceptance_criteria",
-          "text_label": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "agent PreToolUse と UserPromptSubmit の direct hook dispatch は claude、codex、または grok の --host を要求し、未指定・不正値では終了コード 2 を返す。Git process hook に --host を組み合わせた呼び出しは拒否される",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "d6bcace45494695f2eb2cf1bfb480e9a54e77f654bc4aceaa5b8c003f38a0645",
-      "claim_origin": {
-        "data": {
-          "entry_key": "cli::commands::hook::execute_inner",
-          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c0319b12f75855b7b9ec01cb6c98aceeb5c136bc885c9a39ae20062087cba81c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-05",
-          "section": "acceptance_criteria",
-          "text_label": "skill-compliance の入力パース失敗、host 指定ミス、または CLI 起動失敗は接続設定で advisory として吸収され、UserPromptSubmit をブロックしない"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "skill-compliance の入力パース失敗、host 指定ミス、または CLI 起動失敗は接続設定で advisory として吸収され、UserPromptSubmit をブロックしない",
+        "citation": "入力契約の解釈は Rust の入力境界に集約し",
         "kind": "pass"
       }
     },

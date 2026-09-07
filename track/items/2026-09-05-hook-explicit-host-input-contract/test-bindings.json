@@ -353,6 +353,11 @@
         {
           "layer": "cli",
           "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_without_host_preserves_positional_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
           "test_name": "test_dispatch_invalid_host_value_is_rejected_by_clap"
         },
         {
@@ -471,6 +476,79 @@
           "test_name": "test_hook_command_converts_to_driver_input_without_cli_policy"
         }
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::is_hook_block_outcome",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_hook_telemetry_uses_typed_dispositions"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::execute_inner",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_agent_hook_without_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_without_host_preserves_positional_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_block_direct_git_ops_with_extra_args_returns_exit_2"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "HookExecution", "anchor_id": {"file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json", "element_id": "CN-03"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::hook::tests", "test_name": "test_hook_driver_claude_and_codex_share_pretool_use_normalization_and_guard_behavior"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "cli_driver::hook::HookDriver", "anchor_id": {"file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json", "element_id": "CN-03"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::hook::tests", "test_name": "test_hook_driver_claude_and_codex_share_pretool_use_normalization_and_guard_behavior"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CliHookExecution", "anchor_id": {"file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json", "element_id": "AC-05"}},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::hook::tests", "test_name": "test_cli_hook_execution_preserves_driver_dispositions"},
+        {"layer": "cli", "module_path": "cli::tests", "test_name": "test_hook_telemetry_uses_typed_dispositions"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "HookExecutionDisposition", "anchor_id": {"file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json", "element_id": "CN-04"}},
+      "tests": [{"layer": "cli", "module_path": "cli::tests", "test_name": "test_hook_telemetry_uses_typed_dispositions"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "HookExecutionDisposition", "anchor_id": {"file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json", "element_id": "AC-05"}},
+      "tests": [{"layer": "cli", "module_path": "cli::tests", "test_name": "test_hook_telemetry_uses_typed_dispositions"}]
     }
   ]
 }

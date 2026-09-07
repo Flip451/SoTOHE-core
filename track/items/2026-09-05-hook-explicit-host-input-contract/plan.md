@@ -7,7 +7,7 @@ GO-01 -> T002, T003, T006, T008, T009, T010, T011, T013.
 GO-02 -> T004, T005, T006, T009, T011, T012, T014.
 GO-03 -> T001.
 
-## Tasks (9/13 resolved)
+## Tasks (13/13 resolved)
 
 ### implementation — Typed host boundary and private cache correction
 
@@ -29,10 +29,10 @@ GO-03 -> T001.
 
 > Execute T008 through T014 in declared dependency order. GO-01, GO-02.
 
-- [x] **T008**: apps/cli-driver/src/hook.rs::HookInput and HookDriver::handle: implement selected-host input compatibility, envelope normalization, and focused tests. IN-01, IN-03, IN-04, OS-01, OS-02, CN-02, CN-03, AC-01, AC-03, AC-04, AC-06.
-- [ ] **T009**: apps/cli-driver/src/hook.rs::HookExecution and HookDriver::handle: implement execution-result and advisory classification with focused tests. IN-01, CN-03, CN-04, AC-01, AC-05.
-- [x] **T010**: apps/cli/src/commands/hook.rs::HookCommand and From<HookCommand> for cli_driver::hook::HookInput: implement CLI ingress parsing and mechanical conversion with focused tests. IN-01, OS-01, OS-02, CN-01, CN-02, AC-01.
-- [ ] **T011**: apps/cli/src/commands/hook.rs::CliHookExecution, HookExecutionDisposition, execute_inner, and is_hook_block_outcome plus apps/cli/src/main.rs telemetry: implement typed execution/emission and remove is_advisory_hook_command with focused tests. IN-01, CN-03, CN-04, AC-01, AC-05.
-- [ ] **T012**: apps/cli/tests/hook_connections.rs: execute shipped provider-connection argv and advisory branches. IN-02, IN-05, CN-01, CN-04, CN-05, AC-02, AC-05, AC-07.
-- [x] **T013**: apps/cli/tests/hook_dispatch.rs: add direct host-option parser and rejection validation with CARGO_BIN_EXE. IN-01, CN-01, AC-01.
-- [ ] **T014**: apps/cli/tests/hook_dispatch.rs: add cross-host skill-compliance result-parity validation. CN-04, AC-05, AC-08.
+- [x] **T008**: apps/cli-driver/src/hook.rs::HookInput and HookDriver::handle: implement selected-host input compatibility, envelope normalization, and focused tests. IN-01, IN-03, IN-04, OS-01, OS-02, CN-02, CN-03, AC-01, AC-03, AC-04, AC-06. (`5defeb4405b54c3e5b12161935b703be6e00990d`)
+- [x] **T009**: apps/cli-driver/src/hook.rs::HookExecution and HookDriver::handle: implement execution-result and advisory classification with focused tests. IN-01, CN-03, CN-04, AC-01, AC-05.
+- [x] **T010**: apps/cli/src/commands/hook.rs::HookCommand and From<HookCommand> for cli_driver::hook::HookInput: implement CLI ingress parsing and mechanical conversion with focused tests. IN-01, OS-01, OS-02, CN-01, CN-02, AC-01. (`5defeb4405b54c3e5b12161935b703be6e00990d`)
+- [x] **T011**: apps/cli/src/commands/hook.rs::CliHookExecution, HookExecutionDisposition, execute_inner, and is_hook_block_outcome plus apps/cli/src/main.rs telemetry: implement typed execution/emission and remove is_advisory_hook_command with focused tests. IN-01, CN-03, CN-04, AC-01, AC-05.
+- [x] **T012**: apps/cli/tests/hook_connections.rs: execute shipped provider-connection argv and advisory branches. IN-02, IN-05, CN-01, CN-04, CN-05, AC-02, AC-05, AC-07.
+- [x] **T013**: apps/cli/tests/hook_dispatch.rs: add direct host-option parser and rejection validation with CARGO_BIN_EXE. IN-01, CN-01, AC-01. (`5defeb4405b54c3e5b12161935b703be6e00990d`)
+- [x] **T014**: apps/cli/tests/hook_dispatch.rs: add cross-host skill-compliance result-parity validation. CN-04, AC-05, AC-08.

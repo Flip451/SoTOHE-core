@@ -173,7 +173,8 @@ pub fn execute_inner(cmd: HookCommand) -> Result<CliHookExecution, crate::CliErr
 mod tests {
     use clap::Parser;
 
-    use cli_driver::hook::{HookHost, HookInput};
+    use cli_driver::hook::{HookExecution as DriverHookExecution, HookHost, HookInput};
+    use cli_driver::render::CommandOutcome;
 
     use super::{
         CliHookExecution, CliHookHost, CliHookName, HookCommand, HookExecutionDisposition,
@@ -183,6 +184,43 @@ mod tests {
     struct TestCli {
         #[command(subcommand)]
         cmd: HookCommand,
+    }
+
+    #[test]
+    fn test_cli_hook_execution_preserves_driver_dispositions() {
+        for (driver, expected, expected_stdout) in [
+            (
+                DriverHookExecution::InputError(CommandOutcome::success(Some(
+                    "input-error".to_owned(),
+                ))),
+                HookExecutionDisposition::InputError,
+                "input-error",
+            ),
+            (
+                DriverHookExecution::HookBlock(CommandOutcome::success(Some(
+                    "hook-block".to_owned(),
+                ))),
+                HookExecutionDisposition::HookBlock,
+                "hook-block",
+            ),
+            (
+                DriverHookExecution::AdvisoryFired(CommandOutcome::success(Some(
+                    "advisory".to_owned(),
+                ))),
+                HookExecutionDisposition::AdvisoryFired,
+                "advisory",
+            ),
+            (
+                DriverHookExecution::Allow(CommandOutcome::success(Some("allow".to_owned()))),
+                HookExecutionDisposition::Allow,
+                "allow",
+            ),
+        ] {
+            let execution = CliHookExecution::from(driver);
+            assert_eq!(execution.disposition(), expected);
+            assert_eq!(execution.outcome().stdout.as_deref(), Some(expected_stdout));
+            assert_eq!(execution.outcome().exit_code, 0);
+        }
     }
 
     #[test]
@@ -395,6 +433,36 @@ mod tests {
             execution.outcome().stderr.as_deref(),
             Some("error: git process hooks must not specify --host")
         );
+    }
+
+    #[test]
+    fn test_execute_git_hook_without_host_preserves_positional_path() {
+        const CHILD_MARKER: &str = "SOTP_TEST_HOOK_POSITIONAL_CHILD";
+        if std::env::var_os(CHILD_MARKER).is_none() {
+            let status = std::process::Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "commands::hook::tests::test_execute_git_hook_without_host_preserves_positional_path",
+                    "--nocapture",
+                ])
+                .env(CHILD_MARKER, "1")
+                .env_remove("SOTP_GUARDED_GIT")
+                .status()
+                .unwrap();
+            assert!(status.success());
+            return;
+        }
+
+        let execution = super::execute_inner(HookCommand::Dispatch {
+            hook: CliHookName::GitRefUpdate,
+            host: None,
+            git_hook_args: vec!["committed".to_owned()],
+        })
+        .unwrap();
+
+        assert!(matches!(&execution, CliHookExecution::Allow(_)));
+        assert_eq!(execution.outcome().exit_code, 0);
+        assert_eq!(execution.disposition(), HookExecutionDisposition::Allow);
     }
 
     #[test]

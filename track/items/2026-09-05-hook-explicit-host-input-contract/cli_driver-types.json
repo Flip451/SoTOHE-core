@@ -89,23 +89,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
           "anchor": "CN-03",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
-          "anchor": "CN-04",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
-          "anchor": "AC-05",
           "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
         }
       ]
@@ -206,23 +190,7 @@
           "returns": "HookExecution",
           "spec_refs": [
             {
-              "anchor": "IN-01",
-              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-            },
-            {
               "anchor": "CN-03",
-              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-            },
-            {
-              "anchor": "CN-04",
-              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-            },
-            {
-              "anchor": "AC-01",
-              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-            },
-            {
-              "anchor": "AC-05",
               "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
             }
           ]
@@ -234,23 +202,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
           "anchor": "CN-03",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
-          "anchor": "CN-04",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
-        },
-        {
-          "anchor": "AC-05",
           "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
         }
       ]
