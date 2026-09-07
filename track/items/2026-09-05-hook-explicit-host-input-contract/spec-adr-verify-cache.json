@@ -102,7 +102,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -125,7 +125,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -134,7 +134,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「除外規則の変更前に得た fingerprint や型シグナルを、変更後の規則で取得・検証した結果として流用しない。新しい規則で入力 identity を取得し直し」および「キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。」",
+        "citation": "除外規則の変更前に得た fingerprint や型シグナルを、変更後の規則で取得・検証した結果として流用しない。新しい規則で入力 identity を取得し直し、その identity に対して再利用可否を判定する。キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。",
         "kind": "pass"
       }
     },
@@ -309,7 +309,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -332,7 +332,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -470,7 +470,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -608,7 +608,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -631,7 +631,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -861,7 +861,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -884,7 +884,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -893,7 +893,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "除外規則の変更前に得た fingerprint や型シグナルを、変更後の規則で取得・検証した結果として流用しない。新しい規則で入力 identity を取得し直し、その identity に対して再利用可否を判定する。",
+        "citation": "「キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。」",
         "kind": "pass"
       }
     },
@@ -907,7 +907,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -930,7 +930,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -953,7 +953,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "ce7102a085a151b9711f6aeb0908fca3b0194b436392b7dbd03c7ba5d630ae5c",
+      "evidence_hash": "43ca0a0292c90cfa7118b7a62930647b0d55d28ae74f019692eb49d884526b9a",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -962,7 +962,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。…失敗した評価の旧結果への fallback は許さない。",
+        "citation": "キャッシュ以外の記録対象、たとえば Rust ソースや Cargo manifest・lockfile の内容が変われば、引き続き入力 identity に反映する。失敗した評価の旧結果への fallback は許さない。",
         "kind": "pass"
       }
     }
