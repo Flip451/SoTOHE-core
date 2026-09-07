@@ -1,0 +1,349 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "HookHost",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "HookHost",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "HookHost",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "HookHost",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "HookHost",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "HookName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "HookName",
+      "trait_ref": "core::clone::Clone"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "HookExecution": {
+      "action": "add",
+      "docs": "Hook-specific rendered execution classification.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InputError",
+            "payload": {
+              "fields": [
+                "CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InternalError",
+            "payload": {
+              "fields": [
+                "CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "HookBlock",
+            "payload": {
+              "fields": [
+                "CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AdvisoryFired",
+            "payload": {
+              "fields": [
+                "CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Allow",
+            "payload": {
+              "fields": [
+                "CommandOutcome"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "HookHost": {
+      "action": "add",
+      "docs": "Driver-boundary connection-host selector.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Claude",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Codex",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Grok",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::hook::HookDriver": {
+      "action": "modify",
+      "docs": "Hook primary-adapter boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hook_dispatch_service",
+              "ty": "std::sync::Arc<dyn usecase::hook_dispatch::HookDispatchService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "HookInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "HookExecution",
+          "spec_refs": [
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "hook",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::hook::HookInput": {
+      "action": "modify",
+      "docs": "Raw hook-driver boundary record; git_hook_args is opaque ordered process argv without a narrower domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "hook",
+              "ty": "HookName"
+            },
+            {
+              "name": "host",
+              "ty": "Option<HookHost>"
+            },
+            {
+              "name": "git_hook_args",
+              "ty": "Vec<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::hook::HookName": {
+      "action": "reference",
+      "docs": "Baseline-identical finite hook selector carried for the modified HookInput edge; hook_name returns its fixed wire spelling rather than accepting unconstrained text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "HooksPathSetup",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockDirectGitOps",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockTestFileDeletion",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitPrePush",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SkillCompliance",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "hook_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "accepts_git_hook_args",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ]
+    }
+  }
+}

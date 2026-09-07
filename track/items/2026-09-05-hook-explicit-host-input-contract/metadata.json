@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-09-05-hook-explicit-host-input-contract",
+  "title": "hook 接続元の host 明示と入力契約の選択",
+  "branch": "track/2026-09-05-hook-explicit-host-input-contract",
+  "created_at": "2026-09-05T06:01:47Z",
+  "updated_at": "2026-09-05T06:01:47Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

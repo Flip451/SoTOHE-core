@@ -343,9 +343,10 @@ fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
 /// Dispatch a `HookCommand` with telemetry instrumentation.
 ///
 /// Hooks are instrumented per AC-04 / OS-03:
-/// - PreToolUse block (exit code 2) → emit `TelemetryEvent::HookBlock`.
-/// - Advisory `skill-compliance` that produces a non-empty stdout injection →
-///   emit `TelemetryEvent::AdvisoryHookFired`.
+/// - A typed `HookBlock` result → emit `TelemetryEvent::HookBlock`.
+/// - A non-zero typed `InternalError` result → emit `TelemetryEvent::NonZeroExit`.
+/// - A typed `AdvisoryFired` result that produces a non-empty stdout injection
+///   → emit `TelemetryEvent::AdvisoryHookFired`.
 /// - All allow / pass-through paths emit NOTHING and have no file IO (OS-03 /
 ///   AC-06).
 ///
@@ -353,14 +354,11 @@ fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
 /// relative to CWD), consistent with the hook execution context.
 fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
     use cli_composition::telemetry_wiring::{
-        emit_advisory_hook_fired, emit_hook_block, resolve_telemetry_writer,
+        emit_advisory_hook_fired, emit_hook_block, emit_non_zero_exit, resolve_telemetry_writer,
     };
 
     // Capture the hook name before consuming the command.
     let hook_name = hook_command_hook_name(&cmd).to_owned();
-
-    // Classify: is this an advisory (UserPromptSubmit) hook?
-    let is_advisory = is_advisory_hook_command(&cmd);
 
     // Execute the hook via the existing dispatch path.
     let outcome_result = commands::hook::execute_inner(cmd);
@@ -371,16 +369,37 @@ fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
     // the two paths that actually emit events (block / advisory-fired) so that
     // allow-path and pass-through invocations incur zero I/O (OS-03 / AC-06).
     match &outcome_result {
-        Ok(outcome) => {
-            // Block verdict: exit code 2 for PreToolUse hooks.
-            let is_block = !is_advisory && outcome.exit_code == 2;
-
-            if is_block {
+        Ok(execution) => {
+            let outcome = execution.outcome();
+            if is_hook_block_outcome(execution.disposition()) {
                 let items_dir = std::path::PathBuf::from("track/items");
                 if let Some((ref w, ref track_id)) = resolve_telemetry_writer(&items_dir) {
                     emit_hook_block(w, track_id, &hook_name);
                 }
-            } else if is_advisory && outcome.stdout.is_some() {
+            } else if matches!(
+                execution.disposition(),
+                commands::hook::HookExecutionDisposition::InternalError
+            ) && outcome.exit_code != 0
+            {
+                // Preserve failure visibility without counting the internal
+                // error as an intentional hook block. Advisory
+                // UserPromptSubmit failures retain exit 0 and remain
+                // non-blocking.
+                let items_dir = std::path::PathBuf::from("track/items");
+                if let Some((ref w, ref track_id)) = resolve_telemetry_writer(&items_dir) {
+                    emit_non_zero_exit(
+                        w,
+                        track_id,
+                        &hook_name,
+                        i32::from(outcome.exit_code),
+                        outcome.stderr.as_deref().unwrap_or("internal hook error"),
+                    );
+                }
+            } else if matches!(
+                execution.disposition(),
+                commands::hook::HookExecutionDisposition::AdvisoryFired
+            ) && outcome.stdout.is_some()
+            {
                 // Advisory hook fired (non-empty context injection) — OS-03:
                 // only emit when advisory actually produced output.
                 let items_dir = std::path::PathBuf::from("track/items");
@@ -413,18 +432,16 @@ fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
     }
 }
 
+/// Returns whether a typed execution result is an intentional hook block.
+fn is_hook_block_outcome(disposition: commands::hook::HookExecutionDisposition) -> bool {
+    matches!(disposition, commands::hook::HookExecutionDisposition::HookBlock)
+}
+
 /// Returns the hook name string for the given `HookCommand` variant.
 fn hook_command_hook_name(cmd: &commands::hook::HookCommand) -> &'static str {
     match cmd {
         commands::hook::HookCommand::Dispatch { hook, .. } => hook.hook_name(),
     }
-}
-
-/// Returns `true` when the hook is an advisory (UserPromptSubmit / injection)
-/// hook rather than a PreToolUse guard.
-fn is_advisory_hook_command(cmd: &commands::hook::HookCommand) -> bool {
-    use commands::hook::{CliHookName, HookCommand};
-    matches!(cmd, HookCommand::Dispatch { hook: CliHookName::SkillCompliance, .. })
 }
 
 // ---------------------------------------------------------------------------
@@ -1421,14 +1438,15 @@ mod tests {
 
     // ── Hook telemetry wrapper paths ─────────────────────────────────────────
 
-    /// `sotp hook dispatch skill-compliance` routes through `execute_hook_with_telemetry`.
-    /// With empty stdin the advisory hook sees no prompt → no injection → exits 0.
-    /// Telemetry is silently skipped (not on a track branch in CI) — no panic.
     #[test]
-    fn test_hook_dispatch_skill_compliance_via_run_cli_exits_zero() {
-        let cli = Cli::try_parse_from(["sotp", "hook", "dispatch", "skill-compliance"]).unwrap();
-        let exit = dispatch_cli_test!(cli, |_cmd| ExitCode::FAILURE);
-        assert_eq!(exit, ExitCode::SUCCESS);
+    fn test_hook_telemetry_uses_typed_dispositions() {
+        use crate::commands::hook::HookExecutionDisposition;
+
+        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));
+        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));
+        assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));
+        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));
+        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::Allow));
     }
 
     // ── Verify telemetry wrapper paths ───────────────────────────────────────
