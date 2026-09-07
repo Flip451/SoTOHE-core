@@ -74,9 +74,12 @@ fn host_first_scaffold_parent(
     cargo_target_tmpdir: Option<PathBuf>,
     workspace_root: &Path,
     process_id: u32,
+    nextest_global_slot: Option<u64>,
 ) -> PathBuf {
+    let isolation_id = nextest_global_slot
+        .map_or_else(|| process_id.to_string(), |slot| format!("{process_id}-{slot}"));
     template_export_temp_parent(cargo_target_tmpdir, workspace_root)
-        .join(format!("consumer-scaffold-host-first-{process_id}"))
+        .join(format!("consumer-scaffold-host-first-{isolation_id}"))
 }
 
 fn git_predicate(workspace_root: &Path, args: &[&str]) -> bool {
@@ -204,8 +207,11 @@ fn copy_workspace_input_tree(
     if excluded_root.is_some_and(|root| source == root || source.starts_with(root)) {
         return;
     }
-    let metadata = fs::symlink_metadata(&source)
-        .unwrap_or_else(|error| panic!("cannot inspect {}: {error}", source.display()));
+    let metadata = match fs::symlink_metadata(&source) {
+        Ok(metadata) => metadata,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return,
+        Err(error) => panic!("cannot inspect {}: {error}", source.display()),
+    };
     if metadata.file_type().is_symlink() {
         panic!("workspace fixture source must not contain symlink {}", source.display());
     }
@@ -214,12 +220,16 @@ fn copy_workspace_input_tree(
         fs::create_dir_all(destination).unwrap_or_else(|error| {
             panic!("cannot create fixture directory {}: {error}", destination.display())
         });
-        let mut entries = fs::read_dir(&source)
-            .unwrap_or_else(|error| panic!("cannot read {}: {error}", source.display()))
-            .map(|entry| {
-                entry.unwrap_or_else(|error| panic!("cannot read {}: {error}", source.display()))
-            })
-            .collect::<Vec<_>>();
+        let mut entries = match fs::read_dir(&source) {
+            Ok(entries) => entries
+                .map(|entry| {
+                    entry
+                        .unwrap_or_else(|error| panic!("cannot read {}: {error}", source.display()))
+                })
+                .collect::<Vec<_>>(),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return,
+            Err(error) => panic!("cannot read {}: {error}", source.display()),
+        };
         entries.sort_by_key(std::fs::DirEntry::file_name);
         for entry in entries {
             let child = relative_source.join(entry.file_name());
@@ -274,6 +284,9 @@ fn exported_scaffold() -> PathBuf {
                 option_env!("CARGO_TARGET_TMPDIR").map(PathBuf::from),
                 &workspace_root,
                 std::process::id(),
+                std::env::var("NEXTEST_TEST_GLOBAL_SLOT")
+                    .ok()
+                    .and_then(|slot| slot.parse::<u64>().ok()),
             )
         })
         .clone();
@@ -402,8 +415,18 @@ fn test_host_first_scaffold_parent_is_process_isolated_under_target_tmp() {
     let configured = PathBuf::from("/cargo/target/tmp");
 
     assert_eq!(
-        host_first_scaffold_parent(Some(configured), Path::new("/workspace"), 4242),
+        host_first_scaffold_parent(Some(configured), Path::new("/workspace"), 4242, None),
         PathBuf::from("/cargo/target/tmp/consumer-scaffold-host-first-4242")
+    );
+
+    assert_eq!(
+        host_first_scaffold_parent(
+            Some(PathBuf::from("/cargo/target/tmp")),
+            Path::new("/workspace"),
+            4242,
+            Some(7),
+        ),
+        PathBuf::from("/cargo/target/tmp/consumer-scaffold-host-first-4242-7")
     );
 }
 

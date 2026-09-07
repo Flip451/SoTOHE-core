@@ -16,6 +16,357 @@
           "hash": "rvw1:sha256:8423757121cbb6275b50c1c74661517f99fce9a3cf3b8afb6aaee26de8c0ca1d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T11:51:45Z",
+          "findings": [
+            {
+              "category": "integration omission",
+              "file": "knowledge/adr/README.md",
+              "line": 156,
+              "message": "The ADR index omits `2026-09-05-0600-hook-explicit-host-input-contract.md`, even though the ADR file is present and the merge integration requires its incoming index row to be retained.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:ca58f7c712c7dd3397c31c4f856f0a3cea2cb2cd4041cba6cf9b14d86df6ac9b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T11:58:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1717a03a45fa979ca849847ad0ef6f804f73f44de7cf5553201dc0ae1ff36358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:05:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1717a03a45fa979ca849847ad0ef6f804f73f44de7cf5553201dc0ae1ff36358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:15:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1717a03a45fa979ca849847ad0ef6f804f73f44de7cf5553201dc0ae1ff36358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:16:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1717a03a45fa979ca849847ad0ef6f804f73f44de7cf5553201dc0ae1ff36358",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:32:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1717a03a45fa979ca849847ad0ef6f804f73f44de7cf5553201dc0ae1ff36358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:42:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1717a03a45fa979ca849847ad0ef6f804f73f44de7cf5553201dc0ae1ff36358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:45:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1717a03a45fa979ca849847ad0ef6f804f73f44de7cf5553201dc0ae1ff36358",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-09-07T12:00:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3f98414971b66af5c1a276cc86af05976d169a41dd74b75af7d0ab80f1d62fa5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:09:03Z",
+          "findings": [
+            {
+              "category": "integration behavior break",
+              "file": "apps/cli/tests/hook_dispatch.rs",
+              "line": 309,
+              "message": "This assertion is now guaranteed to fail against the current `HookDriver`: malformed `skill-compliance` input returns `HookExecution::Allow` with exit code 0 and a warning, while this integration test still requires exit code 2 for every host. Update the test to assert the non-blocking warning contract so the CLI/driver seam is consistent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3f98414971b66af5c1a276cc86af05976d169a41dd74b75af7d0ab80f1d62fa5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T12:13:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18660d94b3bf8028db2e768fd458ba94f2eb6366f011561473237780e4316ea0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:18:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18660d94b3bf8028db2e768fd458ba94f2eb6366f011561473237780e4316ea0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:26:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18660d94b3bf8028db2e768fd458ba94f2eb6366f011561473237780e4316ea0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:50:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18660d94b3bf8028db2e768fd458ba94f2eb6366f011561473237780e4316ea0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-07T11:56:34Z",
+          "findings": [
+            {
+              "category": "non-CommandOutcome return",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 356,
+              "message": "`HookDriver::handle` publicly returns `HookExecution` instead of `CommandOutcome`, violating the cli_driver adapter contract. Keep telemetry classification outside the driver or expose it separately while preserving the required rendered return type.",
+              "severity": "P1"
+            },
+            {
+              "category": "advisory behavior regression",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 422,
+              "message": "`skill-compliance` JSON parse failures are converted to `InputError` with exit code 2, so malformed advisory input can block `UserPromptSubmit`. D3 requires advisory parse failures to remain non-blocking; return an allow/warning outcome with exit code 0 for this path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:00e5dd4819e482c13c1e47706a592de302bd9748bc2641f6f86e240d4bb8a242",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T12:06:49Z",
+          "findings": [
+            {
+              "category": "non-CommandOutcome return",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 356,
+              "message": "`HookDriver::handle` publicly returns `HookExecution` instead of the required `CommandOutcome`. The driver should render directly to `CommandOutcome`; telemetry classification must be carried separately or derived outside this public driver method.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9f2cdee7fce55f7e944d43df83011916c5b3fc7b0e63c01e8adc78255dd9b830",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T12:17:06Z",
+          "findings": [
+            {
+              "category": "non-CommandOutcome return",
+              "file": "apps/cli-driver/src/hook.rs",
+              "line": 356,
+              "message": "`HookDriver::handle` publicly returns `HookExecution` instead of the required `CommandOutcome`. Keep telemetry/execution classification outside this public driver method, or expose it separately while preserving the driver’s rendered `CommandOutcome` return contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9f2cdee7fce55f7e944d43df83011916c5b3fc7b0e63c01e8adc78255dd9b830",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T12:40:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f2cdee7fce55f7e944d43df83011916c5b3fc7b0e63c01e8adc78255dd9b830",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:43:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f2cdee7fce55f7e944d43df83011916c5b3fc7b0e63c01e8adc78255dd9b830",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-09-07T11:53:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:02:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:07:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:22:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:24:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:25:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:30:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:32:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:34:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:38:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:42:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-09-07T11:56:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:14:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:17:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:49:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:50:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:51:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-07T11:52:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:706814e939ea2be666d402ec624ea5b058d4776c8e987d829105ab01c0fa29d9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:00:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:706814e939ea2be666d402ec624ea5b058d4776c8e987d829105ab01c0fa29d9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-09-07T12:00:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:410912745a27281368c282ab7585ee0cce3c2fb434fe72f92f8b94002029abcb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:08:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:410912745a27281368c282ab7585ee0cce3c2fb434fe72f92f8b94002029abcb",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }

@@ -8,17 +8,17 @@ if [ -z "$hook_id" ]; then
 fi
 
 if [ -n "${SOTP_CLI_BINARY:-}" ]; then
-  exec "$SOTP_CLI_BINARY" hook dispatch "$hook_id"
+  exec "$SOTP_CLI_BINARY" hook dispatch --host codex "$hook_id"
 fi
 
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 if [ -x "$repo_root/bin/sotp" ]; then
-  exec "$repo_root/bin/sotp" hook dispatch "$hook_id"
+  exec "$repo_root/bin/sotp" hook dispatch --host codex "$hook_id"
 fi
 
 if command -v sotp >/dev/null 2>&1; then
-  exec sotp hook dispatch "$hook_id"
+  exec sotp hook dispatch --host codex "$hook_id"
 fi
 
 echo "[SoTOHE Codex Hook] sotp CLI is not available. Build bin/sotp or set SOTP_CLI_BINARY." >&2
