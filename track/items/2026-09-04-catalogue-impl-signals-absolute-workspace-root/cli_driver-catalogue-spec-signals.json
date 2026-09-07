@@ -1,5 +1,46 @@
 {
-  "catalogue_declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
+  "catalogue_declaration_hash": "8197259ba0cafb53ec0d17176e10048fdd380d033d0833dbbb41f18094e33135",
   "schema_version": 1,
-  "signals": []
+  "signals": [
+    {
+      "entry_hash": "1e51ae27cf8aad2f384abfcedbe4acb1e50ba8c4295ec16fe559a38bcea9b36f",
+      "signal": "blue",
+      "type_name": "cli_driver::track_resolution::TrackItemsDirectoryInput"
+    },
+    {
+      "entry_hash": "b4a23a162de5dbab8b3c3767943914ec0816b590f752fa3cab04c410d74b84f6",
+      "signal": "blue",
+      "type_name": "cli_driver::track_resolution::TrackWorkspaceRootInput"
+    },
+    {
+      "entry_hash": "62efee1da12cbadd731ba5c46deebe07c11e6c3f810e3d1cc78530da32bc0e13",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddBaselineGraphInput"
+    },
+    {
+      "entry_hash": "90be2857a8bc3f977271d19d2d51db0f1847fec2ed91648151da27ad45af39e2",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput"
+    },
+    {
+      "entry_hash": "cf7bc3bf677cd76ee60f5865554404929af073cb0ab92b7cf7d89ee435f7aadc",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddContractMapInput"
+    },
+    {
+      "entry_hash": "1e3cc25a863c1be151a61328c69db4f7ccc3407530f32dc4cf636f7992b44d10",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddSpecElementHashInput"
+    },
+    {
+      "entry_hash": "d0c11ded7f03507278b15f6b12aed64d7907a06f5a1b704d1982256b54126242",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddTypeGraphInput"
+    },
+    {
+      "entry_hash": "30ae4b2627232349916e27979095e45aaf18438a1673000837b7901593dc2b54",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackItemsDirectoryInput"
+    }
+  ]
 }

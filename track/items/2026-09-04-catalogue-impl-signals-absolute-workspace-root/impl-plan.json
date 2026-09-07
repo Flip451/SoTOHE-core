@@ -29,19 +29,17 @@
   "schema_version": 2,
   "tasks": [
     {
-      "commit_hash": null,
       "description": "Update apps/cli-driver/src/track_resolution.rs (TrackWorkspaceRootInput::try_new) and add focused cli_driver tests for startup inputs and failure paths (IN-01, IN-02, IN-03, CN-01, CN-02, AC-03, AC-04; OS-02, OS-03).",
       "id": "T1",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T1"
       ],
       "description": "Extend tests in apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs for default and explicit-relative workspace-root invocations and relative/absolute path variants (IN-02, IN-04, CN-01, AC-01, AC-02, AC-04; OS-01).",
       "id": "T2",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

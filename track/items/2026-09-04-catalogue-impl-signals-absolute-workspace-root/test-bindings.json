@@ -1,1 +1,401 @@
-{"track_id": "2026-09-04-catalogue-impl-signals-absolute-workspace-root", "records": []}
+{
+  "track_id": "2026-09-04-catalogue-impl-signals-absolute-workspace-root",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_derives_non_default_workspace_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_rejects_missing_derived_workspace_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_derives_non_default_workspace_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_rejects_missing_derived_workspace_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_default_relative_path"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_explicit_absolute_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_catalogue_impl_signals_excludes_target_for_default_relative_and_absolute_roots"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_missing_root_before_processing"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_non_directory_root"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_symlinked_workspace_root_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_default_relative_path"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_explicit_absolute_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_catalogue_impl_signals_excludes_target_for_default_relative_and_absolute_roots"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_missing_root_before_processing"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_non_directory_root"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_symlinked_workspace_root_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "TrackTdddBaselineGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only carries already-validated TrackItemsDirectoryInput and TrackWorkspaceRootInput values. IN-01 is implemented at those shared input boundaries and exercised by the T1 normalization tests, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "TrackTdddBaselineGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or command execution; it only carries validated path inputs. IN-03's fail-closed unavailable-root behavior belongs to TrackWorkspaceRootInput and TrackItemsDirectoryInput plus the owning command path, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "TrackTdddBaselineGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only transports the shared path-input values. CN-01 is implemented and tested at the shared input boundary and command startup, not by this carrier declaration, so no edge-local behavior exists to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "reason": "TrackTdddBaselineGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or failure path; it only transports already-validated path-input values. CN-02's fail-closed normalization belongs to the shared input boundary and owning command, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "TrackTdddCatalogueSpecSignalsInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only carries already-validated TrackItemsDirectoryInput and TrackWorkspaceRootInput values. IN-01 is implemented at those shared input boundaries and exercised by the T1 normalization tests, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "TrackTdddCatalogueSpecSignalsInput is a passive primary-adapter DTO with no methods, filesystem access, or command execution; it only carries validated path inputs. IN-03's fail-closed unavailable-root behavior belongs to TrackWorkspaceRootInput and TrackItemsDirectoryInput plus the owning command path, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "TrackTdddCatalogueSpecSignalsInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only transports the shared path-input values. CN-01 is implemented and tested at the shared input boundary and command startup, not by this carrier declaration, so no edge-local behavior exists to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "reason": "TrackTdddCatalogueSpecSignalsInput is a passive primary-adapter DTO with no methods, filesystem access, or failure path; it only transports already-validated path-input values. CN-02's fail-closed normalization belongs to the shared input boundary and owning command, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "TrackTdddContractMapInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only carries already-validated TrackItemsDirectoryInput and TrackWorkspaceRootInput values. IN-01 is implemented at those shared input boundaries and exercised by the T1 normalization tests, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "TrackTdddContractMapInput is a passive primary-adapter DTO with no methods, filesystem access, or command execution; it only carries validated path inputs. IN-03's fail-closed unavailable-root behavior belongs to TrackWorkspaceRootInput and TrackItemsDirectoryInput plus the owning command path, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "TrackTdddContractMapInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only transports the shared path-input values. CN-01 is implemented and tested at the shared input boundary and command startup, not by this carrier declaration, so no edge-local behavior exists to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "reason": "TrackTdddContractMapInput is a passive primary-adapter DTO with no methods, filesystem access, or failure path; it only transports already-validated path-input values. CN-02's fail-closed normalization belongs to the shared input boundary and owning command, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "TrackTdddSpecElementHashInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only carries an already-validated TrackItemsDirectoryInput. IN-01 is implemented at the shared items/workspace input boundary and exercised by the T1 normalization tests, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "TrackTdddSpecElementHashInput is a passive primary-adapter DTO with no methods, filesystem access, or command execution; it only carries a validated TrackItemsDirectoryInput. IN-03's fail-closed unavailable-root behavior belongs to the shared items/workspace input boundary and owning command path, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "TrackTdddSpecElementHashInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only transports an already-validated TrackItemsDirectoryInput. CN-01 is implemented and tested at the shared input boundary and command startup, not by this carrier declaration, so no edge-local behavior exists to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "reason": "TrackTdddSpecElementHashInput is a passive primary-adapter DTO with no methods, filesystem access, or failure path; it only transports an already-validated TrackItemsDirectoryInput. CN-02's fail-closed normalization belongs to the shared input boundary and owning command, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "TrackTdddTypeGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only carries already-validated TrackItemsDirectoryInput and TrackWorkspaceRootInput values. IN-01 is implemented at those shared input boundaries and exercised by the T1 normalization tests, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "TrackTdddTypeGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or command execution; it only carries validated path inputs. IN-03's fail-closed unavailable-root behavior belongs to TrackWorkspaceRootInput and TrackItemsDirectoryInput plus the owning command path, so this carrier has no edge-local behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "TrackTdddTypeGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or normalization logic; it only transports the shared path-input values. CN-01 is implemented and tested at the shared input boundary and command startup, not by this carrier declaration, so no edge-local behavior exists to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "reason": "TrackTdddTypeGraphInput is a passive primary-adapter DTO with no methods, filesystem access, or failure path; it only transports already-validated path-input values. CN-02's fail-closed normalization belongs to the shared input boundary and owning command, so this carrier has no edge-local behavior to bind."
+    }
+  ]
+}

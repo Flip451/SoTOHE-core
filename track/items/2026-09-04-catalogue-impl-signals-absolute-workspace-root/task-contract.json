@@ -1,5 +1,40 @@
 {
   "schema_version": 1,
   "track_id": "2026-09-04-catalogue-impl-signals-absolute-workspace-root",
-  "entries": {}
+  "entries": {
+    "T1": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_tddd::TrackItemsDirectoryInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput"
+      }
+    ]
+  }
 }
