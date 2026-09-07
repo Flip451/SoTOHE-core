@@ -51,16 +51,19 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "c0c38aa93102882ed8ef954d6e665e11c37d4231",
       "description": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs and libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs: adopt and verify the already-present private fingerprint correction and focused tests. IN-06, IN-07, OS-05, CN-06, CN-07, AC-09, AC-10, AC-11.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "c0c38aa93102882ed8ef954d6e665e11c37d4231",
       "description": "apps/cli-driver/src/hook.rs: implement HookHost and its trait implementations, modify HookInput, and update co-located tests for HookHost, HookInput, and HookName. IN-01, IN-03, IN-04, OS-01, OS-02, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04, AC-06.",
       "id": "T002",
       "status": "done"
     },
     {
+      "commit_hash": "c0c38aa93102882ed8ef954d6e665e11c37d4231",
       "depends_on": [
         "T002"
       ],
@@ -69,6 +72,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "c0c38aa93102882ed8ef954d6e665e11c37d4231",
       "depends_on": [
         "T002",
         "T003"
@@ -78,6 +82,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "c0c38aa93102882ed8ef954d6e665e11c37d4231",
       "depends_on": [
         "T004"
       ],
@@ -86,6 +91,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "c0c38aa93102882ed8ef954d6e665e11c37d4231",
       "depends_on": [
         "T005"
       ],
@@ -99,7 +105,7 @@
       ],
       "description": "apps/cli-driver/src/hook.rs::HookInput and HookDriver::handle: implement selected-host input compatibility, envelope normalization, and focused tests. IN-01, IN-03, IN-04, OS-01, OS-02, CN-02, CN-03, AC-01, AC-03, AC-04, AC-06.",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -116,7 +122,7 @@
       ],
       "description": "apps/cli/src/commands/hook.rs::HookCommand and From<HookCommand> for cli_driver::hook::HookInput: implement CLI ingress parsing and mechanical conversion with focused tests. IN-01, OS-01, OS-02, CN-01, CN-02, AC-01.",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -143,7 +149,7 @@
       ],
       "description": "apps/cli/tests/hook_dispatch.rs: add direct host-option parser and rejection validation with CARGO_BIN_EXE. IN-01, CN-01, AC-01.",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

@@ -424,6 +424,23 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_hook_command_converts_to_driver_input_without_cli_policy"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
         "entry_key": "CliHookHost",
         "anchor_id": {
           "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json",

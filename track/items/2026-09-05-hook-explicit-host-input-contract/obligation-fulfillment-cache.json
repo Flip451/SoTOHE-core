@@ -635,6 +635,37 @@
         {
           "layer": "cli",
           "module_path": "cli::commands::hook::tests",
+          "test_name": "test_hook_command_converts_to_driver_input_without_cli_policy"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::commands::hook::HookCommand"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "639fa239248aeee2bf8807239fadfaa6e0537a505e606766333f4f59d3e31ab3",
+        "declaration_hash": "b6df88ffb25aa3934a39a5e10c5065f09c711e06b62057d4bcd18cc4b8791ed6"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let input = HookInput::from(HookCommand::Dispatch {\n            hook: CliHookName::GitPrePush,\n            host: None,\n            git_hook_args: vec![\"origin\".to_owned(), \"https://example.com\".to_owned()],\n        });\n\n        assert!(matches!(input.hook, cli_driver::hook::HookName::GitPrePush));\n        assert!(input.host.is_none());\n        assert_eq!(input.git_hook_args, [\"origin\", \"https://example.com\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
           "test_name": "test_cli_hook_host_converts_exhaustively_to_driver_host"
         }
       ],
