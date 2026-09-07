@@ -32,6 +32,175 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-04T08:37:51Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/impl-plan.json",
+              "line": 35,
+              "message": "Task descriptions T1 and T2 restate the upstream behavior contract (absolute normalization, fail-closed handling, and target-directory exclusion) instead of using only target + operation + anchor cites. See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/impl-plan.json",
+              "line": 6,
+              "message": "SECTION-01 and SECTION-02 descriptions repeat upstream behavior in prose, including normalization, rejection, target exclusion, and relative/absolute equivalence. They should contain only executable planning information plus anchor cites, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:62ec7a67a120d5ccdfe786b8102ad36166254b8723d4c5c904dbacdcf7c2c7fe",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T08:52:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c59f9c50e893afee53f56949157e729081567d238d42186b87fa84c3f89a4e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T08:58:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c59f9c50e893afee53f56949157e729081567d238d42186b87fa84c3f89a4e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-04T08:37:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd244bf0a4b020354f3c50f00010019fad859d00c865ac5609cb292f0dae2710",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T08:40:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd244bf0a4b020354f3c50f00010019fad859d00c865ac5609cb292f0dae2710",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-04T04:12:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e0b7699e86718bd2b3bac1efe9998c184426a3ec407ad94cd8decac172f4232",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:16:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e0b7699e86718bd2b3bac1efe9998c184426a3ec407ad94cd8decac172f4232",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-04T06:57:20Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 10,
+              "message": "The `docs` field restates the upstream normalization behavior instead of identifying the modified type and referring to spec anchors. Remove the behavioral prose and retain a concise change description with the relevant anchors, per `.harness/policies/no-upstream-restatement.md`. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:1474634370ace7e28e0dafccc761e19c0fe181c134a0dc3f3b0ec2fee9b372c1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T07:11:19Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 10,
+              "message": "The `docs` field restates the upstream normalization behavior instead of identifying the modified type and referring to spec anchors. Remove the behavioral prose and retain a concise change description with relevant anchors, per `.harness/policies/no-upstream-restatement.md`. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:075f39b0c0501a374c3caba47cd1ae1724c24121cb246605d948da432c4aeede",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T07:27:18Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 22,
+              "message": "The `try_new` method is declared with `action: modify`, but its declared signature is identical to the frozen rustdoc baseline (`value: PathBuf -> Result<Self, TrackResolutionDiagnostic>`). Under the action-classification policy, this method action is incoherent with the baseline diff; classify it as a reference unless the catalogue declares a changed method shape. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput::try_new`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:1237860f0e1d77d50399ff16431e413e6b317a94f21acb0a0f51558fe3a0cd68",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T07:47:13Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 22,
+              "message": "The `try_new` method is declared with `action: modify`, but its declared signature is identical to the frozen rustdoc baseline (`value: PathBuf -> Result<Self, TrackResolutionDiagnostic>`). Under the action-classification policy, this method action is incoherent with the baseline diff; classify it as a reference unless the catalogue declares a changed method shape. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput::try_new`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:027afec2020e5537ad16515471bc84ded658137c04d8f29fba7bd74c7750a482",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T08:05:21Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 7,
+              "message": "The approved spec changes the existing public type `cli_driver::track_resolution::TrackWorkspaceRootInput`, but `cli_driver-types.json` contains no `action: modify` entry for it. This leaves the required post-change type shape undeclared; restore the companion modify entry with its `try_new` contract and spec references.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:87c1953f662f7c5755766cafa5a7653b4c390858784d309bf27cce709d013f55",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T08:25:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:87c1953f662f7c5755766cafa5a7653b4c390858784d309bf27cce709d013f55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T08:29:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:87c1953f662f7c5755766cafa5a7653b4c390858784d309bf27cce709d013f55",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

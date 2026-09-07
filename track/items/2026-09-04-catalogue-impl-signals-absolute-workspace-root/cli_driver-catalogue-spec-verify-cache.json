@@ -1,0 +1,246 @@
+{
+  "entries": [
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "17f6cd37a73c312fd2436a305d4b6f5101294a2e1b9b6383bfacf79475b10f9d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Make catalogue-impl-signals reliably exclude Cargo's target directory when invoked with its default or a relative workspace root."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Make catalogue-impl-signals reliably exclude Cargo's target directory when invoked with its default or a relative workspace root.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6acb0542b4843053345ad78da0f5fd7f1eedfd6b9e53240f3b05570ecb43dce4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "With the default workspace root, catalogue-impl-signals excludes Cargo's target directory from the rustdoc input corpus."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "With the default workspace root, catalogue-impl-signals excludes Cargo's target directory from the rustdoc input corpus.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "892d607079523479a80d5958f0bf04d80c088a1540aa4a4c557d29ff3ce6d464",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "With an explicit relative workspace root, catalogue-impl-signals excludes Cargo's target directory from the rustdoc input corpus."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "With an explicit relative workspace root, catalogue-impl-signals excludes Cargo's target directory from the rustdoc input corpus.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3915370324c5cf2e5a58f925868a8fd6332415010a99648e03180399ad6db2e5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "If the selected workspace root cannot be normalized because it is missing or inaccessible, catalogue-impl-signals stops without processing an input corpus."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If the selected workspace root cannot be normalized because it is missing or inaccessible, catalogue-impl-signals stops without processing an input corpus.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "92eb5591f7eb98f25f10510c467364c821773c40ac53c5309ae8f1c294d24951",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Path comparisons that determine target-directory exclusion use the normalized absolute workspace root, so equivalent relative and absolute root input cannot cause target files to be included."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Path comparisons that determine target-directory exclusion use the normalized absolute workspace root, so equivalent relative and absolute root input cannot cause target files to be included.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5a69e63b3fa7f25b007198bf1825d2ff5dafae92feae3d0f7a6ddbd4a1d8755a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The default and explicitly supplied workspace roots must each be normalized to absolute paths relative to the current directory at command startup."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The default and explicitly supplied workspace roots must each be normalized to absolute paths relative to the current directory at command startup.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2038d795478682bb3b9fc73509abc7b9e52b1c7699987c9dd2d5a25090952430",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Workspace-root normalization failure is fail-closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Workspace-root normalization failure is fail-closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3d5796cdfb0e0e3d8332cb4f68daaf1d77acf3a19c88b0f0055b50fc872e528f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Normalize the default and explicit workspace-root inputs to absolute paths at command startup."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Normalize the default and explicit workspace-root inputs to absolute paths at command startup.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b9c61d04771ca7000611e7f38a13a674f7dcfac60992e2a9cf70d29bf047d573",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Use normalized absolute paths for target-directory exclusion and other comparable workspace-root path comparisons."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Use normalized absolute paths for target-directory exclusion and other comparable workspace-root path comparisons.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9325fb30761991a6e131c7ceabc1efe76ea0aad5fb1b6a936ac0179d955ba6cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4b94029c0c62b11beb2f97a3c905546a56dae8f4a4d4c53033519fc9946ea8b1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Reject an unavailable or inaccessible workspace root before catalogue processing begins."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Reject an unavailable or inaccessible workspace root before catalogue processing begins.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 1
+}

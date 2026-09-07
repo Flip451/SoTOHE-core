@@ -1,0 +1,17 @@
+{
+  "baseline_hash": "8ee4f1a9ee09c7c0558e3bf2981a525c7a901d81eb4c8a2d16ae8e26e689b0db",
+  "declaration_hash": "73195bcbc1efed6e699d825b92988bc24e2ab755f33ea8d9ce7ec2240de382a2",
+  "generated_at": "2026-09-07T11:35:52Z",
+  "head_commit": "c6e5687d2069fb84cb86e4b75f34754d5a35a383",
+  "implementation_fingerprint": "c533d150882fe62bcc750c591c5607e84467097ace662b8bd4247d1e7f38a8a0",
+  "resolution_fingerprint": "3e8b01700dbe87973149dec154c8d1eea99b43f64e3d1d5ef25b63541973f780",
+  "rustdoc_execution_identity": {
+    "crate_name": "cli_composition",
+    "expected_json_path": "target/.sotp-rustdoc/344238888ccbc5e7b7050e889967b228ca5c5b363682c9874ed93ff2fc895013/doc/cli_composition.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/344238888ccbc5e7b7050e889967b228ca5c5b363682c9874ed93ff2fc895013"
+  },
+  "schema_version": 6,
+  "signals": []
+}
