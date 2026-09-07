@@ -334,6 +334,146 @@
         }
       ]
     },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-07T13:54:45Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 6,
+              "message": "T001 description is not executable under the scope policy: it names target files and an operation but provides no AC-NN, IN-NN, CN-NN, or spec-element anchor.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 12,
+              "message": "T002 description is not executable under the scope policy: it names target files and operations but provides no AC-NN, IN-NN, CN-NN, or spec-element anchor.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates upstream behavior and rationale in prose (\"supported lifetime...\", \"normal and exceptional...\", and \"matching limitation\"). Replace this with target + operation + anchor cite per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates the upstream behavior contract in prose (the detailed blue-evaluation and unnumbered-child expectations). Replace this with target + operation + anchor cite per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 27,
+              "message": "Section S1 restates upstream design content (lifetimes, inherent methods, and the private tuple-field limitation) instead of providing only executable planning information with an anchor.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 37,
+              "message": "Section S2 restates the upstream behavior contract (field-identity positional keys and the inherent-implementation case) instead of providing only executable planning information with an anchor.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:003acfde8e0b0f62743e0d39f45e721eb08a7f1381fb276c261309ebd684ff9a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T13:58:30Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 6,
+              "message": "T001 description lacks an AC-NN, IN-NN, CN-NN, or spec-element anchor, so the executable boundary is incomplete.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 12,
+              "message": "T002 description lacks an AC-NN, IN-NN, CN-NN, or spec-element anchor, so the executable boundary is incomplete.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates upstream behavior in prose: \"supported lifetime trait-implementation declaration spelling\", \"normal and exceptional inherent-method declaration locations\", and the tuple-field limitation. Remove the restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates the upstream behavior contract through its detailed blue-evaluation and unnumbered-child expectations. Remove the restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 27,
+              "message": "Section S1 restates upstream design content about lifetimes, inherent methods, and the private tuple-field limitation.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 37,
+              "message": "Section S2 restates the upstream behavior contract about field-identity positional keys and the inherent-implementation case.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:4cef5f99222480bf9b8b8a9f622139a09c6074a1c786c4592f7f065463930335",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T14:01:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4cef5f99222480bf9b8b8a9f622139a09c6074a1c786c4592f7f065463930335",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T14:10:22Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-04-catalogue-schema-declaration-guidance/impl-plan.json",
+              "line": 6,
+              "message": "T001 is still `todo` but bundles two independently verifiable behavior units: (1) lifetime declaration guidance plus the `entries.rs`/`traits.rs` `impl_generics` alignment (IN-01, IN-02, CN-01, AC-01, AC-03), and (2) inherent-method placement plus private-tuple limitation guidance (IN-01, CN-02, OS-01, AC-02). Split T001 at that boundary and update task coverage and batch estimates accordingly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4cef5f99222480bf9b8b8a9f622139a09c6074a1c786c4592f7f065463930335",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T14:18:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fee5b16abd799c1faa838318936a465181ce596807bf4aa31f3fcb18d5690b7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T14:24:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fee5b16abd799c1faa838318936a465181ce596807bf4aa31f3fcb18d5690b7",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -347,6 +487,60 @@
           "at": "2026-09-07T12:00:31Z",
           "findings": [],
           "hash": "rvw1:sha256:706814e939ea2be666d402ec624ea5b058d4776c8e987d829105ab01c0fa29d9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-07T13:39:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dde5e41af900fddf9a41034016764dfb2e9ded75c374f81ac3e97f9f51777d29",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T13:44:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dde5e41af900fddf9a41034016764dfb2e9ded75c374f81ac3e97f9f51777d29",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-07T12:58:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5be2738f24d06956c0e624eaeb26a4e7267286a46d64454cfba3cbbef553fb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T13:03:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5be2738f24d06956c0e624eaeb26a4e7267286a46d64454cfba3cbbef553fb",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-07T13:31:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b2a30fafe49c582418eb9e9c0bc75db0f839b89bfe4b921b934cd29bb3994015",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T13:36:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b2a30fafe49c582418eb9e9c0bc75db0f839b89bfe4b921b934cd29bb3994015",
           "type": "final",
           "verdict": "zero_findings"
         }
