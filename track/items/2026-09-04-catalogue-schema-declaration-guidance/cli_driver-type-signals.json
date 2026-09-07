@@ -1,9 +1,9 @@
 {
   "baseline_hash": "8114299a4356fd7574d0293aa32f756310046d20940e97b55a37fb0161a99d98",
   "declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
-  "generated_at": "2026-09-07T14:35:20Z",
-  "head_commit": "656c050e117827fa97404d14b73ef7cf702bb82e",
-  "implementation_fingerprint": "8954d0fc468770125c58cd796dcf4fb37e0f635cf0eecf9379f6aeb7999d8904",
+  "generated_at": "2026-09-07T15:27:06Z",
+  "head_commit": "60fd1f95a602bcf9cb86a6300736ece941ba4f8d",
+  "implementation_fingerprint": "ea006584c94d99f0a75c4b6fddbddab170b537ce97677852d26bef798e5c10c0",
   "resolution_fingerprint": "de8ec58c446028c113ea0b6d0abf9c7b453dfe2d429312b0f7382528f4a31641",
   "rustdoc_execution_identity": {
     "crate_name": "cli_driver",

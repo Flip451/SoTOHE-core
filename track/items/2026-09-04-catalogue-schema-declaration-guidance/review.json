@@ -285,6 +285,20 @@
           "hash": "rvw1:sha256:7668dbeeaa6164c30a7780498251bb9d6fed28f9326e8abf1eeead595c0f905d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:10:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23f9aa1674245ac5d0e9d94808fe609b872f65aa6f73924f1dc0f8b7f4e1812c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:21:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23f9aa1674245ac5d0e9d94808fe609b872f65aa6f73924f1dc0f8b7f4e1812c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -329,6 +343,35 @@
           "at": "2026-09-07T12:51:51Z",
           "findings": [],
           "hash": "rvw1:sha256:80402363e6bff2bc473a240cdb6ba1b757cf55ea1f43f4e5d3e9b9453ccca941",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:08:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b5a018deccd540e5c8ff78491a3b9759f81cc029f5daf92eb0ac9f50da42332f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:18:04Z",
+          "findings": [
+            {
+              "category": "factual-error",
+              "file": ".harness/reference/catalogue-schema.md",
+              "line": 191,
+              "message": "The new sentence says that a tuple struct can evaluate 🔵 only when it has exactly one trailing private field, incorrectly excluding tuple structs with no private fields. The evaluator explicitly treats matching all-public tuple structs as structurally equal (`test_tuple_struct_all_public_fields_match`). Qualify this as applying to tuple structs that contain private fields.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:b5a018deccd540e5c8ff78491a3b9759f81cc029f5daf92eb0ac9f50da42332f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T15:21:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3694337856bc0da6eede4bf2ba1a4e9b82d2cd0edf3d1ed46063d43138e551ac",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -471,6 +514,20 @@
           "hash": "rvw1:sha256:7fee5b16abd799c1faa838318936a465181ce596807bf4aa31f3fcb18d5690b7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:07:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e1cec3f7d6a534b3bc44f37008e14b951a7ddb6b72601cd784a3882cab340dd2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:13:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e1cec3f7d6a534b3bc44f37008e14b951a7ddb6b72601cd784a3882cab340dd2",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -487,6 +544,20 @@
           "at": "2026-09-07T12:00:31Z",
           "findings": [],
           "hash": "rvw1:sha256:706814e939ea2be666d402ec624ea5b058d4776c8e987d829105ab01c0fa29d9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:10:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c310e6e3f8db7504e9f02dc12b263b3b0f79ac56e4ab34a0ede70be2148c4d36",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T15:20:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c310e6e3f8db7504e9f02dc12b263b3b0f79ac56e4ab34a0ede70be2148c4d36",
           "type": "final",
           "verdict": "zero_findings"
         }
