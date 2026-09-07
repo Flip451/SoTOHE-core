@@ -121,7 +121,8 @@ fn validate_items_dir_scope(workspace_root: &Path, items_dir: &Path) -> Result<(
 ///
 /// Task-contract schema v1 stores the exact catalogue entry key but has no
 /// namespace field. Resolve that key through the catalogue's type/trait/
-/// function sections before joining it to a persisted signal identity.
+/// function and schema-v5 external trait-impl-owner sections before joining it
+/// to a persisted signal identity.
 pub(super) fn resolve_scope_entry_key(
     entry: &ContractedEntryRef,
     catalogue: &CatalogueDocument,

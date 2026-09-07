@@ -1,0 +1,31 @@
+{
+  "catalogue_declaration_hash": "dc01d4b1360c0951709c2fcebe886222aeed6fb600c83a915c07065ac9d88f42",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "5d7878e25b84bf0d0bd4288da2e9600ce0501492c918b94617cd8d40f5d08cf3",
+      "signal": "blue",
+      "type_name": "HookExecution"
+    },
+    {
+      "entry_hash": "73c1856823702ddb540f6dfe1bbbbdf79d6af54020489a04067a3d718e54e812",
+      "signal": "blue",
+      "type_name": "HookHost"
+    },
+    {
+      "entry_hash": "de31eddf08c6c1971a84efe195a03b0536bd1043b66ff5f3b9f9704dd33e952e",
+      "signal": "blue",
+      "type_name": "cli_driver::hook::HookDriver"
+    },
+    {
+      "entry_hash": "3fc24f22aaa7433361689a71dac67257d9f4c116095d1d3b9f65ff6855eb5332",
+      "signal": "blue",
+      "type_name": "cli_driver::hook::HookInput"
+    },
+    {
+      "entry_hash": "e68f7c2370fa83a7348fe2cac193708646e6b95205a1481774e9ba2c61df545b",
+      "signal": "blue",
+      "type_name": "cli_driver::hook::HookName"
+    }
+  ]
+}

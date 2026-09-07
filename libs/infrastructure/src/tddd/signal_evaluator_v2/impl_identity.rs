@@ -12,13 +12,12 @@ use rustdoc_types::{Crate, GenericArgs, Id, ItemEnum, ItemSummary, Path, Type};
 
 use crate::tddd::canonical_type_identity::{
     DefinitionPathAuthority, canonicalize_rustdoc_generic_args_with_authority,
-    canonicalize_rustdoc_path, canonicalize_rustdoc_type_with_authority,
+    canonicalize_rustdoc_path, canonicalize_rustdoc_type_with_authority, strip_impl_params_args,
+    strip_impl_params_type,
 };
 use crate::tddd::type_ref_parser::{core_canonical_path, render_type};
 
-use super::impl_identity_helpers::{
-    render_identity_generic_args, strip_impl_params_args, strip_impl_params_type,
-};
+use super::impl_identity_helpers::render_identity_generic_args;
 
 /// Normalized path forms (both qualified and bare) for compiler-internal phantom
 /// marker traits whose `Impl` blocks are excluded from the identity map.

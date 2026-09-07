@@ -1,0 +1,1001 @@
+{
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_cli_hook_host_converts_exhaustively_to_driver_host"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookHost"
+      },
+      "key": {
+        "anchor_text_hash": "c75cb47f088ed4193ea657d18f63fc36fe7dd9f5061c3459402cedb5163fcda6",
+        "bound_tests_set_hash": "c4b35e7b37195973613a8058e2bc66c2b745e9874b98dc6765fbc62ae5486c7a",
+        "declaration_hash": "e0dd3ed8da575f5d17e3a436a8d3b0eb6db65c1ed99590f9339c40b34572680b"
+      },
+      "obligation_id": {
+        "entry_key": "HookHost",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(HookHost::from(CliHookHost::Claude), HookHost::Claude));\n        assert!(matches!(HookHost::from(CliHookHost::Codex), HookHost::Codex));\n        assert!(matches!(HookHost::from(CliHookHost::Grok), HookHost::Grok));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_search_replace_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_unknown_and_invalid_values"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_missing_required_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookHost"
+      },
+      "key": {
+        "anchor_text_hash": "c6ccf37e6ae3b1373d8125ea97ce9ebb8e4576d207a957f478003c830667f979",
+        "bound_tests_set_hash": "b8d4cf5f450e272fcd5fd40ddd35556fa1523b26a8012f8caa6a8292c269c197",
+        "declaration_hash": "47d8ae52c50a3f161491a65bef571230e8e387c3a6f8cd0da72db046fedbc047"
+      },
+      "obligation_id": {
+        "entry_key": "HookHost",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(parsed.tool_name, \"Bash\");\n        assert_eq!(parsed.command.as_deref(), Some(\"git status\"));\n        assert!(parsed.file_path.is_none());\n        assert!(parsed.content.is_none());\n\nassert_eq!(parsed.tool_name, \"Write\");\n        assert!(parsed.command.is_none());\n        assert_eq!(\n            parsed.file_path.as_deref().and_then(|path| path.to_str()),\n            Some(\"tests/example.rs\")\n        );\n        assert_eq!(parsed.content.as_deref(), Some(\"new\"));\n\nassert!(matches!(\n                result,\n                Err(HookParseError::Unmappable(actual)) if actual.contains(message)\n            ));\n\nassert!(matches!(\n                result,\n                Err(HookParseError::Unmappable(message)) if message.contains(field)\n            ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_codex_apply_patch_remains_snake_case"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookHost"
+      },
+      "key": {
+        "anchor_text_hash": "895ea4607e4cd4de72fddd98e3569eb450a9f26ee590ea8d4388f3d5b0828e19",
+        "bound_tests_set_hash": "227a68da12813a7af16d33407752a0ce597251c763f208c797d55f8d14215ff9",
+        "declaration_hash": "06d5a395b90869f1509258085f921d1aba75571ff9fd3192378289b8b51773e5"
+      },
+      "obligation_id": {
+        "entry_key": "HookHost",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for host in [HookHost::Claude, HookHost::Codex] {\n            let parsed = parse_hook_envelope(raw, host).expect(\"snake-case envelope must parse\");\n            assert_eq!(parsed.tool_name, \"Bash\");\n            assert_eq!(parsed.command.as_deref(), Some(\"git status\"));\n        }\n\nlet parsed = parse_hook_envelope(\n            r#\"{\"tool_name\":\"apply_patch\",\"tool_input\":{\"patch\":\"*** Begin Patch\"}}\"#,\n            HookHost::Codex,\n        )\n        .expect(\"Codex apply_patch envelope must parse\");\n\n        assert_eq!(parsed.tool_name, \"apply_patch\");\n        assert!(parsed.command.is_none());\n        assert!(parsed.file_path.is_none());\n        assert!(parsed.content.is_none());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_uses_only_the_selected_host_contract"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookHost"
+      },
+      "key": {
+        "anchor_text_hash": "dc9fc30a086401524a98740e0965a0912e5ffbfac8aef5c69bf1e835fe642b69",
+        "bound_tests_set_hash": "3dd7ed5fc0f8bc4e448b7f190bed39204f8f516f0b2a2811bac1d5f0e0a5520d",
+        "declaration_hash": "ce831936327471e5cc516474f1f91dcf7bc87c4584d93f9ee4f864aa1ade8016"
+      },
+      "obligation_id": {
+        "entry_key": "HookHost",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let parsed = parse_hook_envelope(\n            r#\"{\"toolName\":\"run_terminal_command\",\"toolInput\":{\"command\":\"git status\"},\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"tests/example.rs\",\"content\":\"\"}}\"#,\n            HookHost::Grok,\n        )\n        .expect(\"Grok terminal envelope must parse\");\n\n        assert_eq!(parsed.tool_name, \"Bash\");\n        assert_eq!(parsed.command.as_deref(), Some(\"git status\"));\n        assert!(parsed.file_path.is_none());\n        assert!(parsed.content.is_none());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_uses_only_the_selected_host_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookHost"
+      },
+      "key": {
+        "anchor_text_hash": "5feae6f49660fe0faf4428491dbb60312254c094651f538e4c98b323ce4b7dfe",
+        "bound_tests_set_hash": "875de3c959117d5406a768930e7d8d3ba151b9b37045c75cd525d6207f786537",
+        "declaration_hash": "d3ace407750889aaa2905f0d7012e71ba72d7710dd28caecbc7559d649cd41f0"
+      },
+      "obligation_id": {
+        "entry_key": "HookHost",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(parsed.tool_name, \"Bash\");\n        assert_eq!(parsed.command.as_deref(), Some(\"git status\"));\n        assert!(parsed.file_path.is_none());\n        assert!(parsed.content.is_none());\n\n        assert!(matches!(\n            grok_for_claude,\n            Err(HookParseError::MissingField(message)) if message.contains(\"tool_name\")\n        ));\n\n        assert!(matches!(\n            claude_for_grok,\n            Err(HookParseError::MissingField(message)) if message.contains(\"toolName\")\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_git_dispatch_preserves_argv_and_allows"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_git_argv_on_agent_hook"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_host_on_git_process_hook"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_missing_agent_host_is_input_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli_driver::hook::HookInput"
+      },
+      "key": {
+        "anchor_text_hash": "c75cb47f088ed4193ea657d18f63fc36fe7dd9f5061c3459402cedb5163fcda6",
+        "bound_tests_set_hash": "4a5ee2ef332ecaa0c94e4556e166d3a783528921d99350dd7775fcb892137e1e",
+        "declaration_hash": "7494205225d4b6539bcad037ae0a0e4f8f47b8836cb4842a1cb8efbc3382e4ff"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "{\n        let (driver, service) = driver_with(Response::Allow);\n        let execution = driver.handle(HookInput {\n            hook: HookName::GitPrePush,\n            host: None,\n            git_hook_args: vec![\"origin\".to_owned(), \"https://example.com\".to_owned()],\n        });\n\n        assert!(matches!(execution, HookExecution::Allow(_)));\n        assert_eq!(outcome(&execution).exit_code, 0);\n        let (_, command) = service.calls.lock().unwrap().pop().expect(\"dispatch call\");\n        assert_eq!(command.tool_name, \"Git\");\n        assert_eq!(command.git_hook_args, [\"origin\", \"https://example.com\"]);\n    }\n{\n        let (driver, service) = driver_with(Response::Allow);\n        let execution = driver.handle(HookInput {\n            hook: HookName::BlockDirectGitOps,\n            host: Some(HookHost::Claude),\n            git_hook_args: vec![\"unexpected\".to_owned()],\n        });\n\n        assert!(matches!(execution, HookExecution::InputError(_)));\n        assert_eq!(outcome(&execution).exit_code, 2);\n        assert!(\n            outcome(&execution)\n                .stderr\n                .as_deref()\n                .unwrap()\n                .contains(\"only supported for git process hooks\")\n        );\n        assert!(service.calls.lock().unwrap().is_empty());\n    }\n{\n        let (driver, service) = driver_with(Response::Allow);\n        let execution = driver.handle(HookInput {\n            hook: HookName::GitRefUpdate,\n            host: Some(HookHost::Claude),\n            git_hook_args: vec![\"committed\".to_owned()],\n        });\n\n        assert!(matches!(execution, HookExecution::InputError(_)));\n        assert_eq!(outcome(&execution).exit_code, 2);\n        assert!(outcome(&execution).stderr.as_deref().unwrap().contains(\"must not specify --host\"));\n        assert!(service.calls.lock().unwrap().is_empty());\n    }\n{\n        for hook in [HookName::BlockDirectGitOps, HookName::SkillCompliance] {\n            let (driver, service) = driver_with(Response::Allow);\n            let execution = driver.handle(HookInput { hook, host: None, git_hook_args: vec![] });\n\n            assert!(matches!(execution, HookExecution::InputError(_)));\n            assert_eq!(outcome(&execution).exit_code, 2);\n            assert_eq!(\n                outcome(&execution).stderr.as_deref(),\n                Some(\"error: agent hooks require --host claude|codex|grok\")\n            );\n            assert!(service.calls.lock().unwrap().is_empty());\n        }\n    }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_search_replace_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_unknown_and_invalid_values"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_rejects_missing_required_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli_driver::hook::HookInput"
+      },
+      "key": {
+        "anchor_text_hash": "c6ccf37e6ae3b1373d8125ea97ce9ebb8e4576d207a957f478003c830667f979",
+        "bound_tests_set_hash": "b8d4cf5f450e272fcd5fd40ddd35556fa1523b26a8012f8caa6a8292c269c197",
+        "declaration_hash": "e63b6ab1038f38d944cf0370842107be48353101ece0c52e74d8a99a75ab79ee"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let parsed = parse_hook_envelope(\n            r#\"{\"toolName\":\"run_terminal_command\",\"toolInput\":{\"command\":\"git status\"},\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"tests/example.rs\",\"content\":\"\"}}\"#,\n            HookHost::Grok,\n        )\n        .expect(\"Grok terminal envelope must parse\");\n\n        assert_eq!(parsed.tool_name, \"Bash\");\n        assert_eq!(parsed.command.as_deref(), Some(\"git status\"));\n        assert!(parsed.file_path.is_none());\n        assert!(parsed.content.is_none());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_codex_apply_patch_remains_snake_case"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_claude_and_codex_share_pretool_use_normalization_and_guard_behavior"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli_driver::hook::HookInput"
+      },
+      "key": {
+        "anchor_text_hash": "895ea4607e4cd4de72fddd98e3569eb450a9f26ee590ea8d4388f3d5b0828e19",
+        "bound_tests_set_hash": "461b1f99d817c4f2705c0b6c6c18922e5e37f524f511cbcdb13a38693120f94f",
+        "declaration_hash": "1158d29ab548114d7afa704687e49a5a3b349e5b0f6abc251b13fea9847273ad"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let parsed = parse_hook_envelope(\n            r#\"{\"tool_name\":\"apply_patch\",\"tool_input\":{\"patch\":\"*** Begin Patch\"}}\"#,\n            HookHost::Codex,\n        )\n        .expect(\"Codex apply_patch envelope must parse\");\n\n        assert_eq!(parsed.tool_name, \"apply_patch\");\n        assert!(parsed.command.is_none());\n        assert!(parsed.file_path.is_none());\n        assert!(parsed.content.is_none());\n\nfor host in [HookHost::Claude, HookHost::Codex] {\n            let (driver, service) = driver_with(Response::Block);\n            let execution = driver.dispatch_agent_input(HookName::BlockDirectGitOps, host, raw);\n\n            assert!(matches!(execution, HookExecution::HookBlock(_)));\n            assert_eq!(outcome(&execution).exit_code, 2);\n            assert_eq!(outcome(&execution).stderr.as_deref(), Some(\"blocked by test service\"));\n\n            let (hook_name, command) = service.calls.lock().unwrap().pop().expect(\"dispatch call\");\n            assert_eq!(hook_name, \"block-direct-git-ops\");\n            assert_eq!(command.tool_name, \"Bash\");\n            assert_eq!(command.command.as_deref(), Some(\"git add safe.txt\"));\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_uses_only_the_selected_host_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli_driver::hook::HookInput"
+      },
+      "key": {
+        "anchor_text_hash": "5feae6f49660fe0faf4428491dbb60312254c094651f538e4c98b323ce4b7dfe",
+        "bound_tests_set_hash": "875de3c959117d5406a768930e7d8d3ba151b9b37045c75cd525d6207f786537",
+        "declaration_hash": "6c69474666d21fcf279a6d3539898efbd32b22e0d5829ccb45c50af27347c286"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(parsed.tool_name, \"Bash\");\n        assert_eq!(parsed.command.as_deref(), Some(\"git status\"));\n        assert!(parsed.file_path.is_none());\n        assert!(parsed.content.is_none());\n\n        assert!(matches!(\n            grok_for_claude,\n            Err(HookParseError::MissingField(message)) if message.contains(\"tool_name\")\n        ));\n\n        assert!(matches!(\n            claude_for_grok,\n            Err(HookParseError::MissingField(message)) if message.contains(\"toolName\")\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_grok_search_replace_ignores_conflicting_aliases"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_parse_hook_envelope_claude_and_codex_share_snake_case_contract"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_input_is_raw_record_with_optional_host_and_ordered_git_argv"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_git_dispatch_preserves_argv_and_allows"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_git_argv_on_agent_hook"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_forbids_host_on_git_process_hook"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli_driver::hook::HookInput"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "11f1163f3201fa5a72906412e8df7f3503b2cdd193f8cb53e5d4d0173157dc55",
+        "declaration_hash": "6c2f624685e5fc788c739790d07bea3b4d30325c43e6650b2757493aa7556676"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::hook::HookInput",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(input.git_hook_args, [\"origin\", \"https://example.com\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_all_cli_values"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "CliHookHost"
+      },
+      "key": {
+        "anchor_text_hash": "c75cb47f088ed4193ea657d18f63fc36fe7dd9f5061c3459402cedb5163fcda6",
+        "bound_tests_set_hash": "317ec5452285801abbd9370db78f9a86fe190b459429aaa9932d866575c41415",
+        "declaration_hash": "2cf21142ebb7e434849e98054dc313032b90e34479f4108dfb0bddbddbb88643"
+      },
+      "obligation_id": {
+        "entry_key": "CliHookHost",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for (raw_host, expected_host) in [\n            (\"claude\", CliHookHost::Claude),\n            (\"codex\", CliHookHost::Codex),\n            (\"grok\", CliHookHost::Grok),\n        ]",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_all_cli_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "CliHookHost"
+      },
+      "key": {
+        "anchor_text_hash": "dc9fc30a086401524a98740e0965a0912e5ffbfac8aef5c69bf1e835fe642b69",
+        "bound_tests_set_hash": "e4f6b35bcc7dc1b02e5d9a211675e3dd378a5ce59bacea18f23eacfae1233072",
+        "declaration_hash": "02c964f4acac45d2898c1dfd3a35d04345003332a6e333fd28785e669da3f2b8"
+      },
+      "obligation_id": {
+        "entry_key": "CliHookHost",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for (raw_host, expected_host) in [\n            (\"claude\", CliHookHost::Claude),\n            (\"codex\", CliHookHost::Codex),\n            (\"grok\", CliHookHost::Grok),\n        ] {\n            let cli = TestCli::try_parse_from([\n                \"hook\",\n                \"dispatch\",\n                \"--host\",\n                raw_host,\n                \"skill-compliance\",\n            ])\n            .unwrap();",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_agent_hook_without_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_without_host_preserves_positional_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_invalid_host_value_is_rejected_by_clap"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_hooks_path_setup_parses"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_git_pre_push_with_remote_args_parses"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_all_cli_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::commands::hook::HookCommand"
+      },
+      "key": {
+        "anchor_text_hash": "c75cb47f088ed4193ea657d18f63fc36fe7dd9f5061c3459402cedb5163fcda6",
+        "bound_tests_set_hash": "ad8112b4106f4004eee1581d41016c8c6caa87e9392d846c7bbefc0878d50960",
+        "declaration_hash": "eb2e95eb9df52926854fd6f91fe49af81196f125f7739b2da28376e4e9a8d8a6"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(&execution, CliHookExecution::InputError(_))); assert_eq!(execution.outcome().exit_code, 2); ... Some(\"error: agent hooks require --host claude|codex|grok\") ... Some(\"error: git process hooks must not specify --host\")",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::commands::hook::HookCommand"
+      },
+      "key": {
+        "anchor_text_hash": "ac0292dd8a04aeca379aa212760d756f9d9e174fd867390ff225a7f74fe24700",
+        "bound_tests_set_hash": "d3f2f1b148b6e373e035e9f33a6da9bd3364d3b3727e5c93db7f80c6b432d122",
+        "declaration_hash": "efd6b4a35a1ca09b9ea76a431a4a7283bffd7de674c4d51e72ed3608cbe743a9"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let cli =\n            TestCli::try_parse_from([\"hook\", \"dispatch\", \"--host\", \"grok\", \"skill-compliance\"])\n                .unwrap();\n\n        match cli.cmd {\n            HookCommand::Dispatch { hook, host, git_hook_args } => {\n                assert!(matches!(hook, CliHookName::SkillCompliance));\n                assert!(matches!(host, Some(CliHookHost::Grok)));\n                assert!(git_hook_args.is_empty());\n            }\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_agent_host_parses_as_optional_clap_field"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_dispatch_git_pre_push_with_remote_args_parses"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::commands::hook::HookCommand"
+      },
+      "key": {
+        "anchor_text_hash": "dc9fc30a086401524a98740e0965a0912e5ffbfac8aef5c69bf1e835fe642b69",
+        "bound_tests_set_hash": "dadc9f755c6d71625de293847254d09d474db04d6d8eb91a4d72ae856ffbc952",
+        "declaration_hash": "d127cebe0d0adf79d36c6b6b492ce9831a5016c7c66ed7e4e423f8041fa4d41f"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TestCli::try_parse_from([\"hook\", \"dispatch\", \"--host\", \"grok\", \"skill-compliance\"])\n                .unwrap();\n\n        match cli.cmd {\n            HookCommand::Dispatch { hook, host, git_hook_args } => {\n                assert!(matches!(hook, CliHookName::SkillCompliance));\n                assert!(matches!(host, Some(CliHookHost::Grok)));\n                assert!(git_hook_args.is_empty());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_hook_command_converts_to_driver_input_without_cli_policy"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::commands::hook::HookCommand"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "639fa239248aeee2bf8807239fadfaa6e0537a505e606766333f4f59d3e31ab3",
+        "declaration_hash": "b6df88ffb25aa3934a39a5e10c5065f09c711e06b62057d4bcd18cc4b8791ed6"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::HookCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let input = HookInput::from(HookCommand::Dispatch {\n            hook: CliHookName::GitPrePush,\n            host: None,\n            git_hook_args: vec![\"origin\".to_owned(), \"https://example.com\".to_owned()],\n        });\n\n        assert!(matches!(input.hook, cli_driver::hook::HookName::GitPrePush));\n        assert!(input.host.is_none());\n        assert_eq!(input.git_hook_args, [\"origin\", \"https://example.com\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_cli_hook_host_converts_exhaustively_to_driver_host"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "CliHookHost"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "b87831cb0740299a0065202880b55db2ec272a8eaed3edb415346441d6a81b18",
+        "declaration_hash": "f6cca70cdb0ef977502713087f28031370590576b816b683287a0a37119a394e"
+      },
+      "obligation_id": {
+        "entry_key": "CliHookHost",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(HookHost::from(CliHookHost::Claude), HookHost::Claude));\n        assert!(matches!(HookHost::from(CliHookHost::Codex), HookHost::Codex));\n        assert!(matches!(HookHost::from(CliHookHost::Grok), HookHost::Grok));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_hook_command_converts_to_driver_input_without_cli_policy"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::commands::hook::CliHookName"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "639fa239248aeee2bf8807239fadfaa6e0537a505e606766333f4f59d3e31ab3",
+        "declaration_hash": "026451879d13207c2226c45480dce1c7b93384587243b670d393e5c9d929ef9d"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::CliHookName",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(input.hook, cli_driver::hook::HookName::GitPrePush));\n        assert!(input.host.is_none());\n        assert_eq!(input.git_hook_args, [\"origin\", \"https://example.com\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_hook_telemetry_uses_typed_dispositions"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::is_hook_block_outcome"
+      },
+      "key": {
+        "anchor_text_hash": "aa7a4250ed90a45c5a0b8982daff7e5d786ec790a77be49a3cbb5b911850e76e",
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
+        "declaration_hash": "ce5480c41776ae18b8ac3a6893483f0b17757ddfcb62bb6026653dcfc31fe18b"
+      },
+      "obligation_id": {
+        "entry_key": "cli::is_hook_block_outcome",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));\n        assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_hook_telemetry_uses_typed_dispositions"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::is_hook_block_outcome"
+      },
+      "key": {
+        "anchor_text_hash": "72d2ec7c21e2e498b337423209b7f2b162f1245de954f99b5634183b0a90c05a",
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
+        "declaration_hash": "ce5480c41776ae18b8ac3a6893483f0b17757ddfcb62bb6026653dcfc31fe18b"
+      },
+      "obligation_id": {
+        "entry_key": "cli::is_hook_block_outcome",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_agent_hook_without_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_with_host_returns_exit_2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_git_hook_without_host_preserves_positional_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_execute_block_direct_git_ops_with_extra_args_returns_exit_2"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli::commands::hook::execute_inner"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "640bbf863ea59d8ce720f32321fd0d6c3c49564150cace25a387dd6c6e8b421f",
+        "declaration_hash": "ed0a40dc2f5ce25120f03bd3c37d45d671ff3534369e8131b3861f29f9792670"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::hook::execute_inner",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let execution = super::execute_inner(HookCommand::Dispatch {\n                hook: CliHookName::GitRefUpdate,\n                host: None,\n                git_hook_args: vec![\"committed\".to_owned()],\n            })\n            .unwrap();\n\n        assert!(matches!(&execution, CliHookExecution::Allow(_)));\n        assert_eq!(execution.outcome().exit_code, 0);\n        assert_eq!(execution.disposition(), HookExecutionDisposition::Allow);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_claude_and_codex_share_pretool_use_normalization_and_guard_behavior"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookExecution"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "b7c512f73fd3eb88ae0577507ad69142332a3761ad2e9e177ed4521e54940c54",
+        "declaration_hash": "5932cffca5f870f3f6bb8c2c0d83e44200e29f6f4bf1e0e6aba0638ec85b7ac6"
+      },
+      "obligation_id": {
+        "entry_key": "HookExecution",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let raw = r#\"{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git add safe.txt\"}}\"#;\n\n        for host in [HookHost::Claude, HookHost::Codex] {\n            let (driver, service) = driver_with(Response::Block);\n            let execution = driver.dispatch_agent_input(HookName::BlockDirectGitOps, host, raw);\n\n            assert!(matches!(execution, HookExecution::HookBlock(_)));\n            assert_eq!(outcome(&execution).exit_code, 2);\n            assert_eq!(outcome(&execution).stderr.as_deref(), Some(\"blocked by test service\"));\n\n            let (hook_name, command) = service.calls.lock().unwrap().pop().expect(\"dispatch call\");\n            assert_eq!(hook_name, \"block-direct-git-ops\");\n            assert_eq!(command.tool_name, \"Bash\");\n            assert_eq!(command.command.as_deref(), Some(\"git add safe.txt\"));\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::hook::tests",
+          "test_name": "test_hook_driver_claude_and_codex_share_pretool_use_normalization_and_guard_behavior"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "cli_driver::hook::HookDriver"
+      },
+      "key": {
+        "anchor_text_hash": "918d6d7d36defb1a21fa6094b9912980971ed9895c7ec51bb82b3d9f98848621",
+        "bound_tests_set_hash": "b7c512f73fd3eb88ae0577507ad69142332a3761ad2e9e177ed4521e54940c54",
+        "declaration_hash": "41f9ec329e30a7cc3609be86156956d6d92167062f906a9d65789118d84a2fed"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::hook::HookDriver",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let execution = driver.dispatch_agent_input(HookName::BlockDirectGitOps, host, raw);\n\n            assert!(matches!(execution, HookExecution::HookBlock(_)));\n            assert_eq!(outcome(&execution).exit_code, 2);\n            assert_eq!(outcome(&execution).stderr.as_deref(), Some(\"blocked by test service\"));\n\n            let (hook_name, command) = service.calls.lock().unwrap().pop().expect(\"dispatch call\");\n            assert_eq!(hook_name, \"block-direct-git-ops\");\n            assert_eq!(command.tool_name, \"Bash\");\n            assert_eq!(command.command.as_deref(), Some(\"git add safe.txt\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::hook::tests",
+          "test_name": "test_cli_hook_execution_preserves_driver_dispositions"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_hook_telemetry_uses_typed_dispositions"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "CliHookExecution"
+      },
+      "key": {
+        "anchor_text_hash": "72d2ec7c21e2e498b337423209b7f2b162f1245de954f99b5634183b0a90c05a",
+        "bound_tests_set_hash": "a8d6a27d756ca7053dbe5af5e64c3f2e50a627e77f1895371da5dde64872cc83",
+        "declaration_hash": "4397db0a6d14430f90207a5ba70a2cb788f779f7f5320964230b3fef2716d178"
+      },
+      "obligation_id": {
+        "entry_key": "CliHookExecution",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));\n        assert!(super::is_hook_block_outcome(HookExecutionDisposition::HookBlock));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_hook_telemetry_uses_typed_dispositions"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookExecutionDisposition"
+      },
+      "key": {
+        "anchor_text_hash": "aa7a4250ed90a45c5a0b8982daff7e5d786ec790a77be49a3cbb5b911850e76e",
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
+        "declaration_hash": "9b29fb9cb9380af3241ac4738932545251f6187fbfd4c88684ac0b9e3922907b"
+      },
+      "obligation_id": {
+        "entry_key": "HookExecutionDisposition",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_hook_telemetry_uses_typed_dispositions"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        "entry_key": "HookExecutionDisposition"
+      },
+      "key": {
+        "anchor_text_hash": "72d2ec7c21e2e498b337423209b7f2b162f1245de954f99b5634183b0a90c05a",
+        "bound_tests_set_hash": "19188f25ea42283396e4ec55e0baa9f1ea6ccf2c623711cd8589a04030e93c07",
+        "declaration_hash": "9e038cb6fd371aba74ec669592dffb83862cc1f8f5c9e59365e1d912b51db87b"
+      },
+      "obligation_id": {
+        "entry_key": "HookExecutionDisposition",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InputError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::InternalError));\n        assert!(!super::is_hook_block_outcome(HookExecutionDisposition::AdvisoryFired));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    }
+  ],
+  "track_id": "2026-09-05-hook-explicit-host-input-contract"
+}

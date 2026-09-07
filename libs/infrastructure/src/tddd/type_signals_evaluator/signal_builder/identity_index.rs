@@ -9,7 +9,9 @@ use domain::tddd::catalogue_v2::{
 };
 use rustdoc_types::{Id, ItemSummary};
 
-use crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref;
+use crate::tddd::canonical_type_identity::{
+    canonicalize_catalogue_type_ref, canonicalize_catalogue_type_ref_without_impl_params,
+};
 
 /// Catalogue aliases used to map report labels to persisted entry keys.
 /// Canonical identities come from T004; renderer path spellings are not identities.
@@ -188,12 +190,23 @@ pub(crate) fn build_type_signal_identity_index(
                 trait_impl.for_type()
             )
         })?;
+        let canonical_without_impl_params = canonicalize_catalogue_type_ref_without_impl_params(
+            trait_impl.for_type(),
+            catalogue_crate,
+            &type_paths,
+            &generic_params,
+        )
+        .map_err(|error| {
+            format!("cannot normalize type-signal impl owner '{}': {error}", trait_impl.for_type())
+        })?;
 
-        // Local type entries own impl rows; external types retain their canonical key.
+        // Local type entries own impl rows; external owners retain the exact
+        // catalogue `for_type` spelling as their namespace-less report key.
         let owner_key =
             declaration_key_for_canonical(&index, canonical.as_str(), CatalogueItemNamespace::Type)
-                .unwrap_or_else(|| canonical.as_str().to_owned());
+                .unwrap_or_else(|| trait_impl.for_type().as_str().to_owned());
         index.add_impl_alias(canonical.as_str(), &owner_key);
+        index.add_impl_alias(canonical_without_impl_params.as_str(), &owner_key);
         index.add_impl_alias(trait_impl.for_type().as_str(), &owner_key);
         index.add_impl_alias(strip_generic_suffix(trait_impl.for_type().as_str()), &owner_key);
         index.add_impl_alias(short_name(trait_impl.for_type().as_str()), &owner_key);

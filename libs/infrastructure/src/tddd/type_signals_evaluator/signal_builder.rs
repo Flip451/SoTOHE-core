@@ -837,6 +837,179 @@ mod tests {
     }
 
     #[test]
+    fn test_build_identity_index_preserves_std_for_type_for_alloc_impl_owner() {
+        let raw_owner = "std::vec::Vec<i32>";
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer"),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("SomeTrait").expect("valid trait reference"),
+            TypeRef::new(raw_owner).expect("valid external owner"),
+        ));
+
+        let rustdoc_paths = HashMap::from([(
+            Id(1),
+            ItemSummary {
+                crate_id: 1,
+                path: vec!["alloc".to_owned(), "vec".to_owned(), "Vec".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("the std re-export must resolve through the alloc definition");
+
+        for alias in ["alloc::vec::Vec<i32>", raw_owner, "std::vec::Vec", "Vec"] {
+            assert_eq!(
+                index.owner_candidates(alias),
+                Some(vec![raw_owner.to_owned()]),
+                "alias {alias:?} must resolve to the exact catalogue for_type"
+            );
+        }
+
+        let signals = [ThreeWaySignal::label(
+            FreeText::new("alloc::vec::Vec<i32>: SomeTrait"),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+        let built = build_type_signals_from_report(signals.iter(), &BTreeMap::new(), &index);
+
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), raw_owner);
+        assert_eq!(built[0].identity().namespace(), None);
+        assert_eq!(built[0].found_items(), &["SomeTrait".to_owned(),]);
+    }
+
+    #[test]
+    fn test_build_identity_index_matches_parameter_stripped_canonical_external_impl_owner() {
+        use domain::tddd::catalogue_v2::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let raw_owner = "std::vec::Vec<T>";
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer"),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+            ItemAction::Add,
+            TypeRef::new("SomeTrait").expect("valid trait reference"),
+            TypeRef::new(raw_owner).expect("valid external generic owner"),
+            vec![MethodGenericParam {
+                name: ParamName::new("T").expect("valid generic parameter"),
+                bounds: vec![],
+            }],
+            vec![],
+        ));
+
+        let rustdoc_paths = HashMap::from([(
+            Id(1),
+            ItemSummary {
+                crate_id: 1,
+                path: vec!["alloc".to_owned(), "vec".to_owned(), "Vec".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("the generic std re-export must resolve through the alloc definition");
+
+        for alias in ["alloc::vec::Vec<T>", "alloc::vec::Vec", raw_owner, "std::vec::Vec", "Vec"] {
+            assert_eq!(
+                index.owner_candidates(alias),
+                Some(vec![raw_owner.to_owned()]),
+                "alias {alias:?} must resolve to the exact catalogue for_type"
+            );
+        }
+
+        let signals = [ThreeWaySignal::label(
+            FreeText::new("alloc::vec::Vec: SomeTrait"),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+        let built = build_type_signals_from_report(signals.iter(), &BTreeMap::new(), &index);
+
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), raw_owner);
+        assert_eq!(built[0].identity().namespace(), None);
+        assert_eq!(built[0].found_items(), &["SomeTrait".to_owned(),]);
+    }
+
+    #[test]
+    fn test_build_identity_index_preserves_mixed_canonical_concrete_impl_owner_argument() {
+        use domain::tddd::catalogue_v2::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let raw_owner = "std::collections::HashMap<K, String>";
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer"),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+            ItemAction::Add,
+            TypeRef::new("SomeTrait").expect("valid trait reference"),
+            TypeRef::new(raw_owner).expect("valid mixed generic owner"),
+            vec![MethodGenericParam {
+                name: ParamName::new("K").expect("valid generic parameter"),
+                bounds: vec![],
+            }],
+            vec![],
+        ));
+
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 1,
+                    path: vec![
+                        "alloc".to_owned(),
+                        "collections".to_owned(),
+                        "hash_map".to_owned(),
+                        "HashMap".to_owned(),
+                    ],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 1,
+                    path: vec!["alloc".to_owned(), "string".to_owned(), "String".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+        ]);
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("the mixed generic external owner must resolve");
+
+        for alias in [
+            "alloc::collections::hash_map::HashMap<K, alloc::string::String>",
+            "alloc::collections::hash_map::HashMap<alloc::string::String>",
+            raw_owner,
+            "std::collections::HashMap",
+            "HashMap",
+        ] {
+            assert_eq!(
+                index.owner_candidates(alias),
+                Some(vec![raw_owner.to_owned()]),
+                "alias {alias:?} must retain the concrete canonical argument"
+            );
+        }
+
+        let signals = [ThreeWaySignal::label(
+            FreeText::new(
+                "alloc::collections::hash_map::HashMap<alloc::string::String>: SomeTrait",
+            ),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+        let built = build_type_signals_from_report(signals.iter(), &BTreeMap::new(), &index);
+
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), raw_owner);
+        assert_eq!(built[0].identity().namespace(), None);
+        assert_eq!(built[0].found_items(), &["SomeTrait".to_owned(),]);
+    }
+
+    #[test]
     fn test_build_identity_index_joins_generic_impl_owner_to_declaration_identity() {
         use domain::tddd::LayerId;
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};

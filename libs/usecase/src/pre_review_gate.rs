@@ -653,8 +653,11 @@ mod tests {
     };
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
-    use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, CrateName, ModulePath};
+    use domain::tddd::catalogue_v2::identifiers::{
+        CatalogueItemNamespace, CrateName, ModulePath, TypeRef,
+    };
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
         AttestedCatalogueDocument, CatalogueDocument, CatalogueDocumentLoaderError,
         TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
@@ -749,6 +752,18 @@ mod tests {
             ThreeWaySignalIdentity::Label { label: FreeText::new(name) },
             "unknown".to_owned(),
             ConfidenceSignal::Yellow,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )
+    }
+
+    fn namespace_less_signal(name: &str, signal: ConfidenceSignal) -> TypeSignal {
+        TypeSignal::new(
+            ThreeWaySignalIdentity::Label { label: FreeText::new(name) },
+            "unknown".to_owned(),
+            signal,
             true,
             vec![],
             vec![],
@@ -954,6 +969,32 @@ mod tests {
             ),
             signals,
         )
+    }
+
+    fn make_signals_for_catalogue(
+        signals: Vec<TypeSignal>,
+        catalogue: &AttestedCatalogueDocument,
+    ) -> TypeSignalsDocument {
+        let baseline_digest =
+            domain::Sha256Digest::try_new("a".repeat(64)).expect("valid baseline digest");
+        TypeSignalsDocument::new(
+            ts("2026-06-27T00:00:00Z"),
+            test_cache_key(
+                catalogue.declaration_hash().clone(),
+                domain::CommitHash::try_new("a".repeat(40)).expect("valid commit hash"),
+                domain::BaselineHash::new(baseline_digest),
+            ),
+            signals,
+        )
+    }
+
+    fn external_owner_catalogue() -> CatalogueDocument {
+        let mut document = CatalogueDocument::new(5, CrateName::new("cli").unwrap(), layer("cli"));
+        document.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("core::convert::From<CliHookHost>").unwrap(),
+            TypeRef::new("cli_driver::hook::HookHost").unwrap(),
+        ));
+        document
     }
 
     fn assert_liveness_violations(
@@ -1661,6 +1702,62 @@ mod tests {
                     ),
                 ),
             ],
+        );
+    }
+
+    #[test]
+    fn external_trait_impl_owner_is_attributed_in_liveness_and_coverage() {
+        let owner = entry_key("cli_driver::hook::HookHost");
+        let attested = attest_catalogue(external_owner_catalogue(), 'a');
+        let contract = make_contract(
+            "my-track",
+            vec![(task_id("T001"), vec![ContractedEntryRef::new(layer("cli"), owner.clone())])],
+        );
+
+        let liveness = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(contract.clone()))),
+            Arc::new(ConstSignalReader(Ok(make_signals_for_catalogue(
+                vec![namespace_less_signal(owner.as_str(), ConfidenceSignal::Blue)],
+                &attested,
+            )))),
+            Arc::new(FixedImplPlanReader(std::collections::HashMap::from([(
+                task_id("T001"),
+                TaskStatusKind::InProgress,
+            )]))),
+            Arc::new(ConstCatalogueReader(attested.clone())),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
+        );
+        assert!(
+            matches!(liveness.check(cmd("my-track", "cli")).unwrap(), PreReviewGateOutcome::Passed),
+            "external trait-impl owner should resolve as the namespace-less liveness identity"
+        );
+
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert(
+            "cli".to_owned(),
+            make_signals_for_catalogue(
+                vec![namespace_less_signal(owner.as_str(), ConfidenceSignal::Blue)],
+                &attested,
+            ),
+        );
+        for layer_name in ["domain", "usecase", "infrastructure", "cli_driver", "cli_composition"] {
+            signal_docs
+                .insert(layer_name.to_owned(), make_signals_for_catalogue(vec![], &attested));
+        }
+
+        let coverage = coverage_interactor_with_catalogue(
+            Ok(contract),
+            signal_docs,
+            Arc::new(ConstCatalogueReader(attested)),
+        );
+        assert!(
+            matches!(
+                coverage.verify_coverage(coverage_cmd("my-track")).unwrap(),
+                CoverageVerifyOutcome::Passed
+            ),
+            "external trait-impl owner should resolve as the namespace-less coverage identity"
         );
     }
 
