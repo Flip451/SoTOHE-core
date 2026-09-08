@@ -284,6 +284,13 @@ fn normalize_windows_verbatim_path(path: &Path) -> PathBuf {
 
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
+pub(crate) fn canonicalized_path(path: impl AsRef<Path>) -> PathBuf {
+    let canonicalized = std::fs::canonicalize(path).unwrap();
+    normalize_windows_verbatim_path(&canonicalized)
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use std::sync::Mutex;
@@ -354,11 +361,6 @@ mod tests {
         let path = PathBuf::from(r"\\?\Volume{fixture-guid}\repo");
 
         assert_eq!(normalize_windows_verbatim_path(&path), path);
-    }
-
-    fn canonicalized_path(path: impl AsRef<Path>) -> PathBuf {
-        let canonicalized = std::fs::canonicalize(path).unwrap();
-        normalize_windows_verbatim_path(&canonicalized)
     }
 
     #[test]

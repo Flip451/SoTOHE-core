@@ -662,6 +662,7 @@ mod tests {
     use std::sync::Mutex;
 
     use super::*;
+    use crate::track_resolution::canonicalized_path;
 
     #[test]
     fn test_track_tddd_driver_production_has_no_shim_or_reverse_delegation() {
@@ -1010,7 +1011,7 @@ mod tests {
 
     #[test]
     fn test_track_tddd_items_directory_input_normalizes_relative_workspace_root() {
-        let expected = std::fs::canonicalize(std::env::current_dir().unwrap()).unwrap();
+        let expected = canonicalized_path(std::env::current_dir().unwrap());
         let items_dir = TrackItemsDirectoryInput::try_new(PathBuf::from("track/items")).unwrap();
 
         let workspace_root = items_dir.workspace_root().unwrap();
