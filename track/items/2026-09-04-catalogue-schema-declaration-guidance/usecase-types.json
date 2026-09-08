@@ -1,0 +1,8 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {},
+  "types": {}
+}

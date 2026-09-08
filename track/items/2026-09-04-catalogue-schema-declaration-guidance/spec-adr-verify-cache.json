@@ -1,0 +1,419 @@
+{
+  "entries": [
+    {
+      "claim_hash": "58b48bd806fc8af80d2ba93b40cd8a67b4896ff57199c199adc986b4c2a18ed1",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Make supported catalogue declarations discoverable and make structural matching consistently recognize their field and inherent-implementation children."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`catalogue-schema.md` に次を可否の実例つきで追記する。\n\n- inherent method の置き場: entry 本体の `methods` が正規。`inherent_impls` は entry 本体で表せない場合(impl-block-level generics や where 条件つき等)に限る。\n- tuple struct の private field: 照合可能なのは「末尾に private field が 1 つ」の形のみ。private field が 2 つ以上、または public field より前にある tuple struct は現行機構では 🔵 にならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "58b48bd806fc8af80d2ba93b40cd8a67b4896ff57199c199adc986b4c2a18ed1",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Make supported catalogue declarations discoverable and make structural matching consistently recognize their field and inherent-implementation children."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "構造照合の位置番号(`[0]` 等)は、子要素自身が tuple struct または tuple variant の field item であるときにのみ付与し、子 index と field 数の比較では決めない。impl 由来の子要素には付与しない。これにより `inherent_impls` 配置でも実装側と鍵が一致する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "76a11849e5e50ea5f0148dd9c57637e8c8ccb9871366b8453ac5245faa19e175",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Document the supported lifetime trait-implementation spelling, inherent-method placement guidance, and private tuple-field matching limitation in the catalogue schema reference."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`catalogue-schema.md` に次を可否の実例つきで追記する。\n\n- lifetime 引数つき trait impl の宣言法: `trait_ref` は引数を含めた表記(`serde::Deserialize<'de>`)とし、`impl_generics` には lifetime 名を先頭 `'` なし(`de`)で宣言する。\n- inherent method の置き場: entry 本体の `methods` が正規。`inherent_impls` は entry 本体で表せない場合(impl-block-level generics や where 条件つき等)に限る。\n- tuple struct の private field: 照合可能なのは「末尾に private field が 1 つ」の形のみ。private field が 2 つ以上、または public field より前にある tuple struct は現行機構では 🔵 にならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dc6d0f14b7c393d0155e4d81eabe201d4ee5a8736246e3b0e1ecf1f93b90514a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Align implementation-generics documentation in the catalogue DTO surface with the supported lifetime declaration guidance."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "あわせて `catalogue_v2/entries.rs` と `catalogue_v2/traits.rs` の `impl_generics` doc コメントから「lifetime は対象外」の記述を外し、スキーマ文書と同じ規則(lifetime 名は `'` なしで宣言する)に揃える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf93991f1d1910bf3cb6cd2cf77b0bd4efe08d3c62c4b654ebfb8ec5351c7849",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Restrict structural-matching positional keys to tuple field children, leaving inherent-implementation-derived children unnumbered."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "構造照合の位置番号(`[0]` 等)は、子要素自身が tuple struct または tuple variant の field item であるときにのみ付与し、子 index と field 数の比較では決めない。impl 由来の子要素には付与しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "12c5a3acb107a70a12765261253948747eba3f3ad54e910ff6fa6fef000be41d",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Add regression coverage for the matchable one-trailing-private-tuple-field form when its inherent method is declared through a top-level inherent-implementation entry."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "回帰テストとして、末尾に private tuple field を 1 つ持つ型の inherent method を `inherent_impls` に置いた fixture で 🔵 になることを固定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "185d256d9bacc6c98663d8f364dc5992ff296dfe208fde54d82647af00912652",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "Supporting structural matching for tuple structs with two or more private fields or with a private field before a public field."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "private field が 2 つ以上、または public field より前にある tuple struct は現行機構では 🔵 にならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3b176539cea85c50316b4edbef813ad27a62d5e45278e9ea656d24ac8aea5cfd",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "Changing the codec's single-trailing-private-field None encoding."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "tuple struct の private field: 照合可能なのは「末尾に private field が 1 つ」の形のみ。private field が 2 つ以上、または public field より前にある tuple struct は現行機構では 🔵 にならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6fe97cdbbd1580f2eef6ceb2d956bee514989b72ff26e0a6388fad215b5594e1",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The declaration guidance and DTO documentation alignment do not change runtime behaviour."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "スキーマ文書と同じ規則(lifetime 名は `'` なしで宣言する)に揃える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b28f84feb7d36010738ecba906e9cdbac6442c1b136d1da6b30ca2e56e2eaa2",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Top-level inherent-implementation declarations remain supported for cases that cannot be expressed through an entry's methods; the guidance must not turn their use into an unsupported declaration form."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "inherent method の置き場: entry 本体の `methods` が正規。`inherent_impls` は entry 本体で表せない場合(impl-block-level generics や where 条件つき等)に限る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f049cd116f694dd83d5e4d0d7477a96e928095ff4d8c88cf0ab6526bfdfcc7ee",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "The positional-key decision is determined by the child item's field identity rather than by comparing its position with the number of fields."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "子 index と field 数の比較では決めない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "15fd61cbba8ca9b30dc838f6d15bace324f93ffc990901c47fdc0956c6e3b6d4",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "The existing codec representation of one trailing private tuple field remains unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "tuple struct の private field: 照合可能なのは「末尾に private field が 1 つ」の形のみ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c277897756ca38e0d54930f4687803934866634e1a71e182d2462beb0c9cf32",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "The catalogue schema reference documents the supported declaration spelling for trait implementations with lifetime arguments, including the distinct lifetime notation used in the trait reference and implementation-generics declaration."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "lifetime 引数つき trait impl の宣言法: `trait_ref` は引数を含めた表記(`serde::Deserialize<'de>`)とし、`impl_generics` には lifetime 名を先頭 `'` なし(`de`)で宣言する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5e62ba9fa4b7c913d19fc168365af8f7619c69814d20279f8c24526590f1e247",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The catalogue schema reference identifies entry-level methods as the normal inherent-method declaration location, reserves top-level inherent-implementation declarations for entry-level limitations, and documents the currently matchable single trailing private tuple-field form."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "inherent method の置き場: entry 本体の `methods` が正規。`inherent_impls` は entry 本体で表せない場合(impl-block-level generics や where 条件つき等)に限る。\n- tuple struct の private field: 照合可能なのは「末尾に private field が 1 つ」の形のみ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbace43d347184cbb30905b69a6a47270463dfcc34c469456a0705b9dc479f35",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "The catalogue DTO documentation for implementation generics no longer states that lifetimes are outside the supported surface and instead aligns with the schema reference's lifetime declaration rule."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "あわせて `catalogue_v2/entries.rs` と `catalogue_v2/traits.rs` の `impl_generics` doc コメントから「lifetime は対象外」の記述を外し、スキーマ文書と同じ規則(lifetime 名は `'` なしで宣言する)に揃える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "56cd178347ac5a711af3a472b3da79824917e2af1da65387e02d0fd2330b2f37",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Structural matching assigns a positional key only to a tuple-struct or tuple-variant field item; a child originating from an inherent implementation receives no positional suffix."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "構造照合の位置番号(`[0]` 等)は、子要素自身が tuple struct または tuple variant の field item であるときにのみ付与し、子 index と field 数の比較では決めない。impl 由来の子要素には付与しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f130d55e6a2a626a93586d15c8e96e7474bdaefdfc9ce9aa42c425a382cea015",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "A catalogue fixture with exactly one trailing private tuple field and an inherent method declared through a top-level inherent-implementation entry evaluates blue."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "回帰テストとして、末尾に private tuple field を 1 つ持つ型の inherent method を `inherent_impls` に置いた fixture で 🔵 になることを固定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8d4aa1d47acdc7a808261fec3435b8717537d04db85d8c93628bc974c8736a45",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "Previously blue structural-matching verdicts remain blue; the only changed verdict class is the combination of a tuple struct, a private field, and an inherent implementation."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "5d0212913620b7373e00772ef304e73c2e899fc4fbda6dba967635cc9fbfc143",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "回帰テストとして、末尾に private tuple field を 1 つ持つ型の inherent method を `inherent_impls` に置いた fixture で 🔵 になることを固定する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

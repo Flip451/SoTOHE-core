@@ -370,7 +370,7 @@ fn item_context(item: &Item) -> String {
 }
 
 fn child_context(parent: &str, parent_item: &Item, child: &Item, child_index: usize) -> String {
-    let position = if positional_child(parent_item, child_index) {
+    let position = if positional_child(parent_item, child) {
         format!("[{child_index}]")
     } else {
         String::new()
@@ -378,18 +378,17 @@ fn child_context(parent: &str, parent_item: &Item, child: &Item, child_index: us
     format!("{parent}/{}{position}", item_context(child))
 }
 
-fn positional_child(parent: &Item, child_index: usize) -> bool {
-    match &parent.inner {
-        ItemEnum::Struct(structure) => matches!(
-            &structure.kind,
-            rustdoc_types::StructKind::Tuple(fields) if child_index < fields.len()
-        ),
-        ItemEnum::Variant(variant) => matches!(
-            &variant.kind,
-            rustdoc_types::VariantKind::Tuple(fields) if child_index < fields.len()
-        ),
+fn positional_child(parent: &Item, child: &Item) -> bool {
+    let is_tuple_field_parent = match &parent.inner {
+        ItemEnum::Struct(structure) => {
+            matches!(&structure.kind, rustdoc_types::StructKind::Tuple(_))
+        }
+        ItemEnum::Variant(variant) => {
+            matches!(&variant.kind, rustdoc_types::VariantKind::Tuple(_))
+        }
         _ => false,
-    }
+    };
+    is_tuple_field_parent && matches!(&child.inner, ItemEnum::StructField(_))
 }
 
 /// Compares alias targets while retaining the established catalogue/rustdoc
@@ -797,6 +796,347 @@ mod tests {
         assert!(
             !structs_structurally_equal(&s_struct, &c_struct, &s_index, &c_index),
             "different field types must not match"
+        );
+    }
+
+    fn make_empty_inherent_impl(id: Id, owner_path: &str) -> Item {
+        make_item(
+            id,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(Path {
+                    path: owner_path.to_owned(),
+                    id: Id(0),
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        )
+    }
+
+    fn make_method_item(id: Id, name: &str) -> Item {
+        let mut item = make_item(
+            id,
+            ItemEnum::Function(rustdoc_types::Function {
+                sig: FunctionSignature {
+                    inputs: vec![(
+                        "self".to_owned(),
+                        Type::BorrowedRef {
+                            lifetime: None,
+                            is_mutable: false,
+                            type_: Box::new(Type::Generic("Self".to_owned())),
+                        },
+                    )],
+                    output: Some(Type::BorrowedRef {
+                        lifetime: None,
+                        is_mutable: false,
+                        type_: Box::new(Type::Primitive("str".to_owned())),
+                    }),
+                    is_c_variadic: false,
+                },
+                generics: empty_generics(),
+                header: FunctionHeader {
+                    is_unsafe: false,
+                    is_const: false,
+                    is_async: false,
+                    abi: Abi::Rust,
+                },
+                has_body: true,
+            }),
+        );
+        item.name = Some(name.to_owned());
+        item
+    }
+
+    fn make_method_inherent_impl(id: Id, owner_path: &str, method_id: Id) -> Item {
+        make_item(
+            id,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(Path {
+                    path: owner_path.to_owned(),
+                    id: Id(0),
+                    args: None,
+                }),
+                items: vec![method_id],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        )
+    }
+
+    #[test]
+    fn test_positional_key_is_assigned_only_to_tuple_field_items() {
+        let field_id = Id(1);
+        let empty_impl_id = Id(2);
+        let method_impl_id = Id(3);
+        let parent = make_item(
+            Id(10),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Tuple(vec![Some(field_id), None]),
+                generics: empty_generics(),
+                impls: vec![empty_impl_id, method_impl_id],
+            }),
+        );
+        let field = make_struct_field_item(field_id, "u32");
+        let empty_impl = make_empty_inherent_impl(empty_impl_id, "Holder");
+        let method_impl = make_method_inherent_impl(method_impl_id, "Holder", Id(4));
+
+        assert_eq!(
+            super::child_context("struct:Holder", &parent, &field, 0),
+            "struct:Holder/field:<anonymous>[0]"
+        );
+        assert_eq!(
+            super::child_context("struct:Holder", &parent, &empty_impl, 1),
+            "struct:Holder/inherent_impl:<anonymous>"
+        );
+        assert_eq!(
+            super::child_context("struct:Holder", &parent, &method_impl, 2),
+            "struct:Holder/inherent_impl:<anonymous>"
+        );
+    }
+
+    #[test]
+    fn test_positional_key_is_assigned_only_to_tuple_variant_field_items() {
+        let field_id = Id(1);
+        let parent = make_item(
+            Id(2),
+            ItemEnum::Variant(Variant {
+                kind: VariantKind::Tuple(vec![Some(field_id)]),
+                discriminant: None,
+            }),
+        );
+        let field = make_struct_field_item(field_id, "u32");
+        let inherent = make_empty_inherent_impl(Id(3), "Holder");
+
+        assert_eq!(
+            super::child_context("variant:Value", &parent, &field, 0),
+            "variant:Value/field:<anonymous>[0]"
+        );
+        assert_eq!(
+            super::child_context("variant:Value", &parent, &inherent, 1),
+            "variant:Value/inherent_impl:<anonymous>"
+        );
+    }
+
+    #[test]
+    fn test_all_public_tuple_fields_keep_positional_keys_and_impls_stay_unnumbered() {
+        let field0 = Id(1);
+        let field1 = Id(2);
+        let impl_id = Id(3);
+        let parent = make_item(
+            Id(10),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Tuple(vec![Some(field0), Some(field1)]),
+                generics: empty_generics(),
+                impls: vec![impl_id],
+            }),
+        );
+        let first = make_struct_field_item(field0, "u32");
+        let second = make_struct_field_item(field1, "String");
+        let inherent = make_empty_inherent_impl(impl_id, "Holder");
+
+        assert_eq!(
+            super::child_context("struct:Holder", &parent, &first, 0),
+            "struct:Holder/field:<anonymous>[0]"
+        );
+        assert_eq!(
+            super::child_context("struct:Holder", &parent, &second, 1),
+            "struct:Holder/field:<anonymous>[1]"
+        );
+        assert_eq!(
+            super::child_context("struct:Holder", &parent, &inherent, 2),
+            "struct:Holder/inherent_impl:<anonymous>"
+        );
+    }
+
+    #[test]
+    fn test_one_trailing_private_tuple_field_with_inherent_impls_matches_rustdoc() {
+        let a_field_id = Id(1);
+        let a_empty_impl_id = Id(2);
+        let a_method_impl_id = Id(3);
+        let a_method_id = Id(4);
+        let a_root_id = Id(10);
+        let a = make_item(
+            a_root_id,
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Tuple(vec![Some(a_field_id), None]),
+                generics: empty_generics(),
+                impls: vec![a_empty_impl_id, a_method_impl_id],
+            }),
+        );
+        let mut a_field = make_struct_field_item(a_field_id, "u32");
+        a_field.name = None;
+        let a_index = HashMap::from([
+            (a_root_id, a.clone()),
+            (a_field_id, a_field),
+            (a_empty_impl_id, make_empty_inherent_impl(a_empty_impl_id, "Holder")),
+            (a_method_impl_id, make_method_inherent_impl(a_method_impl_id, "Holder", a_method_id)),
+            (a_method_id, make_method_item(a_method_id, "as_str")),
+        ]);
+
+        let b_field_id = Id(11);
+        let b_method_impl_id = Id(12);
+        let b_method_id = Id(13);
+        let b_root_id = Id(20);
+        let b = make_item(
+            b_root_id,
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Tuple(vec![Some(b_field_id), None]),
+                generics: empty_generics(),
+                impls: vec![b_method_impl_id],
+            }),
+        );
+        let mut b_field = make_struct_field_item(b_field_id, "u32");
+        b_field.name = Some("0".to_owned());
+        let b_index = HashMap::from([
+            (b_root_id, b.clone()),
+            (b_field_id, b_field),
+            (b_method_impl_id, make_method_inherent_impl(b_method_impl_id, "Holder", b_method_id)),
+            (b_method_id, make_method_item(b_method_id, "as_str")),
+        ]);
+
+        let a_paths = HashMap::from([(
+            a_root_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Holder".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            b_root_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Holder".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+
+        assert!(
+            super::items_structurally_equal_with_paths(
+                &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+            ),
+            "one trailing private tuple field plus inherent_impls methods must match rustdoc"
+        );
+    }
+
+    #[test]
+    fn test_one_trailing_private_tuple_field_with_inherent_impls_evaluates_blue() {
+        use domain::tddd::catalogue_v2::{
+            CatalogueDocument, CatalogueEntryKey, CrateName, DataRole, InherentImplDeclV2,
+            ItemAction, MethodDeclaration, MethodName, ModulePath, SelfReceiver, StructKind,
+            StructShape, TypeEntry, TypeKindV2, TypeRef,
+        };
+        use domain::tddd::{LayerId, SignalEvaluatorPort, SignalRegion};
+        use rustdoc_types::{Crate, FORMAT_VERSION, Target};
+
+        use crate::tddd::signal_evaluator_v2::SignalEvaluatorV2;
+
+        let crate_name = "domain";
+        let mut doc = CatalogueDocument::new(
+            2,
+            CrateName::new(crate_name).unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Tuple {
+                        fields: vec![TypeRef::new("u32").unwrap()],
+                        has_stripped_fields: true,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.push_inherent_impl(InherentImplDeclV2::new(
+            CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+            vec![],
+            vec![],
+            vec![MethodDeclaration::new(
+                MethodName::new("as_str").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("str").unwrap(),
+                false,
+                false,
+                vec![],
+                vec![],
+                vec![],
+                ItemAction::Add,
+                None,
+            )],
+        ));
+
+        let empty = Crate {
+            root: Id(0),
+            crate_version: None,
+            includes_private: false,
+            index: HashMap::new(),
+            paths: HashMap::new(),
+            external_crates: HashMap::new(),
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+        let a =
+            crate::tddd::catalogue_to_extended_crate_codec::encode_document(doc, &empty, &empty)
+                .expect("catalogue fixture must encode");
+
+        let mut current = a.krate().clone();
+        let empty_impl_ids: Vec<Id> = current
+            .index
+            .iter()
+            .filter_map(|(id, item)| match &item.inner {
+                ItemEnum::Impl(implementation)
+                    if implementation.trait_.is_none() && implementation.items.is_empty() =>
+                {
+                    Some(*id)
+                }
+                _ => None,
+            })
+            .collect();
+        for item in current.index.values_mut() {
+            if let ItemEnum::Struct(structure) = &mut item.inner {
+                structure.impls.retain(|id| !empty_impl_ids.contains(id));
+            }
+        }
+        for id in &empty_impl_ids {
+            current.index.remove(id);
+        }
+        for item in current.index.values_mut() {
+            if let ItemEnum::StructField(_) = &item.inner {
+                item.name = Some("0".to_owned());
+            }
+        }
+
+        let report = SignalEvaluatorV2::new().evaluate(a, empty, current).unwrap();
+        let signal = report.iter().find(|signal| signal.item_name() == "Holder");
+        assert!(signal.is_some(), "expected Holder in the evaluation report");
+        assert_eq!(
+            signal.unwrap().region(),
+            SignalRegion::SIntersectC_Match_Add,
+            "one trailing private tuple field with inherent_impls methods must evaluate blue"
         );
     }
 

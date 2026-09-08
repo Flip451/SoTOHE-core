@@ -302,12 +302,14 @@ fn test_hook_dispatch_skill_compliance_is_consistent_across_hosts() {
 }
 
 #[test]
-fn test_hook_dispatch_skill_compliance_malformed_input_fails_closed_for_direct_dispatch() {
+fn test_hook_dispatch_skill_compliance_malformed_input_fails_closed_on_direct_dispatch() {
     for host in ["claude", "codex", "grok"] {
         let output = run_agent_hook(host, "skill-compliance", b"not json");
 
         assert_exit_code(&output, 2);
         assert!(output.stdout.is_empty());
-        assert!(String::from_utf8_lossy(&output.stderr).contains("failed to parse prompt JSON"));
+        assert!(
+            String::from_utf8_lossy(&output.stderr).contains("error: failed to parse prompt JSON")
+        );
     }
 }
