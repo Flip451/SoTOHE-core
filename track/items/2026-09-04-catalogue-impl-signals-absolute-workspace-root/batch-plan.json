@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-09-04-catalogue-impl-signals-absolute-workspace-root",
+  "task_estimates": [
+    {
+      "task_id": "T1",
+      "scope_estimates": [
+        {
+          "scope": "cli_driver",
+          "production_lines": 24,
+          "test_lines": 72
+        }
+      ]
+    },
+    {
+      "task_id": "T2",
+      "scope_estimates": [
+        {
+          "scope": "cli",
+          "production_lines": 0,
+          "test_lines": 140
+        }
+      ]
+    }
+  ],
+  "batches": [
+    {
+      "id": "BATCH-001",
+      "task_ids": [
+        "T1",
+        "T2"
+      ]
+    }
+  ]
+}

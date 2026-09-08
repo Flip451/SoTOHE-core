@@ -24,58 +24,18 @@ use usecase::track_lifecycle::tddd::lint::{TrackLintRulesFile, TrackLintService}
 use usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashService;
 use usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphService;
 use usecase::track_lifecycle::{
-    TrackItemsDirectory, TrackLayerFilter, TrackLayerSelection, TrackLifecycleIdInput,
-    TrackSelection, TrackSourceWorkspace, TrackSpecAnchorSelection,
+    TrackLayerFilter, TrackLayerSelection, TrackLifecycleIdInput, TrackSelection,
+    TrackSourceWorkspace, TrackSpecAnchorSelection,
 };
 
 use crate::adr_baseline::TrackIdInput;
 use crate::render::CommandOutcome;
+pub use crate::track_resolution::TrackItemsDirectoryInput;
 use crate::track_resolution::TrackResolutionDiagnostic;
 use crate::track_spec_element_hash::{
     render_track_spec_element_hash_result, spec_element_hash_input_to_command,
     track_spec_element_hash_error_to_outcome,
 };
-
-/// Validated `track/items` input for a TDDD command.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TrackItemsDirectoryInput {
-    value: PathBuf,
-}
-
-impl TrackItemsDirectoryInput {
-    /// Validates and wraps a `track/items` path.
-    pub fn try_new(value: PathBuf) -> Result<Self, TrackResolutionDiagnostic> {
-        TrackItemsDirectory::try_new(value.clone()).map_err(|error| {
-            if error.to_string().contains("must end in 'track/items'") {
-                TrackResolutionDiagnostic::new(format!(
-                    "--items-dir must point to '<project-root>/track/items'; got {}",
-                    value.display()
-                ))
-            } else {
-                TrackResolutionDiagnostic::new(error.to_string())
-            }
-        })?;
-        Ok(Self { value })
-    }
-
-    /// Derives the workspace-root input from this items directory.
-    #[must_use]
-    pub fn workspace_root(&self) -> TrackWorkspaceRootInput {
-        let root = self
-            .value
-            .parent()
-            .and_then(std::path::Path::parent)
-            .map(std::path::Path::to_path_buf)
-            .filter(|path| !path.as_os_str().is_empty())
-            .unwrap_or_else(|| PathBuf::from("."));
-        TrackWorkspaceRootInput::from_derived_items_parent(root)
-    }
-
-    pub(crate) fn into_usecase(self) -> Result<TrackItemsDirectory, TrackResolutionDiagnostic> {
-        TrackItemsDirectory::try_new(self.value)
-            .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))
-    }
-}
 
 /// Validated comma-separated TDDD layer input.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -702,6 +662,7 @@ mod tests {
     use std::sync::Mutex;
 
     use super::*;
+    use crate::track_resolution::canonicalized_path;
 
     #[test]
     fn test_track_tddd_driver_production_has_no_shim_or_reverse_delegation() {
@@ -1042,8 +1003,32 @@ mod tests {
     }
 
     fn workspace_root() -> TrackWorkspaceRootInput {
-        TrackWorkspaceRootInput::try_from(PathBuf::from("workspace"))
-            .expect("workspace root is valid")
+        TrackWorkspaceRootInput::try_from(
+            std::env::current_dir().expect("test workspace root is available"),
+        )
+        .expect("workspace root is valid")
+    }
+
+    #[test]
+    fn test_track_tddd_items_directory_input_normalizes_relative_workspace_root() {
+        let expected = canonicalized_path(std::env::current_dir().unwrap());
+        let items_dir = TrackItemsDirectoryInput::try_new(PathBuf::from("track/items")).unwrap();
+
+        let workspace_root = items_dir.workspace_root().unwrap();
+
+        assert_eq!(workspace_root.into_path(), expected);
+    }
+
+    #[test]
+    fn test_track_tddd_items_directory_input_rejects_missing_derived_workspace_root() {
+        let items_dir = TrackItemsDirectoryInput::try_new(PathBuf::from(
+            "missing-workspace-root-for-tddd-derived-items-test/track/items",
+        ))
+        .unwrap();
+
+        let result = items_dir.workspace_root();
+
+        assert!(result.is_err());
     }
 
     fn track_id() -> TrackIdInput {
@@ -1088,45 +1073,12 @@ mod tests {
             &command.track,
             TrackSelection::Explicit(track_id) if track_id.as_ref() == "capture-track"
         ));
-        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.workspace_root.as_path(), std::env::current_dir().unwrap().as_path());
         assert_eq!(command.source_workspace.as_ref().map(|workspace| workspace.as_path()), None);
         assert!(matches!(
             &command.layer,
             TrackLayerSelection::One(layer) if layer.as_ref() == "usecase"
         ));
-    }
-
-    #[test]
-    fn test_track_tddd_driver_invalid_workspace_input_returns_failure_without_service_call() {
-        let service = Arc::new(RecordingService {
-            commands: Mutex::new(Vec::new()),
-            result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
-        });
-        let driver = TrackTdddDriver::new(
-            Arc::new(UnusedTypeSignalsService),
-            Arc::new(UnusedTypeGraphService),
-            Arc::new(UnusedBaselineGraphService),
-            Arc::new(UnusedTrackContractMapService),
-            Arc::new(UnusedCatalogueSpecSignalsService),
-            Arc::new(UnusedSpecElementHashService),
-            service.clone(),
-            Arc::new(UnusedLintService),
-            Arc::new(UnusedCatalogueImplSignalsService),
-            Arc::new(UnusedCatalogueLintActiveService),
-        );
-
-        let input = TrackTdddBaselineCaptureInput {
-            track_id: None,
-            workspace_root: TrackWorkspaceRootInput::from_derived_items_parent(PathBuf::from(
-                "../escape",
-            )),
-            source_workspace: None,
-            layer: None,
-        };
-        let outcome = driver.handle(TrackTdddInput::BaselineCapture(input));
-
-        assert_eq!(outcome.exit_code, 1);
-        assert!(service.commands.lock().expect("command lock is available").is_empty());
     }
 
     #[test]
@@ -1276,7 +1228,7 @@ mod tests {
         );
         let input = TrackTdddBaselineGraphInput {
             track_id: None,
-            items_dir: TrackItemsDirectoryInput { value: PathBuf::from("../escape") },
+            items_dir: TrackItemsDirectoryInput::from_test_value(PathBuf::from("../escape")),
             workspace_root: workspace_root(),
             layers: None,
         };
@@ -1378,42 +1330,6 @@ mod tests {
     }
 
     #[test]
-    fn test_track_tddd_driver_invalid_catalogue_impl_signals_workspace_returns_failure_without_service_call()
-     {
-        let service = Arc::new(RecordingCatalogueImplSignalsService {
-            commands: Mutex::new(Vec::new()),
-            error: None,
-        });
-        let driver = TrackTdddDriver::new(
-            Arc::new(UnusedTypeSignalsService),
-            Arc::new(UnusedTypeGraphService),
-            Arc::new(UnusedBaselineGraphService),
-            Arc::new(UnusedTrackContractMapService),
-            Arc::new(UnusedCatalogueSpecSignalsService),
-            Arc::new(UnusedSpecElementHashService),
-            Arc::new(RecordingService {
-                commands: Mutex::new(Vec::new()),
-                result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
-            }),
-            Arc::new(UnusedLintService),
-            service.clone(),
-            Arc::new(UnusedCatalogueLintActiveService),
-        );
-        let input = TrackTdddCatalogueImplSignalsInput {
-            track_id: None,
-            workspace_root: TrackWorkspaceRootInput::from_derived_items_parent(PathBuf::from(
-                "../escape",
-            )),
-            layer: None,
-        };
-
-        let outcome = driver.handle(TrackTdddInput::CatalogueImplSignals(input));
-
-        assert_eq!(outcome.exit_code, 1);
-        assert!(service.commands.lock().expect("command lock is available").is_empty());
-    }
-
-    #[test]
     fn test_track_tddd_driver_catalogue_impl_signals_service_error_maps_to_failure_outcome() {
         let service = Arc::new(RecordingCatalogueImplSignalsService {
             commands: Mutex::new(Vec::new()),
@@ -1487,7 +1403,7 @@ mod tests {
             TrackSelection::Explicit(track_id) if track_id.as_ref() == "signals-track"
         ));
         assert_eq!(command.items_dir.as_path(), std::path::Path::new("workspace/track/items"));
-        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.workspace_root.as_path(), std::env::current_dir().unwrap().as_path());
         assert!(matches!(&command.layer, TrackLayerSelection::One(_)));
     }
 
@@ -1515,7 +1431,7 @@ mod tests {
         );
         let input = TrackTdddCatalogueSpecSignalsInput {
             track_id: None,
-            items_dir: TrackItemsDirectoryInput { value: PathBuf::from("../escape") },
+            items_dir: TrackItemsDirectoryInput::from_test_value(PathBuf::from("../escape")),
             workspace_root: workspace_root(),
             layer: None,
         };
@@ -1670,7 +1586,7 @@ mod tests {
             &command.track,
             TrackSelection::Explicit(track_id) if track_id.as_ref() == "lint-track"
         ));
-        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.workspace_root.as_path(), std::env::current_dir().unwrap().as_path());
         assert_eq!(
             command.rules_file.as_ref().map(|rules| rules.as_path()),
             Some(std::path::Path::new("custom/rules.json"))
@@ -1745,7 +1661,7 @@ mod tests {
             &command.track,
             TrackSelection::Explicit(track_id) if track_id.as_ref() == "lint-track"
         ));
-        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.workspace_root.as_path(), std::env::current_dir().unwrap().as_path());
         assert_eq!(command.layer.as_ref(), "domain");
         assert_eq!(
             command.rules_file.as_ref().map(|rules| rules.as_path()),
@@ -1850,7 +1766,7 @@ mod tests {
             &command.track,
             TrackSelection::Explicit(track_id) if track_id.as_ref() == "signals-track"
         ));
-        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.workspace_root.as_path(), std::env::current_dir().unwrap().as_path());
         assert!(
             matches!(&command.layer, TrackLayerSelection::One(layer) if layer.as_ref() == "usecase")
         );
@@ -1945,7 +1861,7 @@ mod tests {
             TrackSelection::Explicit(track_id) if track_id.as_ref() == "graph-track"
         ));
         assert_eq!(command.items_dir.as_path(), std::path::Path::new("workspace/track/items"));
-        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.workspace_root.as_path(), std::env::current_dir().unwrap().as_path());
         assert_eq!(command.cluster_depth.value(), 2);
         assert!(matches!(
             command.edges,
@@ -1964,7 +1880,7 @@ mod tests {
         });
         let input = TrackTdddTypeGraphInput {
             track_id: None,
-            items_dir: TrackItemsDirectoryInput { value: PathBuf::from("../escape") },
+            items_dir: TrackItemsDirectoryInput::from_test_value(PathBuf::from("../escape")),
             workspace_root: workspace_root(),
             layer: None,
             cluster_depth: TrackTypeGraphClusterDepthInput::new(0),

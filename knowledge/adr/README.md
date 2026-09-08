@@ -157,6 +157,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [rustdoc の実装 fingerprint から workspace 直下の生成キャッシュを除外する](2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md) | Accepted | 2026-09-05 |
 | [カタログ型参照の静的検査と実装突合の責務を分離する](2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md) | Proposed | 2026-08-23 |
 | [rustdoc 子アイテムの除外は番兵 id ではなく kind で判定する](2026-09-04-0049-rustdoc-child-exclusion-by-kind.md) | Proposed | 2026-09-04 |
+| [catalogue-impl-signals の workspace root は絶対パスに解決してから使う](2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md) | Proposed | 2026-09-04 |
 
 ### トラック・ワークフロー
 

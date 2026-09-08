@@ -1,0 +1,485 @@
+{
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
+        "declaration_hash": "d62839c09b22c9fb0520d630e5000f1a718a1d7edbfb3e80e8c385a7243843ad",
+        "waived_reason_hash": "e9a27f497d4f9d802056413fede10c0a723ff8587a2c0abc2b6b868ee471ff89"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "cdd6dca644039749c9c15b8b91f7ed0864307cc1e51cf6e1addb36af0dba8558",
+        "declaration_hash": "ba5da3a6bb40e3aa591031e3f0c18f87181c280c67d3b43fb0ad30589c4bcb6b",
+        "waived_reason_hash": "48acd0a152b4d928555139d5c6b24176ccf74705647b670279743327cc54a9ba"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
+        "declaration_hash": "0409e3e936e346c8aa118f0a380d05ef64666906af7462399ebc05154b10bd5b",
+        "waived_reason_hash": "5f128c5d3f1ba82ff300828e5dca83f074260b7b30a5722d8b38bdfe16abdf5c"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "0ff216167afc3f732cd38bcd8659dde5f2000b995ea10f30db9e68ae9dff8554",
+        "declaration_hash": "4016887831eabd00c20cbc2b5713ba978ccee9596c8b24cdd51821bc9551b890",
+        "waived_reason_hash": "1e839ba5abd41720b4b5ff47d71cb49216315e87c8aceea6599d09e240a14b15"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput"
+      },
+      "key": {
+        "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
+        "declaration_hash": "4a39f790e1e16427acc647d1bbe3d3860df697f90332aa8178ecc97d764ae331",
+        "waived_reason_hash": "1769698df69ffdc7c5878813d9f01addee5e4e94693d2ee91f085c78a0952d7b"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput"
+      },
+      "key": {
+        "anchor_text_hash": "cdd6dca644039749c9c15b8b91f7ed0864307cc1e51cf6e1addb36af0dba8558",
+        "declaration_hash": "05eb3fde14d732f167fe39c20a7e71921927f9858a6ae8109d14bc169e376f20",
+        "waived_reason_hash": "ab1c87653bac5ce71a9cf3824b19556875e3c2872dee7fe5ab99f7dc4c7de2a9"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput"
+      },
+      "key": {
+        "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
+        "declaration_hash": "16dec076e769d57092c62d1e65a03c7934e7b76fcd4f79e847b37abf4ebdccd7",
+        "waived_reason_hash": "292d2c894f4edecd5a59a91f168ff57e4b43ec664572242168976e9be19aafb4"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput"
+      },
+      "key": {
+        "anchor_text_hash": "0ff216167afc3f732cd38bcd8659dde5f2000b995ea10f30db9e68ae9dff8554",
+        "declaration_hash": "54fc260599ffff4a56cafeee6f92ff048f98ff2cfe1242187af5bdafc1981042",
+        "waived_reason_hash": "e3c8717ac628626d5bce55c292e2a2b1f022d383e0e800173ab19dccb998ada9"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: [],",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput"
+      },
+      "key": {
+        "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
+        "declaration_hash": "c6773f59d7b7ba4399746b0821f9b2f7e1c20304b01c4c6c6c7667216a22dbb8",
+        "waived_reason_hash": "70c2903c12593a3258be1daf1373895c3965f1e2b3cc3110d442002cad7d97fe"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput"
+      },
+      "key": {
+        "anchor_text_hash": "cdd6dca644039749c9c15b8b91f7ed0864307cc1e51cf6e1addb36af0dba8558",
+        "declaration_hash": "eada9880f4ebcf40427e5cc4d8632014dc17241ca72176d8dc7732820f875c4b",
+        "waived_reason_hash": "0a83b205cb85bfa71f5c092137e72bf0169a35aed54455de6279670acba9773c"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput"
+      },
+      "key": {
+        "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
+        "declaration_hash": "8cba3ab94118eead21aa1a3cb78ba8c617f219f322736d684a565eb6c2ae4f10",
+        "waived_reason_hash": "f1b8b8a66c4f851d4a6e6c27d01072cf4c677d14546bbcbf48ad9c9bc1d8a8d0"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput"
+      },
+      "key": {
+        "anchor_text_hash": "0ff216167afc3f732cd38bcd8659dde5f2000b995ea10f30db9e68ae9dff8554",
+        "declaration_hash": "24ac967ec99e076a97610b81ccbebde9295f092ced2c2703ba4d38991ce21170",
+        "waived_reason_hash": "e52cc42b429141aa0359c6b6d62860853251ff783d161dd5a7a41b3d7b7f8a58"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddContractMapInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Modify, role: Dto, kind: Struct(StructKind { shape: Plain { fields: [FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"Option<TrackIdInput>\") }, FieldDecl { name: FieldName(Identifier(\"items_dir\")), ty: TypeRef(\"crate::track_resolution::TrackItemsDirectoryInput\") }, FieldDecl { name: FieldName(Identifier(\"workspace_root\")), ty: TypeRef(\"TrackWorkspaceRootInput\") }, FieldDecl { name: FieldName(Identifier(\"layers\")), ty: TypeRef(\"Option<TrackLayersInput>\") }], has_stripped_fields: false }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"track_tddd\")])), docs: Some(DocString(\"Primary-adapter input for TDDD contract-map rendering (IN-01, IN-03, CN-01, CN-02).\")), spec_refs: [SpecRef { file: \"track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json\", anchor: SpecElementId(\"IN-01\") }, SpecRef { file: \"track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json\", anchor: SpecElementId(\"IN-03\") }, SpecRef { file: \"track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json\", anchor: SpecElementId(\"CN-01\") }, SpecRef { file: \"track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json\", anchor: SpecElementId(\"CN-02\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput"
+      },
+      "key": {
+        "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
+        "declaration_hash": "9d2db9ddb6f352f5d6b101250971cceadf9b1347cb73dff5dba41a3660cf7cd6",
+        "waived_reason_hash": "bd6f6036e0ce9c15014a88863af52601a1b8130e187c1466a2ce027fa757125c"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput"
+      },
+      "key": {
+        "anchor_text_hash": "cdd6dca644039749c9c15b8b91f7ed0864307cc1e51cf6e1addb36af0dba8558",
+        "declaration_hash": "6871fb50afad8108dbb4b6f0cea5bbeb227a24dcc4bd651243b2cd03a4f6d77a",
+        "waived_reason_hash": "916a062d20b1f3fb19264795ea5c4baea2f33dab227f582f333154182752efe3"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Modify, role: Dto, kind: Struct(StructKind { shape: Plain { fields: [FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"Option<TrackIdInput>\") }, FieldDecl { name: FieldName(Identifier(\"items_dir\")), ty: TypeRef(\"crate::track_resolution::TrackItemsDirectoryInput\") }, FieldDecl { name: FieldName(Identifier(\"anchor\")), ty: TypeRef(\"Option<TrackSpecAnchorInput>\") }], has_stripped_fields: false }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"track_tddd\")])), docs: Some(DocString(\"Primary-adapter input for TDDD spec-element-hash lookup (IN-01, IN-03, CN-01, CN-02).\")), spec_refs: [SpecRef { file: \"track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json\", anchor: SpecElementId(\"IN-03\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput"
+      },
+      "key": {
+        "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
+        "declaration_hash": "cd7a5a453c2c2e7d021438d2a2f2d4e900d61473e54d35a7bbc1081fbdc87e85",
+        "waived_reason_hash": "7e881449bc47e0a1d4441344bc29c2671ff2769d2fd70f84189ae92beaa6510a"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput"
+      },
+      "key": {
+        "anchor_text_hash": "0ff216167afc3f732cd38bcd8659dde5f2000b995ea10f30db9e68ae9dff8554",
+        "declaration_hash": "d603aa8198de3120ca37aac46984591b0eedc1e20d3112bad2746c4177a5d6cb",
+        "waived_reason_hash": "96802aee54229288ae9dd6a364d823d33e5ee89221d5a0a896e08f5df2a0cfc0"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddSpecElementHashInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
+        "declaration_hash": "7f89fad2d6ff09cf4be11f934ba2d7383af6fa202172de4f24d735c3f5a538d6",
+        "waived_reason_hash": "77099d8a0364a78f1334db7a93b673fc96b9fdfee3a7a9610461f16f8d06b727"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "cdd6dca644039749c9c15b8b91f7ed0864307cc1e51cf6e1addb36af0dba8558",
+        "declaration_hash": "558bd53550685a551c0be4c587d491ca7932999812940ce20c3406676078f49f",
+        "waived_reason_hash": "6b516b79a0257d5d21ad1e308e0b4c020b45eb4ba779ba71ff464ad65ea0a74f"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
+        "declaration_hash": "a47129d3cd4864c26619f9d59eb9e2f4876a2adef2843afeb7d4694f743234a6",
+        "waived_reason_hash": "4e857890e14f337dd898b36c9672fb1b11154d7bfe2411f31a06992687b1e78c"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput"
+      },
+      "key": {
+        "anchor_text_hash": "0ff216167afc3f732cd38bcd8659dde5f2000b995ea10f30db9e68ae9dff8554",
+        "declaration_hash": "3b9a2307517a434a79cf70e732aefc85a647dc104927372b9dfc248a2450a768",
+        "waived_reason_hash": "cebddd7504bb13d6c098e51a916e5299a12c2337d7e0165468b3417fad91cb00"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_tddd::TrackTdddTypeGraphInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"methods: []\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
+  "track_id": "2026-09-04-catalogue-impl-signals-absolute-workspace-root"
+}

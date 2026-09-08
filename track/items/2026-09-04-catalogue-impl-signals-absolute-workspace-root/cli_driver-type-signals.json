@@ -1,0 +1,74 @@
+{
+  "baseline_hash": "450c3f834197316f4eddfe211d81fa412dc6b989fb90acaa469ae22329d52a47",
+  "declaration_hash": "8197259ba0cafb53ec0d17176e10048fdd380d033d0833dbbb41f18094e33135",
+  "generated_at": "2026-09-08T04:56:50Z",
+  "head_commit": "7b94750a82b67fbc4185875c61a16691dc481649",
+  "implementation_fingerprint": "97ca649d52b8742f18291c205699302d327e0251e11e874b9212e7c78a6afe00",
+  "resolution_fingerprint": "aa972eeecb7a801ec17e95fb59cf76d2e8d6be794004923b24c80207002bbbd2",
+  "rustdoc_execution_identity": {
+    "crate_name": "cli_driver",
+    "expected_json_path": "target/.sotp-rustdoc/b344e11e0bc3d020e0731e518fd25ae7a713019b8b4305737008fd4b531ca096/doc/cli_driver.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/b344e11e0bc3d020e0731e518fd25ae7a713019b8b4305737008fd4b531ca096"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_resolution::TrackItemsDirectoryInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_resolution::TrackWorkspaceRootInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddBaselineGraphInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddContractMapInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddSpecElementHashInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackTdddTypeGraphInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::track_tddd::TrackItemsDirectoryInput"
+    }
+  ]
+}

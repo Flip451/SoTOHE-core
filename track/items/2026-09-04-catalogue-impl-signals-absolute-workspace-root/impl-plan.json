@@ -1,0 +1,47 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Update apps/cli-driver/src/track_resolution.rs (TrackWorkspaceRootInput::try_new) and add focused cli_driver tests for startup inputs and failure paths (IN-01, IN-02, IN-03, CN-01, CN-02, AC-03, AC-04; OS-02, OS-03)."
+        ],
+        "id": "SECTION-01",
+        "task_ids": [
+          "T1"
+        ],
+        "title": "Workspace-root boundary normalization"
+      },
+      {
+        "description": [
+          "Extend tests in apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs for default and explicit-relative workspace-root invocations and relative/absolute path variants (IN-02, IN-04, CN-01, AC-01, AC-02, AC-04; OS-01)."
+        ],
+        "id": "SECTION-02",
+        "task_ids": [
+          "T2"
+        ],
+        "title": "Relative-root target-exclusion regressions"
+      }
+    ],
+    "summary": [
+      "Coordinate TrackWorkspaceRootInput::try_new changes with catalogue-impl-signals regression tests (GO-01)."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "a0c00271f9453b90f800f94fcfa6111f9eec8b10",
+      "description": "Update apps/cli-driver/src/track_resolution.rs (TrackWorkspaceRootInput::try_new) and add focused cli_driver tests for startup inputs and failure paths (IN-01, IN-02, IN-03, CN-01, CN-02, AC-03, AC-04; OS-02, OS-03).",
+      "id": "T1",
+      "status": "done"
+    },
+    {
+      "commit_hash": "a0c00271f9453b90f800f94fcfa6111f9eec8b10",
+      "depends_on": [
+        "T1"
+      ],
+      "description": "Extend tests in apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs for default and explicit-relative workspace-root invocations and relative/absolute path variants (IN-02, IN-04, CN-01, AC-01, AC-02, AC-04; OS-01).",
+      "id": "T2",
+      "status": "done"
+    }
+  ]
+}
