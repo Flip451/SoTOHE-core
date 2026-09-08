@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-08T16:17:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45d3a9626b18b3bd01f3a6928cc2145f69233b97ade545f853d6513343f185ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T16:37:43Z",
+          "findings": [
+            {
+              "category": "broken narrative reference",
+              "file": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md",
+              "line": 53,
+              "message": "D3 は共通方法論の正本を framework-owned の `.harness/prompts/pr-reviewer.md` に委譲していますが、この ADR の自己完結方針および現在の SoTOHE-core の review 文書配置と整合しません。SoTOHE-core 内でどの既存 authority が方法論を所有するのかを明示しない限り、D3 の所有境界が未解決です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:801f2487e07f7053189c3765de5339d456283e65c8c1c40f90a3eb8a3fa66a4d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T16:44:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c75ed478754ca54416b2bede477f909eb2dc4160b20c915f954dd86bc4d6787",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T16:55:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c75ed478754ca54416b2bede477f909eb2dc4160b20c915f954dd86bc4d6787",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-08T16:36:35Z",
+          "findings": [
+            {
+              "category": "documentation correctness",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/research/handoff-triage.md",
+              "line": 13,
+              "message": "H07 is recorded as fixed, but the claimed framework-owned `.harness/prompts/pr-reviewer.md` does not exist, and the current custom prompt still contains the full review methodology rather than only focus/severity plus a reference. The triage note therefore misstates the branch's actual state.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c675a0800cb796c29fdd25c148a11390a4b4fc143865e81256e6f7bd2d539d8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T16:50:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a589617620a78a3a03d3048946fdab71b755545b566291bb65b3f0ff7927a826",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T17:00:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a589617620a78a3a03d3048946fdab71b755545b566291bb65b3f0ff7927a826",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
