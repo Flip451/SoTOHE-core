@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-09-04-rustdoc-child-exclusion-by-kind",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 20,
+          "test_lines": 110
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": [
+        "T001"
+      ]
+    }
+  ]
+}

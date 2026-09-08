@@ -1,0 +1,206 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "The catalogue schema reference documents the supported declaration spelling for trait implementations with lifetime arguments, including the distinct lifetime notation used in the trait reference and implementation-generics declaration."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "The catalogue schema reference identifies entry-level methods as the normal inherent-method declaration location, reserves top-level inherent-implementation declarations for entry-level limitations, and documents the currently matchable single trailing private tuple-field form."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "The catalogue DTO documentation for implementation generics no longer states that lifetimes are outside the supported surface and instead aligns with the schema reference's lifetime declaration rule."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "Structural matching assigns a positional key only to a tuple-struct or tuple-variant field item; a child originating from an inherent implementation receives no positional suffix."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "AC-05",
+      "text": "A catalogue fixture with exactly one trailing private tuple field and an inherent method declared through a top-level inherent-implementation entry evaluates blue."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "AC-06",
+      "text": "Previously blue structural-matching verdicts remain blue; the only changed verdict class is the combination of a tuple struct, a private field, and an inherent implementation."
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "The declaration guidance and DTO documentation alignment do not change runtime behaviour."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "Top-level inherent-implementation declarations remain supported for cases that cannot be expressed through an entry's methods; the guidance must not turn their use into an unsupported declaration form."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "CN-03",
+      "text": "The positional-key decision is determined by the child item's field identity rather than by comparing its position with the number of fields."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "CN-04",
+      "text": "The existing codec representation of one trailing private tuple field remains unchanged."
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "Make supported catalogue declarations discoverable and make structural matching consistently recognize their field and inherent-implementation children."
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "Document the supported lifetime trait-implementation spelling, inherent-method placement guidance, and private tuple-field matching limitation in the catalogue schema reference."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "Align implementation-generics documentation in the catalogue DTO surface with the supported lifetime declaration guidance."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "Restrict structural-matching positional keys to tuple field children, leaving inherent-implementation-derived children unnumbered."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+          }
+        ],
+        "id": "IN-04",
+        "text": "Add regression coverage for the matchable one-trailing-private-tuple-field form when its inherent method is declared through a top-level inherent-implementation entry."
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "Supporting structural matching for tuple structs with two or more private fields or with a private field before a public field."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0057-catalogue-schema-declaration-guidance.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "Changing the codec's single-trailing-private-field None encoding."
+      }
+    ]
+  },
+  "signals": {
+    "blue": 17,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "Catalogue schema declaration guidance and field-only positional keys",
+  "version": "1.0"
+}

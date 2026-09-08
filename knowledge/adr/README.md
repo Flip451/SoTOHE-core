@@ -152,7 +152,12 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [参照先 crate の add 宣言を解決集合に加える](2026-08-28-1034-cross-crate-add-declaration-resolution.md) | Proposed | 2026-08-28 |
 | [型シグナルの rustdoc 再利用と実行環境を拘束する](2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md) | Accepted | 2026-08-29 |
 | [評価開始時の authoritative input 捕捉に時間上限を設ける](2026-09-02-0000-evaluation-start-capture-time-bounds.md) | Accepted | 2026-09-02 |
+| [catalogue の宣言規則を文書化し、位置引数の鍵付けを field item に限る](2026-09-04-0057-catalogue-schema-declaration-guidance.md) | Proposed | 2026-09-04 |
+| [hook 接続元の host 明示と入力契約の選択](2026-09-05-0600-hook-explicit-host-input-contract.md) | Proposed | 2026-09-05 |
+| [rustdoc の実装 fingerprint から workspace 直下の生成キャッシュを除外する](2026-09-05-1031-rustdoc-fingerprint-excludes-workspace-cache.md) | Accepted | 2026-09-05 |
 | [カタログ型参照の静的検査と実装突合の責務を分離する](2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md) | Proposed | 2026-08-23 |
+| [rustdoc 子アイテムの除外は番兵 id ではなく kind で判定する](2026-09-04-0049-rustdoc-child-exclusion-by-kind.md) | Proposed | 2026-09-04 |
+| [catalogue-impl-signals の workspace root は絶対パスに解決してから使う](2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md) | Proposed | 2026-09-04 |
 
 ### トラック・ワークフロー
 

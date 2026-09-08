@@ -3,11 +3,12 @@
 //! `hook` command family — primary adapter driver.
 //!
 //! `HookDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.
+//! `handle(input) -> HookExecution`.
 //!
 //! Stdin reading and provider hook JSON envelope parsing are performed at this
-//! driver boundary (CN-02): the driver owns I/O, normalizes Claude and Grok
-//! envelopes, and converts the result into
+//! driver boundary (CN-02): the driver owns I/O, selects the envelope contract
+//! from the explicit host, normalizes the selected provider envelope, and
+//! converts the result into
 //! [`usecase::hook_dispatch::HookDispatchCommand`] before calling the usecase
 //! layer.
 //!
@@ -26,6 +27,17 @@ use crate::render::CommandOutcome;
 // ---------------------------------------------------------------------------
 // Input types
 // ---------------------------------------------------------------------------
+
+/// Driver-boundary connection-host selector.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookHost {
+    /// Claude Code's snake-case hook envelope.
+    Claude,
+    /// Codex's snake-case hook envelope.
+    Codex,
+    /// Grok's camel-case hook envelope.
+    Grok,
+}
 
 /// Known hook names for the `hook dispatch` subcommand.
 #[derive(Debug, Clone)]
@@ -63,15 +75,29 @@ impl HookName {
     }
 }
 
-/// Typed input for the `hook` command family.
-pub enum HookInput {
-    /// Dispatch a security-critical hook via Rust logic.
-    Dispatch {
-        /// The hook to dispatch.
-        hook: HookName,
-        /// Positional arguments supplied by git process hooks.
-        git_hook_args: Vec<String>,
-    },
+/// Raw hook-driver boundary record; `git_hook_args` is opaque ordered
+/// process-argument payload without a narrower domain concept.
+pub struct HookInput {
+    /// The parsed hook selector.
+    pub hook: HookName,
+    /// The selected agent host, or `None` for a Git process hook.
+    pub host: Option<HookHost>,
+    /// Positional arguments supplied by a Git process hook.
+    pub git_hook_args: Vec<String>,
+}
+
+/// Hook-specific rendered execution classification.
+pub enum HookExecution {
+    /// The input failed validation, parsing, or I/O handling.
+    InputError(CommandOutcome),
+    /// The post-dispatch service or handler failed after valid input reached the use case.
+    InternalError(CommandOutcome),
+    /// The use-case handler deliberately blocked the hook operation.
+    HookBlock(CommandOutcome),
+    /// An advisory hook produced context for the host.
+    AdvisoryFired(CommandOutcome),
+    /// The hook completed without a block or advisory output.
+    Allow(CommandOutcome),
 }
 
 // ---------------------------------------------------------------------------
@@ -97,6 +123,7 @@ fn is_git_process_hook(hook_name: &str) -> bool {
 #[derive(Debug)]
 enum HookParseError {
     InvalidJson(String),
+    InvalidField(String),
     MissingField(String),
     Unmappable(String),
 }
@@ -105,6 +132,7 @@ impl std::fmt::Display for HookParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::InvalidJson(msg) => write!(f, "{msg}"),
+            Self::InvalidField(msg) => write!(f, "{msg}"),
             Self::MissingField(msg) => write!(f, "{msg}"),
             Self::Unmappable(msg) => write!(f, "{msg}"),
         }
@@ -119,28 +147,22 @@ struct ParsedHookEnvelope {
     content: Option<String>,
 }
 
-/// Parse a Claude Code or Grok PreToolUse hook JSON envelope from `raw`.
+/// Parse a host-selected PreToolUse hook JSON envelope from `raw`.
 ///
-/// Claude uses snake-case `tool_name` / `tool_input`; Grok uses camel-case
-/// `toolName` / `toolInput` and provider-specific tool identifiers. Grok input
-/// is normalized here to the tool names and fields consumed by the existing
-/// Claude-oriented hook handlers.
+/// Claude and Codex use snake-case `tool_name` / `tool_input`; Grok uses
+/// camel-case `toolName` / `toolInput` and provider-specific tool identifiers.
+/// The selected host is authoritative: the parser never infers a host from
+/// the JSON or falls back to another provider's envelope contract.
 ///
 /// Returns `Err(HookParseError)` when the JSON is invalid, required fields are
 /// missing, or a Grok envelope cannot be mapped to the existing contract.
-fn parse_hook_envelope(raw: &str) -> Result<ParsedHookEnvelope, HookParseError> {
+fn parse_hook_envelope(raw: &str, host: HookHost) -> Result<ParsedHookEnvelope, HookParseError> {
     let value: serde_json::Value = serde_json::from_str(raw)
         .map_err(|e| HookParseError::InvalidJson(format!("failed to parse hook JSON: {e}")))?;
 
-    match (value.get("tool_name"), value.get("toolName")) {
-        (Some(_), Some(_)) => Err(HookParseError::Unmappable(
-            "hook JSON contains both Claude 'tool_name' and Grok 'toolName' fields".to_owned(),
-        )),
-        (Some(_), None) => parse_claude_hook_envelope(&value),
-        (None, Some(_)) => parse_grok_hook_envelope(&value),
-        (None, None) => Err(HookParseError::MissingField(
-            "hook JSON missing required field 'tool_name'".to_owned(),
-        )),
+    match host {
+        HookHost::Claude | HookHost::Codex => parse_claude_hook_envelope(&value),
+        HookHost::Grok => parse_grok_hook_envelope(&value),
     }
 }
 
@@ -290,14 +312,21 @@ fn collect_text_parts(value: &serde_json::Value, parts: &mut Vec<String>) {
 }
 
 /// Extract the `prompt` field from a UserPromptSubmit hook JSON envelope.
-///
-/// Returns an empty string when the field is absent or the JSON is invalid
-/// (advisory hook — never blocks on parse failure).
-fn parse_prompt_envelope(raw: &str) -> String {
-    serde_json::from_str::<serde_json::Value>(raw)
-        .ok()
-        .and_then(|v| v.get("prompt").and_then(|p| p.as_str()).map(str::to_owned))
-        .unwrap_or_default()
+fn parse_prompt_envelope(raw: &str) -> Result<String, HookParseError> {
+    let value: serde_json::Value = serde_json::from_str(raw)
+        .map_err(|e| HookParseError::InvalidJson(format!("failed to parse prompt JSON: {e}")))?;
+
+    let prompt = value.get("prompt").ok_or_else(|| {
+        HookParseError::MissingField(
+            "UserPromptSubmit hook JSON missing required field 'prompt'".to_owned(),
+        )
+    })?;
+
+    prompt.as_str().map(str::to_owned).ok_or_else(|| {
+        HookParseError::InvalidField(
+            "UserPromptSubmit hook JSON field 'prompt' must be a string".to_owned(),
+        )
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -306,7 +335,7 @@ fn parse_prompt_envelope(raw: &str) -> String {
 
 /// Primary adapter driver for the `hook` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds injected use-case interactors; exposes `handle(input) -> HookExecution`.
 pub struct HookDriver {
     hook_dispatch_service: Arc<dyn HookDispatchService>,
 }
@@ -319,11 +348,18 @@ impl HookDriver {
 
     /// Handle a hook command.
     ///
-    /// Exit code 0 = allow, exit code 2 = block (Claude Code hook protocol).
-    /// PreToolUse hooks: any internal error → exit code 2 (fail-closed).
-    pub fn handle(&self, input: HookInput) -> CommandOutcome {
-        match input {
-            HookInput::Dispatch { hook, git_hook_args } => self.hook_dispatch(hook, git_hook_args),
+    /// Validate the hook-kind/host/argv combination and dispatch it.
+    ///
+    /// Exit code 0 = allow, exit code 2 = block or input error (Claude Code
+    /// hook protocol). The typed return keeps input failures, internal service
+    /// failures, and actual use-case blocks distinct for callers such as telemetry.
+    pub fn handle(&self, input: HookInput) -> HookExecution {
+        let HookInput { hook, host, git_hook_args } = input;
+
+        if hook.accepts_git_hook_args() {
+            self.git_dispatch(hook, host, git_hook_args)
+        } else {
+            self.agent_dispatch(hook, host, git_hook_args)
         }
     }
 
@@ -331,41 +367,64 @@ impl HookDriver {
     // Internal dispatch helpers
     // -----------------------------------------------------------------------
 
-    fn hook_dispatch(&self, hook: HookName, git_hook_args: Vec<String>) -> CommandOutcome {
-        if !git_hook_args.is_empty() && !hook.accepts_git_hook_args() {
-            return CommandOutcome {
-                stdout: None,
-                stderr: Some(
-                    "extra hook arguments are only supported for git process hooks".to_owned(),
-                ),
-                exit_code: 2,
-            };
+    fn agent_dispatch(
+        &self,
+        hook: HookName,
+        host: Option<HookHost>,
+        git_hook_args: Vec<String>,
+    ) -> HookExecution {
+        let Some(host) = host else {
+            return HookExecution::InputError(make_hook_error(
+                false,
+                "agent hooks require --host claude|codex|grok",
+            ));
+        };
+
+        if !git_hook_args.is_empty() {
+            return HookExecution::InputError(make_hook_error(
+                false,
+                "extra hook arguments are only supported for git process hooks",
+            ));
         }
 
         let hook_name = hook.hook_name().to_owned();
         let is_post = is_post_tool_use(&hook_name);
 
+        let mut stdin_buf = String::new();
+        if let Err(e) = std::io::stdin().read_to_string(&mut stdin_buf) {
+            return HookExecution::InputError(make_hook_error(
+                is_post,
+                &format!("failed to read stdin: {e}"),
+            ));
+        }
+
+        self.dispatch_agent_input(hook, host, &stdin_buf)
+    }
+
+    fn dispatch_agent_input(
+        &self,
+        hook: HookName,
+        host: HookHost,
+        stdin_buf: &str,
+    ) -> HookExecution {
+        let hook_name = hook.hook_name().to_owned();
+        let is_post = is_post_tool_use(&hook_name);
+
         // Build the dispatch command.
         // Stdin-reading strategy is determined by the hook type (I/O boundary responsibility):
-        //   - git process hooks: no stdin envelope; use a placeholder Git command.
-        //   - skill-compliance: read stdin, parse prompt field (UserPromptSubmit envelope).
-        //   - all others: read stdin, parse PreToolUse JSON envelope.
-        let dispatch_cmd = if is_git_process_hook(&hook_name) {
-            HookDispatchCommand {
-                tool_name: "Git".to_owned(),
-                command: None,
-                file_path: None,
-                content: None,
-                git_hook_args: git_hook_args.clone(),
-            }
-        } else if hook_name == "skill-compliance" {
-            // Advisory hook — never block on stdin errors.
-            let mut stdin_buf = String::new();
-            if std::io::stdin().read_to_string(&mut stdin_buf).is_err() {
-                // Fall through to dispatch with empty content; usecase returns Allow + None.
-                stdin_buf = String::new();
-            }
-            let prompt = parse_prompt_envelope(stdin_buf.trim());
+        //   - skill-compliance: read stdin, parse the common prompt field.
+        //   - all other agent hooks: read stdin, parse the selected host's
+        //     PreToolUse JSON envelope.
+        let dispatch_cmd = if hook_name == "skill-compliance" {
+            let prompt = match parse_prompt_envelope(stdin_buf.trim()) {
+                Ok(prompt) => prompt,
+                Err(e) => {
+                    // Direct dispatch is fail-closed for malformed input. The
+                    // provider connection wrapper may normalize this exit code
+                    // for its advisory UserPromptSubmit hook.
+                    return HookExecution::InputError(make_hook_error(is_post, &e.to_string()));
+                }
+            };
             HookDispatchCommand {
                 tool_name: "UserPromptSubmit".to_owned(),
                 command: None,
@@ -374,20 +433,14 @@ impl HookDriver {
                 git_hook_args: vec![],
             }
         } else {
-            // PreToolUse / PostToolUse: read stdin JSON envelope.
-            let mut stdin_buf = String::new();
-            if let Err(e) = std::io::stdin().read_to_string(&mut stdin_buf) {
-                return make_hook_error(is_post, &format!("failed to read stdin: {e}"));
-            }
-
             if stdin_buf.trim().is_empty() {
-                return make_hook_error(
+                return HookExecution::InputError(make_hook_error(
                     is_post,
                     "hook received empty stdin — no envelope to check",
-                );
+                ));
             }
 
-            match parse_hook_envelope(&stdin_buf) {
+            match parse_hook_envelope(stdin_buf, host) {
                 Ok(parsed) => HookDispatchCommand {
                     tool_name: parsed.tool_name,
                     command: parsed.command,
@@ -395,31 +448,79 @@ impl HookDriver {
                     content: parsed.content,
                     git_hook_args: vec![],
                 },
-                Err(e) => return make_hook_error(is_post, &e.to_string()),
+                Err(e) => {
+                    return HookExecution::InputError(make_hook_error(is_post, &e.to_string()));
+                }
             }
         };
 
+        self.dispatch_command(hook_name, is_post, dispatch_cmd)
+    }
+
+    fn git_dispatch(
+        &self,
+        hook: HookName,
+        host: Option<HookHost>,
+        git_hook_args: Vec<String>,
+    ) -> HookExecution {
+        let hook_name = hook.hook_name().to_owned();
+        if host.is_some() {
+            return HookExecution::InputError(make_hook_error(
+                false,
+                "git process hooks must not specify --host",
+            ));
+        }
+
+        if !is_git_process_hook(&hook_name) {
+            return HookExecution::InputError(make_hook_error(
+                false,
+                "extra hook arguments are only supported for git process hooks",
+            ));
+        }
+
+        // Git process hooks do not receive an agent envelope on stdin. Keep
+        // this path separate so their positional arguments reach the existing
+        // process-level handlers without any provider parsing.
+        let dispatch_cmd = HookDispatchCommand {
+            tool_name: "Git".to_owned(),
+            command: None,
+            file_path: None,
+            content: None,
+            git_hook_args,
+        };
+
+        self.dispatch_command(hook_name, false, dispatch_cmd)
+    }
+
+    fn dispatch_command(
+        &self,
+        hook_name: String,
+        is_post: bool,
+        dispatch_cmd: HookDispatchCommand,
+    ) -> HookExecution {
         // Single unconditional dispatch — ALL routing is inside the usecase.
         let result = self.hook_dispatch_service.dispatch(hook_name, dispatch_cmd);
 
         match result {
             Ok(verdict) => {
-                // skill-compliance returns pre-formatted JSON output via this field.
-                if let Some(output) = verdict.skill_compliance_output {
-                    return CommandOutcome::success(Some(output));
-                }
                 if verdict.decision == HookVerdictDecision::Block {
                     let reason = verdict.reason.unwrap_or_default();
-                    CommandOutcome {
+                    return HookExecution::HookBlock(CommandOutcome {
                         stdout: None,
                         stderr: if reason.is_empty() { None } else { Some(reason) },
                         exit_code: 2,
-                    }
+                    });
+                }
+                // skill-compliance returns pre-formatted JSON output via this field.
+                if let Some(output) = verdict.skill_compliance_output {
+                    HookExecution::AdvisoryFired(CommandOutcome::success(Some(output)))
                 } else {
-                    CommandOutcome::success(None)
+                    HookExecution::Allow(CommandOutcome::success(None))
                 }
             }
-            Err(e) => make_hook_error(is_post, &format!("hook error: {e}")),
+            Err(e) => {
+                HookExecution::InternalError(make_hook_error(is_post, &format!("hook error: {e}")))
+            }
         }
     }
 }
@@ -442,95 +543,359 @@ fn make_hook_error(is_post_tool_use: bool, message: &str) -> CommandOutcome {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
 
+    use crate::render::CommandOutcome;
     use usecase::hook_dispatch::{
-        HookDispatchCommand, HookDispatchError, HookDispatchService, HookVerdictOutput,
+        HookDispatchCommand, HookDispatchError, HookDispatchService, HookVerdictDecision,
+        HookVerdictOutput,
     };
 
     use super::{
-        HookDriver, HookInput, HookName, HookParseError, make_hook_error, parse_hook_envelope,
+        HookDriver, HookExecution, HookHost, HookInput, HookName, HookParseError, make_hook_error,
+        parse_hook_envelope, parse_prompt_envelope,
     };
 
     #[test]
-    fn test_parse_hook_envelope_grok_camel_case_terminal_input_maps_to_bash() {
-        let result = parse_hook_envelope(
+    fn test_parse_hook_envelope_grok_terminal_ignores_conflicting_aliases() {
+        let parsed = parse_hook_envelope(
+            r#"{"toolName":"run_terminal_command","toolInput":{"command":"git status"},"tool_name":"Write","tool_input":{"file_path":"tests/example.rs","content":""}}"#,
+            HookHost::Grok,
+        )
+        .expect("Grok terminal envelope must parse");
+
+        assert_eq!(parsed.tool_name, "Bash");
+        assert_eq!(parsed.command.as_deref(), Some("git status"));
+        assert!(parsed.file_path.is_none());
+        assert!(parsed.content.is_none());
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_grok_search_replace_ignores_conflicting_aliases() {
+        let parsed = parse_hook_envelope(
+            r#"{"toolName":"search_replace","toolInput":{"file_path":"tests/example.rs","old_string":"old","new_string":"new"},"tool_name":"run_terminal_command","tool_input":{"command":"git status"}}"#,
+            HookHost::Grok,
+        )
+        .expect("Grok search-replace envelope must parse");
+
+        assert_eq!(parsed.tool_name, "Write");
+        assert!(parsed.command.is_none());
+        assert_eq!(
+            parsed.file_path.as_deref().and_then(|path| path.to_str()),
+            Some("tests/example.rs")
+        );
+        assert_eq!(parsed.content.as_deref(), Some("new"));
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_grok_rejects_unknown_and_invalid_values() {
+        let cases = [
+            (
+                r#"{"toolName":"unknown_tool","toolInput":{"command":"git status"}}"#,
+                "cannot be mapped",
+            ),
+            (r#"{"toolName":"run_terminal_command"}"#, "toolInput"),
+            (
+                r#"{"toolName":"run_terminal_command","toolInput":{"command":42}}"#,
+                "requires string field",
+            ),
+        ];
+
+        for (raw, message) in cases {
+            let result = parse_hook_envelope(raw, HookHost::Grok);
+            assert!(matches!(
+                result,
+                Err(HookParseError::Unmappable(actual)) if actual.contains(message)
+            ));
+        }
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_grok_rejects_missing_required_values() {
+        let cases = [
+            (
+                r#"{"toolName":"search_replace","toolInput":{"old_string":"old","new_string":"new"}}"#,
+                "file_path",
+            ),
+            (
+                r#"{"toolName":"search_replace","toolInput":{"file_path":"tests/example.rs","new_string":"new"}}"#,
+                "old_string",
+            ),
+            (
+                r#"{"toolName":"search_replace","toolInput":{"file_path":"tests/example.rs","old_string":"old"}}"#,
+                "new_string",
+            ),
+        ];
+
+        for (raw, field) in cases {
+            let result = parse_hook_envelope(raw, HookHost::Grok);
+            assert!(matches!(
+                result,
+                Err(HookParseError::Unmappable(message)) if message.contains(field)
+            ));
+        }
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_uses_only_the_selected_host_contract() {
+        let grok_for_claude = parse_hook_envelope(
             r#"{"toolName":"run_terminal_command","toolInput":{"command":"git status"}}"#,
+            HookHost::Claude,
         );
-
-        match result {
-            Ok(parsed) => {
-                assert_eq!(parsed.tool_name, "Bash");
-                assert_eq!(parsed.command.as_deref(), Some("git status"));
-                assert!(parsed.file_path.is_none());
-                assert!(parsed.content.is_none());
-            }
-            Err(error) => panic!("unexpected parse error: {error}"),
-        }
-    }
-
-    #[test]
-    fn test_parse_hook_envelope_grok_search_replace_maps_to_write_contract() {
-        let result = parse_hook_envelope(
-            r#"{"toolName":"search_replace","toolInput":{"file_path":"tests/example.rs","old_string":"old","new_string":"new"}}"#,
-        );
-
-        match result {
-            Ok(parsed) => {
-                assert_eq!(parsed.tool_name, "Write");
-                assert!(parsed.command.is_none());
-                assert_eq!(
-                    parsed.file_path.as_deref().and_then(|path| path.to_str()),
-                    Some("tests/example.rs")
-                );
-                assert_eq!(parsed.content.as_deref(), Some("new"));
-            }
-            Err(error) => panic!("unexpected parse error: {error}"),
-        }
-    }
-
-    #[test]
-    fn test_parse_hook_envelope_grok_unknown_tool_fails_closed() {
-        let result = parse_hook_envelope(
-            r#"{"toolName":"unknown_tool","toolInput":{"command":"git status"}}"#,
-        );
-
         assert!(matches!(
-            result,
-            Err(HookParseError::Unmappable(message))
-                if message.contains("cannot be mapped")
+            grok_for_claude,
+            Err(HookParseError::MissingField(message)) if message.contains("tool_name")
+        ));
+
+        let claude_for_grok = parse_hook_envelope(
+            r#"{"tool_name":"Bash","tool_input":{"command":"git status"}}"#,
+            HookHost::Grok,
+        );
+        assert!(matches!(
+            claude_for_grok,
+            Err(HookParseError::MissingField(message)) if message.contains("toolName")
         ));
     }
 
     #[test]
-    fn test_parse_hook_envelope_grok_missing_input_fails_closed() {
-        let result = parse_hook_envelope(r#"{"toolName":"run_terminal_command"}"#);
+    fn test_parse_hook_envelope_claude_and_codex_share_snake_case_contract() {
+        let raw = r#"{"tool_name":"Bash","tool_input":{"command":"git status"}}"#;
 
+        for host in [HookHost::Claude, HookHost::Codex] {
+            let parsed = parse_hook_envelope(raw, host).expect("snake-case envelope must parse");
+            assert_eq!(parsed.tool_name, "Bash");
+            assert_eq!(parsed.command.as_deref(), Some("git status"));
+        }
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_codex_apply_patch_remains_snake_case() {
+        let parsed = parse_hook_envelope(
+            r#"{"tool_name":"apply_patch","tool_input":{"patch":"*** Begin Patch"}}"#,
+            HookHost::Codex,
+        )
+        .expect("Codex apply_patch envelope must parse");
+
+        assert_eq!(parsed.tool_name, "apply_patch");
+        assert!(parsed.command.is_none());
+        assert!(parsed.file_path.is_none());
+        assert!(parsed.content.is_none());
+    }
+
+    #[test]
+    fn test_parse_prompt_envelope_preserves_prompt_and_rejects_invalid_input() {
+        assert_eq!(
+            parse_prompt_envelope(r#"{"prompt":"/track:review"}"#).unwrap(),
+            "/track:review"
+        );
         assert!(matches!(
-            result,
-            Err(HookParseError::Unmappable(message))
-                if message.contains("toolInput")
+            parse_prompt_envelope("not json"),
+            Err(HookParseError::InvalidJson(message)) if message.contains("prompt JSON")
+        ));
+        assert!(matches!(
+            parse_prompt_envelope(r#"{"prompt":42}"#),
+            Err(HookParseError::InvalidField(message)) if message.contains("prompt")
         ));
     }
 
     #[test]
-    fn test_hook_driver_non_git_arguments_returns_fail_closed_command_outcome() {
-        let driver = HookDriver::new(Arc::new(RecordingHookService));
-        let outcome = driver.handle(HookInput::Dispatch {
+    fn test_hook_input_is_raw_record_with_optional_host_and_ordered_git_argv() {
+        let input = HookInput {
+            hook: HookName::GitPrePush,
+            host: None,
+            git_hook_args: vec!["origin".to_owned(), "https://example.com".to_owned()],
+        };
+
+        assert_eq!(input.hook.hook_name(), "git-pre-push");
+        assert!(input.host.is_none());
+        assert_eq!(input.git_hook_args, ["origin", "https://example.com"]);
+    }
+
+    #[test]
+    fn test_hook_driver_missing_agent_host_is_input_error() {
+        for hook in [HookName::BlockDirectGitOps, HookName::SkillCompliance] {
+            let (driver, service) = driver_with(Response::Allow);
+            let execution = driver.handle(HookInput { hook, host: None, git_hook_args: vec![] });
+
+            assert!(matches!(execution, HookExecution::InputError(_)));
+            assert_eq!(outcome(&execution).exit_code, 2);
+            assert_eq!(
+                outcome(&execution).stderr.as_deref(),
+                Some("error: agent hooks require --host claude|codex|grok")
+            );
+            assert!(service.calls.lock().unwrap().is_empty());
+        }
+    }
+
+    #[test]
+    fn test_hook_driver_forbids_host_on_git_process_hook() {
+        let (driver, service) = driver_with(Response::Allow);
+        let execution = driver.handle(HookInput {
+            hook: HookName::GitRefUpdate,
+            host: Some(HookHost::Claude),
+            git_hook_args: vec!["committed".to_owned()],
+        });
+
+        assert!(matches!(execution, HookExecution::InputError(_)));
+        assert_eq!(outcome(&execution).exit_code, 2);
+        assert!(outcome(&execution).stderr.as_deref().unwrap().contains("must not specify --host"));
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_hook_driver_forbids_git_argv_on_agent_hook() {
+        let (driver, service) = driver_with(Response::Allow);
+        let execution = driver.handle(HookInput {
             hook: HookName::BlockDirectGitOps,
+            host: Some(HookHost::Claude),
             git_hook_args: vec!["unexpected".to_owned()],
         });
 
-        assert_eq!(outcome.exit_code, 2);
-        assert_eq!(
-            outcome.stderr.as_deref(),
-            Some("extra hook arguments are only supported for git process hooks")
+        assert!(matches!(execution, HookExecution::InputError(_)));
+        assert_eq!(outcome(&execution).exit_code, 2);
+        assert!(
+            outcome(&execution)
+                .stderr
+                .as_deref()
+                .unwrap()
+                .contains("only supported for git process hooks")
         );
-        assert!(outcome.stdout.is_none());
+        assert!(service.calls.lock().unwrap().is_empty());
     }
 
     #[test]
-    fn test_make_hook_error_unmappable_input_returns_fail_closed_command_outcome() {
+    fn test_hook_driver_git_dispatch_preserves_argv_and_allows() {
+        let (driver, service) = driver_with(Response::Allow);
+        let execution = driver.handle(HookInput {
+            hook: HookName::GitPrePush,
+            host: None,
+            git_hook_args: vec!["origin".to_owned(), "https://example.com".to_owned()],
+        });
+
+        assert!(matches!(execution, HookExecution::Allow(_)));
+        assert_eq!(outcome(&execution).exit_code, 0);
+        let (_, command) = service.calls.lock().unwrap().pop().expect("dispatch call");
+        assert_eq!(command.tool_name, "Git");
+        assert_eq!(command.git_hook_args, ["origin", "https://example.com"]);
+    }
+
+    #[test]
+    fn test_hook_driver_distinguishes_actual_block_from_input_error() {
+        let (blocking_driver, _) = driver_with(Response::Block);
+        let block = blocking_driver.handle(HookInput {
+            hook: HookName::GitPrePush,
+            host: None,
+            git_hook_args: vec!["origin".to_owned()],
+        });
+
+        let (error_driver, _) = driver_with(Response::Allow);
+        let input_error = error_driver.handle(HookInput {
+            hook: HookName::BlockDirectGitOps,
+            host: None,
+            git_hook_args: vec![],
+        });
+
+        assert!(matches!(block, HookExecution::HookBlock(_)));
+        assert!(matches!(input_error, HookExecution::InputError(_)));
+        assert_eq!(outcome(&block).exit_code, 2);
+        assert_eq!(outcome(&input_error).exit_code, 2);
+    }
+
+    #[test]
+    fn test_hook_driver_agent_parse_failure_is_input_error() {
+        let (driver, service) = driver_with(Response::Allow);
+        let execution =
+            driver.dispatch_agent_input(HookName::BlockDirectGitOps, HookHost::Claude, "not json");
+
+        assert!(matches!(execution, HookExecution::InputError(_)));
+        assert_eq!(outcome(&execution).exit_code, 2);
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_hook_driver_claude_and_codex_share_pretool_use_normalization_and_guard_behavior() {
+        let raw = r#"{"tool_name":"Bash","tool_input":{"command":"git add safe.txt"}}"#;
+
+        for host in [HookHost::Claude, HookHost::Codex] {
+            let (driver, service) = driver_with(Response::Block);
+            let execution = driver.dispatch_agent_input(HookName::BlockDirectGitOps, host, raw);
+
+            assert!(matches!(execution, HookExecution::HookBlock(_)));
+            assert_eq!(outcome(&execution).exit_code, 2);
+            assert_eq!(outcome(&execution).stderr.as_deref(), Some("blocked by test service"));
+
+            let (hook_name, command) = service.calls.lock().unwrap().pop().expect("dispatch call");
+            assert_eq!(hook_name, "block-direct-git-ops");
+            assert_eq!(command.tool_name, "Bash");
+            assert_eq!(command.command.as_deref(), Some("git add safe.txt"));
+        }
+    }
+
+    #[test]
+    fn test_hook_driver_skill_context_is_advisory_fired() {
+        let (driver, service) = driver_with(Response::Advisory);
+        let execution = driver.dispatch_agent_input(
+            HookName::SkillCompliance,
+            HookHost::Grok,
+            r#"{"prompt":"/track:review"}"#,
+        );
+
+        assert!(matches!(execution, HookExecution::AdvisoryFired(_)));
+        assert_eq!(outcome(&execution).exit_code, 0);
+        assert!(outcome(&execution).stdout.as_deref().unwrap().contains("additionalContext"));
+        let (hook_name, command) = service.calls.lock().unwrap().pop().expect("dispatch call");
+        assert_eq!(hook_name, "skill-compliance");
+        assert_eq!(command.tool_name, "UserPromptSubmit");
+        assert_eq!(command.content.as_deref(), Some("/track:review"));
+    }
+
+    #[test]
+    fn test_hook_driver_skill_parse_failure_is_input_error() {
+        let (driver, service) = driver_with(Response::Advisory);
+        let execution =
+            driver.dispatch_agent_input(HookName::SkillCompliance, HookHost::Claude, "not json");
+
+        assert!(matches!(execution, HookExecution::InputError(_)));
+        assert_eq!(outcome(&execution).exit_code, 2);
+        assert!(
+            outcome(&execution)
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.starts_with("error: failed to parse prompt JSON"))
+        );
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_hook_driver_valid_skill_without_context_is_allow() {
+        let (driver, _) = driver_with(Response::Allow);
+        let execution = driver.dispatch_agent_input(
+            HookName::SkillCompliance,
+            HookHost::Claude,
+            r#"{"prompt":"hello"}"#,
+        );
+
+        assert!(matches!(execution, HookExecution::Allow(_)));
+        assert_eq!(outcome(&execution).exit_code, 0);
+        assert!(outcome(&execution).stdout.is_none());
+    }
+
+    #[test]
+    fn test_hook_driver_service_failure_is_internal_error() {
+        let (driver, _) = driver_with(Response::Error);
+        let execution = driver.dispatch_agent_input(
+            HookName::BlockDirectGitOps,
+            HookHost::Claude,
+            r#"{"tool_name":"Bash","tool_input":{"command":"printf ok"}}"#,
+        );
+
+        assert!(matches!(execution, HookExecution::InternalError(_)));
+        assert_eq!(outcome(&execution).exit_code, 2);
+        assert!(outcome(&execution).stderr.as_deref().unwrap().contains("hook error"));
+    }
+
+    #[test]
+    fn test_make_hook_error_is_fail_closed_for_pre_tool_use() {
         let outcome = make_hook_error(false, "unmappable Grok hook input");
 
         assert_eq!(outcome.exit_code, 2);
@@ -538,15 +903,64 @@ mod tests {
         assert!(outcome.stdout.is_none());
     }
 
-    struct RecordingHookService;
+    fn outcome(execution: &HookExecution) -> &CommandOutcome {
+        match execution {
+            HookExecution::InputError(outcome)
+            | HookExecution::InternalError(outcome)
+            | HookExecution::HookBlock(outcome)
+            | HookExecution::AdvisoryFired(outcome)
+            | HookExecution::Allow(outcome) => outcome,
+        }
+    }
 
-    impl HookDispatchService for RecordingHookService {
+    fn driver_with(response: Response) -> (HookDriver, Arc<StubHookService>) {
+        let service = Arc::new(StubHookService { response, calls: Mutex::new(Vec::new()) });
+        let driver = HookDriver::new(service.clone());
+        (driver, service)
+    }
+
+    #[derive(Clone, Copy)]
+    enum Response {
+        Allow,
+        Block,
+        Advisory,
+        Error,
+    }
+
+    struct StubHookService {
+        response: Response,
+        calls: Mutex<Vec<(String, HookDispatchCommand)>>,
+    }
+
+    impl HookDispatchService for StubHookService {
         fn dispatch(
             &self,
-            _hook_name: String,
-            _command: HookDispatchCommand,
+            hook_name: String,
+            command: HookDispatchCommand,
         ) -> Result<HookVerdictOutput, HookDispatchError> {
-            Err(HookDispatchError::UnknownHookName("test".to_owned()))
+            self.calls.lock().unwrap().push((hook_name, command));
+            match self.response {
+                Response::Allow => Ok(HookVerdictOutput {
+                    decision: HookVerdictDecision::Allow,
+                    reason: None,
+                    skill_compliance_output: None,
+                }),
+                Response::Block => Ok(HookVerdictOutput {
+                    decision: HookVerdictDecision::Block,
+                    reason: Some("blocked by test service".to_owned()),
+                    skill_compliance_output: None,
+                }),
+                Response::Advisory => Ok(HookVerdictOutput {
+                    decision: HookVerdictDecision::Allow,
+                    reason: None,
+                    skill_compliance_output: Some(
+                        r#"{"hookSpecificOutput":{"additionalContext":"advice"}}"#.to_owned(),
+                    ),
+                }),
+                Response::Error => {
+                    Err(HookDispatchError::HandlerFailed("stub service failure".to_owned()))
+                }
+            }
         }
 
         fn check_skill_compliance(&self, _prompt: &str) -> Option<String> {

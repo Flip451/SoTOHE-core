@@ -1,0 +1,669 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-04T03:38:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94b88fef949ec30cff84396dff421c4aeed4cc8303625dde909945fd7c75b313",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:43:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94b88fef949ec30cff84396dff421c4aeed4cc8303625dde909945fd7c75b313",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:56:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:680eb1b5f1d247d2a62fc5efe8c8bc799f81770f89ec3a239d71848c2d33f47f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:00:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:680eb1b5f1d247d2a62fc5efe8c8bc799f81770f89ec3a239d71848c2d33f47f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T01:07:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af5c6b27bdf077d6b684df587c367e831057c3586daedb670c6ced0fb8dccf44",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T01:10:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af5c6b27bdf077d6b684df587c367e831057c3586daedb670c6ced0fb8dccf44",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-09-07T12:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37dc72a393aa29dd2598644cc922563618766cf37f16d88c5434d64b2cbaec74",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:29:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37dc72a393aa29dd2598644cc922563618766cf37f16d88c5434d64b2cbaec74",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:57:39Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs",
+              "line": 165,
+              "message": "The generated cargo shim embeds `metadata`—including `TMPDIR`-derived workspace and target paths—inside a single-quoted shell literal. A valid Unix path containing `'` terminates that literal and makes the regression test fail before exercising target exclusion. Neither the spec nor `environment-assumptions.md` declares apostrophe-free paths (its input-encoding policy remains TODO). Pass the metadata through an environment variable/file or apply shell-safe quoting.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:37dc72a393aa29dd2598644cc922563618766cf37f16d88c5434d64b2cbaec74",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T13:07:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45450ffe0776daace2466eb96cbca102cdd2bd6d3fdeb915c30b45b148c8366a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T17:20:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c00085cb30abafb1ec7075e2303add07f8b1f78cf10a30777fd86d8ad61d1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T17:27:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c00085cb30abafb1ec7075e2303add07f8b1f78cf10a30777fd86d8ad61d1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-07T12:31:08Z",
+          "findings": [
+            {
+              "category": "path normalization",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 61,
+              "message": "`current_dir().join(value)` produces only a lexical absolute path and leaves components such as `.` intact. The default `.` therefore becomes `<cwd>/.`, which does not prefix-match Cargo's `<cwd>/target` in the downstream path comparisons, so target exclusion can still fail. Canonicalize the existing directory (with fail-closed error handling) before storing it.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:6f5e96ed10d9dd1299c12df4e002606c4a349c736663078d152ecca0eb260f8b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T12:41:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:909288dc0c322fb34aaa59fc46c8ceb702d83ad2eea636041225f3032b449894",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T13:03:06Z",
+          "findings": [
+            {
+              "category": "boundary validation",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 99,
+              "message": "`TrackWorkspaceRootInput` can still be constructed without the new normalization invariant. `from_derived_items_parent` stores its argument directly, and both public `TrackItemsDirectoryInput::workspace_root` methods reach this unchecked path (the resolution variant constructs the struct directly). A relative or missing `track/items` input can therefore produce a relative or unavailable workspace root that `catalogue_impl_signals_input_to_command` forwards after only lexical use-case validation, recreating the relative/absolute target-exclusion failure. Route derived roots through the new fallible normalization and propagate its diagnostic, or remove the unchecked construction path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:909288dc0c322fb34aaa59fc46c8ceb702d83ad2eea636041225f3032b449894",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T13:25:45Z",
+          "findings": [
+            {
+              "category": "boundary validation",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 99,
+              "message": "`TrackWorkspaceRootInput` still has construction paths that bypass the new normalization invariant. `from_derived_items_parent` stores its argument directly; `track_tddd::TrackItemsDirectoryInput::workspace_root` calls it, and the resolution-layer `TrackItemsDirectoryInput::workspace_root` likewise constructs the value directly. A relative or unavailable `track/items` path can therefore yield a relative/unavailable workspace root that `catalogue_impl_signals_input_to_command` forwards after only lexical validation, recreating the target-exclusion failure. Route derived roots through the fallible normalization and propagate its diagnostic, or prevent unchecked construction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:909288dc0c322fb34aaa59fc46c8ceb702d83ad2eea636041225f3032b449894",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T17:19:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:caff9fadb30fd0916870d16982e9c2591d5adae928d6cd40d3dfee426107662f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T17:32:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:caff9fadb30fd0916870d16982e9c2591d5adae928d6cd40d3dfee426107662f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:15:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f15e317f2a62b3b98541fb2029f03a4421cf6c78c4d110fa1d2062b530371a71",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:22:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f15e317f2a62b3b98541fb2029f03a4421cf6c78c4d110fa1d2062b530371a71",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:30:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f15e317f2a62b3b98541fb2029f03a4421cf6c78c4d110fa1d2062b530371a71",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T02:12:33Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 278,
+              "message": "The helper strips `\\\\?\\` from every non-UNC verbatim path, including valid volume/device namespaces such as `\\\\?\\Volume{GUID}\\...`, producing a relative/malformed workspace root. Restrict stripping to drive-letter paths (`[A-Za-z]:\\`) and preserve other namespaces.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-correctness",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 354,
+              "message": "Windows canonicalization tests still compare against the raw `std::fs::canonicalize` result, which retains the `\\\\?\\C:\\` prefix while production code now strips it. The tests at lines 354, 400, and 411 will fail on Windows; normalize the expected paths through the same platform-aware expectation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f0c35ad47c0d4d2c674ce4cb3a9271a5180bc038161c48313538c9397c5016a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T02:20:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1481bb62c4424ff3590722b3a39fadc2d1ce1e4d8d7f8a3e55d7141eef8efc60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T02:38:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1481bb62c4424ff3590722b3a39fadc2d1ce1e4d8d7f8a3e55d7141eef8efc60",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T03:32:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e0e0ebeb5cc182d18b0fc00c2e6f82e7ec0d2f8b03e77f4f1e3fb2b5d8651b14",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T03:41:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e0e0ebeb5cc182d18b0fc00c2e6f82e7ec0d2f8b03e77f4f1e3fb2b5d8651b14",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:26:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1863254c26a55e9948071913627fc2edd433f6b7a240bfb38b6524547c56b1d5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:38:21Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 275,
+              "message": "The UNC normalization relies on undeclared external-boundary assumptions: `Path::to_str()` must succeed, Windows canonicalization must produce `\\\\?\\UNC\\...`, and Cargo must report the equivalent target as ordinary UNC. The spec does not define UNC behavior, while `environment-assumptions.md` leaves input encoding unspecified and declares Windows unsupported for the relevant evaluator. Consequently, non-Unicode UNC roots remain verbatim and the intended path match is not guaranteed. Declare the supported Windows/UNC and encoding contract, reject unsupported inputs explicitly, or normalize without requiring Unicode conversion.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:1863254c26a55e9948071913627fc2edd433f6b7a240bfb38b6524547c56b1d5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T04:53:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:db7255bd7894d81aba9a2cad4525ed483ea0b6c34d2797d34d82efd2c5a993a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-04T08:37:51Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/impl-plan.json",
+              "line": 35,
+              "message": "Task descriptions T1 and T2 restate the upstream behavior contract (absolute normalization, fail-closed handling, and target-directory exclusion) instead of using only target + operation + anchor cites. See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/impl-plan.json",
+              "line": 6,
+              "message": "SECTION-01 and SECTION-02 descriptions repeat upstream behavior in prose, including normalization, rejection, target exclusion, and relative/absolute equivalence. They should contain only executable planning information plus anchor cites, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:62ec7a67a120d5ccdfe786b8102ad36166254b8723d4c5c904dbacdcf7c2c7fe",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T08:52:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c59f9c50e893afee53f56949157e729081567d238d42186b87fa84c3f89a4e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T08:58:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c59f9c50e893afee53f56949157e729081567d238d42186b87fa84c3f89a4e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:20:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71feea3059db0aed6fbf05098fb2e1344e052099e2fb7c98ecbf762485aa3acb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T12:44:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71feea3059db0aed6fbf05098fb2e1344e052099e2fb7c98ecbf762485aa3acb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T17:17:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cb6c9d8cc105f7e4cd0f780887c2c5e47d0be24e109b7e43fa044cb1567987c5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T17:24:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cb6c9d8cc105f7e4cd0f780887c2c5e47d0be24e109b7e43fa044cb1567987c5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:40:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71a942c4a9a0492300806e250921177786b279a652ce3b34b03b7788d62846ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:44:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71a942c4a9a0492300806e250921177786b279a652ce3b34b03b7788d62846ad",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-08T01:10:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bde8ba5ca0478b716a153ce3d840ab534efa436c5ede96159372ad88bdac2a89",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T01:22:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bde8ba5ca0478b716a153ce3d840ab534efa436c5ede96159372ad88bdac2a89",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T02:12:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a844a831426f65939af6caadf6442fc0aa4c75b23bd7b65bf748f2ce9750fba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T03:01:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a844a831426f65939af6caadf6442fc0aa4c75b23bd7b65bf748f2ce9750fba",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:26:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e6ca12f01698e9ec3fe0683954fb8d853615beb91efb009e7bd0cfbda181853",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:36:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e6ca12f01698e9ec3fe0683954fb8d853615beb91efb009e7bd0cfbda181853",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-04T08:37:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd244bf0a4b020354f3c50f00010019fad859d00c865ac5609cb292f0dae2710",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T08:40:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd244bf0a4b020354f3c50f00010019fad859d00c865ac5609cb292f0dae2710",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:14:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b45c0f418f2e01da50385ede7af6ca49dd9b6381e3298a90b85d7a9c0c6f9808",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:21:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b45c0f418f2e01da50385ede7af6ca49dd9b6381e3298a90b85d7a9c0c6f9808",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T18:25:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b45c0f418f2e01da50385ede7af6ca49dd9b6381e3298a90b85d7a9c0c6f9808",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-04T04:12:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e0b7699e86718bd2b3bac1efe9998c184426a3ec407ad94cd8decac172f4232",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:16:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e0b7699e86718bd2b3bac1efe9998c184426a3ec407ad94cd8decac172f4232",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-04T06:57:20Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 10,
+              "message": "The `docs` field restates the upstream normalization behavior instead of identifying the modified type and referring to spec anchors. Remove the behavioral prose and retain a concise change description with the relevant anchors, per `.harness/policies/no-upstream-restatement.md`. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:1474634370ace7e28e0dafccc761e19c0fe181c134a0dc3f3b0ec2fee9b372c1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T07:11:19Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 10,
+              "message": "The `docs` field restates the upstream normalization behavior instead of identifying the modified type and referring to spec anchors. Remove the behavioral prose and retain a concise change description with relevant anchors, per `.harness/policies/no-upstream-restatement.md`. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:075f39b0c0501a374c3caba47cd1ae1724c24121cb246605d948da432c4aeede",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T07:27:18Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 22,
+              "message": "The `try_new` method is declared with `action: modify`, but its declared signature is identical to the frozen rustdoc baseline (`value: PathBuf -> Result<Self, TrackResolutionDiagnostic>`). Under the action-classification policy, this method action is incoherent with the baseline diff; classify it as a reference unless the catalogue declares a changed method shape. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput::try_new`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:1237860f0e1d77d50399ff16431e413e6b317a94f21acb0a0f51558fe3a0cd68",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T07:47:13Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 22,
+              "message": "The `try_new` method is declared with `action: modify`, but its declared signature is identical to the frozen rustdoc baseline (`value: PathBuf -> Result<Self, TrackResolutionDiagnostic>`). Under the action-classification policy, this method action is incoherent with the baseline diff; classify it as a reference unless the catalogue declares a changed method shape. Entry key: `cli_driver::track_resolution::TrackWorkspaceRootInput::try_new`.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:027afec2020e5537ad16515471bc84ded658137c04d8f29fba7bd74c7750a482",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T08:05:21Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 7,
+              "message": "The approved spec changes the existing public type `cli_driver::track_resolution::TrackWorkspaceRootInput`, but `cli_driver-types.json` contains no `action: modify` entry for it. This leaves the required post-change type shape undeclared; restore the companion modify entry with its `try_new` contract and spec references.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:87c1953f662f7c5755766cafa5a7653b4c390858784d309bf27cce709d013f55",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T08:25:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:87c1953f662f7c5755766cafa5a7653b4c390858784d309bf27cce709d013f55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T08:29:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:87c1953f662f7c5755766cafa5a7653b4c390858784d309bf27cce709d013f55",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T14:15:54Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 10,
+              "message": "The `cli_driver::track_resolution::TrackItemsDirectoryInput` docs restate the upstream normalization and fail-closed behavior contract instead of referencing it by anchor only. Remove the behavioral rationale from `docs` per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 67,
+              "message": "The `cli_driver::track_tddd::TrackItemsDirectoryInput` docs repeat the upstream normalization and fail-closed behavior contract. Keep `docs` limited to type-specific purpose plus anchor references, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "duplicated structural declaration",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 65,
+              "message": "`cli_driver::track_resolution::TrackItemsDirectoryInput` and `cli_driver::track_tddd::TrackItemsDirectoryInput` declare functionally identical DTO shapes and method signatures without a shared trait or `reference` relationship. This duplicates the same structural contract across neighbouring modules; declare a shared type/trait contract or document a genuine boundary distinction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:64d644c5d441fdc21e1afcdb297f81ed09a280610929761dabab80396a0a1b87",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T14:19:56Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 10,
+              "message": "`cli_driver::track_resolution::TrackItemsDirectoryInput` repeats the upstream normalization and fail-closed behavior contract in `docs`; use anchor references instead, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 67,
+              "message": "`cli_driver::track_tddd::TrackItemsDirectoryInput` repeats the upstream normalization and fail-closed behavior contract in `docs`; use anchor references instead, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "duplicated structural declaration",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 65,
+              "message": "`cli_driver::track_resolution::TrackItemsDirectoryInput` and `cli_driver::track_tddd::TrackItemsDirectoryInput` declare functionally identical shapes and method signatures without a shared trait or reference relationship. Consolidate the structural contract or document a genuine boundary distinction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:64d644c5d441fdc21e1afcdb297f81ed09a280610929761dabab80396a0a1b87",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T14:23:28Z",
+          "findings": [
+            {
+              "category": "duplicated structural declaration",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 65,
+              "message": "`cli_driver::track_resolution::TrackItemsDirectoryInput` and `cli_driver::track_tddd::TrackItemsDirectoryInput` still declare identical fields, methods, and invariants without a shared trait or reference relationship. The documented command-family distinction is nominal and does not remove the duplicated structural contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3fbef6d620a20c2e7fab0e057c7a4df8f28e93f515dad0dea7ecf50f4962d9a6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T16:19:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:356889e036e2427a2f288cbcc4679b5c18ac4bca2815fc8c371d90264425320d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T16:34:06Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 102,
+              "message": "The method declarations for `cli_driver::track_resolution::TrackItemsDirectoryInput` omit their independent `action`, so both default to `add`. The frozen rustdoc baseline already contains both methods: `try_new` is signature-identical and should be `reference`, while `workspace_root` changes from returning `TrackWorkspaceRootInput` to `Result<TrackWorkspaceRootInput, TrackResolutionDiagnostic>` and should be `modify`. The current declarations misstate the baseline diff.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/cli_driver-types.json",
+              "line": 159,
+              "message": "The method declarations for `cli_driver::track_resolution::TrackWorkspaceRootInput` omit their independent `action`, so `try_new` and `into_path` both default to `add`. Both methods already exist with identical signatures in the frozen rustdoc baseline and must be classified as `reference`; the parent type may remain `modify` for the track-level contract change.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:356889e036e2427a2f288cbcc4679b5c18ac4bca2815fc8c371d90264425320d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-07T17:04:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ca48e4b2b93d2c7db8161c794376e0069a33900b9572d61537effa15c7e630",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-07T17:09:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ca48e4b2b93d2c7db8161c794376e0069a33900b9572d61537effa15c7e630",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

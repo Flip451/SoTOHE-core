@@ -1,0 +1,57 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a logic test covering 'entry' of cli::is_hook_block_outcome",
+      "declaration_hash": "d8b565b5d2686e9fcaad4ba054fcc346a96a9cf7babc8c142ae453fbd3a26cfa",
+      "id": {
+        "entry_key": "cli::is_hook_block_outcome",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli::is_hook_block_outcome",
+        "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli::commands::hook::execute_inner",
+      "declaration_hash": "09c168dc6f1931400731ab642ca88c5ca4339f4a630158e3cc110fa270660a89",
+      "id": {
+        "entry_key": "cli::commands::hook::execute_inner",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli::commands::hook::execute_inner",
+        "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/cli-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    }
+  ],
+  "track_id": "2026-09-05-hook-explicit-host-input-contract"
+}

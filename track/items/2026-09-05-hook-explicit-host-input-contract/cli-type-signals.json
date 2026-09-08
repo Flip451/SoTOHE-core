@@ -1,0 +1,110 @@
+{
+  "baseline_hash": "ea697e2ba4aae4813a1e6de7b2cf2c9847f7e91b9c8274d343982aebe645fbef",
+  "declaration_hash": "664a80e69970cebbd05c9cb7f69f494d249519cc1c8ad52e4fd941c19db1749b",
+  "generated_at": "2026-09-07T10:15:39Z",
+  "head_commit": "cc729028da29fe15014b10d70417fbf6b65305ba",
+  "implementation_fingerprint": "a544f761a4d0a3ae73fb3c7f1ad4ec6309f5c3c1a7352c3eaad9e0733c6462b8",
+  "resolution_fingerprint": "7e825474575f930b2e68edb5335001a8a7656d9a3a96e937792e7d8aa0810e80",
+  "rustdoc_execution_identity": {
+    "crate_name": "cli",
+    "expected_json_path": "target/.sotp-rustdoc/aa542b99abb6395487e5fa287ad521adfe5b92ccd13030c60393fad98cd3b249/doc/sotp.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/aa542b99abb6395487e5fa287ad521adfe5b92ccd13030c60393fad98cd3b249"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_items": [
+        "core::convert::From<cli_driver::hook::HookExecution>"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "CliHookExecution"
+    },
+    {
+      "found_items": [
+        "clap_builder::derive::ValueEnum",
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "CliHookHost"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli::commands::hook::CliHookName"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli::commands::hook::HookCommand"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "HookExecutionDisposition"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "cli::commands::hook::execute_inner"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "cli::is_hook_block_outcome"
+    },
+    {
+      "found_items": [
+        "core::convert::From<cli::commands::hook::CliHookHost>"
+      ],
+      "found_type": true,
+      "kind_tag": "unknown",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "cli_driver::hook::HookHost"
+    },
+    {
+      "found_items": [
+        "core::convert::From<cli::commands::hook::HookCommand>"
+      ],
+      "found_type": true,
+      "kind_tag": "unknown",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "cli_driver::hook::HookInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "cli::is_advisory_hook_command"
+    }
+  ]
+}

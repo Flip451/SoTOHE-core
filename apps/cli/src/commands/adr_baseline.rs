@@ -158,7 +158,10 @@ fn dispatch(cmd: AdrBaselineCommand) -> Result<cli_driver::CommandOutcome, CliEr
     };
     let items_dir_input = TrackItemsDirectoryInput::try_new(items_dir.clone())
         .map_err(|error| CliError::Message(error.message().to_owned()))?;
-    let project_root = items_dir_input.workspace_root().into_path();
+    let project_root = items_dir_input
+        .workspace_root()
+        .map_err(|error| CliError::Message(error.message().to_owned()))?
+        .into_path();
     Ok(AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input))
 }
 

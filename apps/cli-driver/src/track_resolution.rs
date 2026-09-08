@@ -1,5 +1,6 @@
 //! Primary adapter for compatibility track-id resolution.
 
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -44,11 +45,48 @@ pub struct TrackWorkspaceRootInput {
 }
 
 impl TrackWorkspaceRootInput {
-    /// Validates and wraps a workspace root path.
+    /// Validates, normalizes, and wraps a workspace root path.
     pub fn try_new(value: PathBuf) -> Result<Self, TrackResolutionDiagnostic> {
         TrackWorkspaceRoot::try_new(value.clone())
-            .map(|_| Self { value })
-            .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))
+            .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))?;
+
+        let absolute = if value.is_absolute() {
+            value
+        } else {
+            std::env::current_dir()
+                .map_err(|error| {
+                    TrackResolutionDiagnostic::new(format!(
+                        "cannot resolve workspace root from the current directory: {error}"
+                    ))
+                })?
+                .join(value)
+        };
+        let metadata = std::fs::symlink_metadata(&absolute).map_err(|error| {
+            TrackResolutionDiagnostic::new(format!(
+                "cannot access workspace root '{}': {error}",
+                absolute.display()
+            ))
+        })?;
+        if metadata.file_type().is_symlink() {
+            return Err(TrackResolutionDiagnostic::new(format!(
+                "symlink guard rejected workspace root '{}'",
+                absolute.display()
+            )));
+        }
+        if !metadata.is_dir() {
+            return Err(TrackResolutionDiagnostic::new(format!(
+                "workspace root '{}' is not a directory",
+                absolute.display()
+            )));
+        }
+        let normalized = std::fs::canonicalize(&absolute).map_err(|error| {
+            TrackResolutionDiagnostic::new(format!(
+                "cannot canonicalize workspace root '{}': {error}",
+                absolute.display()
+            ))
+        })?;
+
+        Ok(Self { value: normalize_windows_verbatim_path(&normalized) })
     }
 
     /// Consumes the input and returns its path.
@@ -56,15 +94,9 @@ impl TrackWorkspaceRootInput {
     pub fn into_path(self) -> PathBuf {
         self.value
     }
-
-    /// Builds an input from a derived parent path without re-validating.
-    #[must_use]
-    pub(crate) fn from_derived_items_parent(value: PathBuf) -> Self {
-        Self { value }
-    }
 }
 
-/// Validated `track/items` input for the resolution driver.
+/// Validated `track/items` input shared by the resolution and TDDD drivers.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackItemsDirectoryInput {
     value: PathBuf,
@@ -86,9 +118,13 @@ impl TrackItemsDirectoryInput {
         Ok(Self { value })
     }
 
-    /// Derives the workspace-root input from this items directory.
-    #[must_use]
-    pub fn workspace_root(&self) -> TrackWorkspaceRootInput {
+    /// Derives and normalizes the workspace-root input from this items directory.
+    ///
+    /// # Errors
+    ///
+    /// Returns a diagnostic when the derived workspace root is unavailable,
+    /// inaccessible, or cannot be normalized.
+    pub fn workspace_root(&self) -> Result<TrackWorkspaceRootInput, TrackResolutionDiagnostic> {
         let root = self
             .value
             .parent()
@@ -96,12 +132,17 @@ impl TrackItemsDirectoryInput {
             .map(Path::to_path_buf)
             .filter(|path| !path.as_os_str().is_empty())
             .unwrap_or_else(|| PathBuf::from("."));
-        TrackWorkspaceRootInput { value: root }
+        TrackWorkspaceRootInput::try_new(root)
     }
 
-    fn into_usecase(self) -> Result<TrackItemsDirectory, TrackResolutionDiagnostic> {
+    pub(crate) fn into_usecase(self) -> Result<TrackItemsDirectory, TrackResolutionDiagnostic> {
         TrackItemsDirectory::try_new(self.value)
             .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))
+    }
+
+    #[cfg(test)]
+    pub(crate) fn from_test_value(value: PathBuf) -> Self {
+        Self { value }
     }
 }
 
@@ -225,6 +266,43 @@ fn diagnostic_from_error(error: TrackResolutionCompatError) -> TrackResolutionDi
     TrackResolutionDiagnostic::new(error.to_string())
 }
 
+fn normalize_windows_verbatim_path(path: &Path) -> PathBuf {
+    let encoded_path = path.as_os_str().as_encoded_bytes();
+    let Some(non_verbatim_path) = encoded_path.strip_prefix(br"\\?\") else {
+        return path.to_path_buf();
+    };
+    if let Some(unc_path) = non_verbatim_path.strip_prefix(br"UNC\") {
+        let mut normalized = Vec::with_capacity(2 + unc_path.len());
+        normalized.extend_from_slice(br"\\");
+        normalized.extend_from_slice(unc_path);
+        return PathBuf::from(os_string_from_encoded_bytes(normalized));
+    }
+    let is_drive_path = match non_verbatim_path {
+        [drive, b':', b'\\', ..] => drive.is_ascii_alphabetic(),
+        _ => false,
+    };
+    if is_drive_path {
+        PathBuf::from(os_string_from_encoded_bytes(non_verbatim_path.to_vec()))
+    } else {
+        path.to_path_buf()
+    }
+}
+
+fn os_string_from_encoded_bytes(bytes: Vec<u8>) -> OsString {
+    // SAFETY:
+    // - bytes is composed of bytes copied from OsStr::as_encoded_bytes.
+    // - Any newly inserted bytes are ASCII, which is valid in the OS encoding.
+    // - Prefix removal and insertion happen only at ASCII boundaries.
+    unsafe { OsString::from_encoded_bytes_unchecked(bytes) }
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
+pub(crate) fn canonicalized_path(path: impl AsRef<Path>) -> PathBuf {
+    let canonicalized = std::fs::canonicalize(path).unwrap();
+    normalize_windows_verbatim_path(&canonicalized)
+}
+
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
@@ -278,6 +356,74 @@ mod tests {
     }
 
     #[test]
+    fn test_normalize_windows_verbatim_path_strips_drive_prefix() {
+        assert_eq!(
+            normalize_windows_verbatim_path(Path::new(r"\\?\C:\repo")),
+            PathBuf::from(r"C:\repo")
+        );
+    }
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_converts_unc_prefix() {
+        let path = PathBuf::from(r"\\?\UNC\server\share");
+
+        assert_eq!(normalize_windows_verbatim_path(&path), PathBuf::from(r"\\server\share"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_normalize_windows_verbatim_path_converts_non_unicode_unc_prefix() {
+        use std::os::unix::ffi::OsStringExt as _;
+
+        let path = PathBuf::from(OsString::from_vec(b"\\\\?\\UNC\\server\\share\\\xff".to_vec()));
+        let expected = PathBuf::from(OsString::from_vec(b"\\\\server\\share\\\xff".to_vec()));
+
+        assert_eq!(normalize_windows_verbatim_path(&path), expected);
+    }
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_preserves_non_drive_namespace() {
+        let path = PathBuf::from(r"\\?\Volume{fixture-guid}\repo");
+
+        assert_eq!(normalize_windows_verbatim_path(&path), path);
+    }
+
+    #[test]
+    fn test_track_workspace_root_input_normalizes_default_relative_path() {
+        let current_dir = std::env::current_dir().unwrap();
+        let input = TrackWorkspaceRootInput::try_new(PathBuf::from(".")).unwrap();
+
+        assert!(input.value.is_absolute());
+        assert_eq!(input.into_path(), canonicalized_path(current_dir));
+    }
+
+    #[test]
+    fn test_track_workspace_root_input_normalizes_explicit_absolute_path() {
+        let current_dir = std::env::current_dir().unwrap();
+        let input = TrackWorkspaceRootInput::try_new(current_dir.clone()).unwrap();
+
+        assert_eq!(input.into_path(), current_dir);
+    }
+
+    #[test]
+    fn test_track_workspace_root_input_rejects_missing_root_before_processing() {
+        let missing = std::env::current_dir()
+            .unwrap()
+            .join("this-workspace-root-does-not-exist-for-track-resolution-tests");
+
+        let result = TrackWorkspaceRootInput::try_new(missing);
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_track_workspace_root_input_rejects_non_directory_root() {
+        let result = TrackWorkspaceRootInput::try_new(PathBuf::from("Cargo.toml"));
+
+        assert!(result.is_err());
+    }
+
+    #[test]
     fn test_track_items_directory_input_rejects_noncanonical_path() {
         let result = TrackItemsDirectoryInput::try_new("fixture/items".into());
 
@@ -285,6 +431,39 @@ mod tests {
             result.unwrap_err().message(),
             "--items-dir must point to '<project-root>/track/items'; got fixture/items"
         );
+    }
+
+    #[test]
+    fn test_track_items_directory_input_normalizes_relative_workspace_root() {
+        let expected = canonicalized_path(std::env::current_dir().unwrap());
+        let items_dir = TrackItemsDirectoryInput::try_new(PathBuf::from("track/items")).unwrap();
+
+        let workspace_root = items_dir.workspace_root().unwrap();
+
+        assert_eq!(workspace_root.into_path(), expected);
+    }
+
+    #[test]
+    fn test_track_items_directory_input_derives_non_default_workspace_root() {
+        let items_dir =
+            TrackItemsDirectoryInput::try_new(PathBuf::from("src/track/items")).unwrap();
+        let expected = canonicalized_path(PathBuf::from("src"));
+
+        let workspace_root = items_dir.workspace_root().unwrap();
+
+        assert_eq!(workspace_root.into_path(), expected);
+    }
+
+    #[test]
+    fn test_track_items_directory_input_rejects_missing_derived_workspace_root() {
+        let items_dir = TrackItemsDirectoryInput::try_new(PathBuf::from(
+            "missing-workspace-root-for-derived-items-test/track/items",
+        ))
+        .unwrap();
+
+        let result = items_dir.workspace_root();
+
+        assert!(result.is_err());
     }
 
     #[test]

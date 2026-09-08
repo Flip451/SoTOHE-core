@@ -1,0 +1,293 @@
+{
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_derives_non_default_workspace_root"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput"
+      },
+      "key": {
+        "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
+        "bound_tests_set_hash": "ea3506b5ed2d7674b75fb5e1c59f60034a89e0d5481f40249281188be22b0d79",
+        "declaration_hash": "2575b6b443402bd7ae32372a74ced9fc64b22141bf1d0dadebd85dd454ec43ce"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected = canonicalized_path(PathBuf::from(\"src\"));\n\n        let workspace_root = items_dir.workspace_root().unwrap();\n\n        assert_eq!(workspace_root.into_path(), expected);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_rejects_missing_derived_workspace_root"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput"
+      },
+      "key": {
+        "anchor_text_hash": "cdd6dca644039749c9c15b8b91f7ed0864307cc1e51cf6e1addb36af0dba8558",
+        "bound_tests_set_hash": "96bf24cc1891ddfaa1cffd932cd18ccc77fa46a0e25814bac829e51e529d91ae",
+        "declaration_hash": "22e5d15ecfd3240312fe52a1e3950199db379086eeadffc2f16f5fd9138773b6"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let result = items_dir.workspace_root();\n\n        assert!(result.is_err());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_derives_non_default_workspace_root"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput"
+      },
+      "key": {
+        "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
+        "bound_tests_set_hash": "ea3506b5ed2d7674b75fb5e1c59f60034a89e0d5481f40249281188be22b0d79",
+        "declaration_hash": "91c9033eed5a34ab680fa830a7582c7de91d0d2cc133a14bba018d1332b784de"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let items_dir =\n            TrackItemsDirectoryInput::try_new(PathBuf::from(\"src/track/items\")).unwrap();\n        let expected = canonicalized_path(PathBuf::from(\"src\"));\n\n        let workspace_root = items_dir.workspace_root().unwrap();\n\n        assert_eq!(workspace_root.into_path(), expected);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_items_directory_input_rejects_missing_derived_workspace_root"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput"
+      },
+      "key": {
+        "anchor_text_hash": "0ff216167afc3f732cd38bcd8659dde5f2000b995ea10f30db9e68ae9dff8554",
+        "bound_tests_set_hash": "96bf24cc1891ddfaa1cffd932cd18ccc77fa46a0e25814bac829e51e529d91ae",
+        "declaration_hash": "711ef4c73f507d6463102bcfe060fecd049a1c86d2031196aeb7979219796a0a"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let result = items_dir.workspace_root();\n\n        assert!(result.is_err());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_default_relative_path"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_explicit_absolute_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_catalogue_impl_signals_excludes_target_for_default_relative_and_absolute_roots"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput"
+      },
+      "key": {
+        "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
+        "bound_tests_set_hash": "6d455cfc91f2062ed47ba1c3856dbfe268943bdba7f39bfd7dfee78a79d88d05",
+        "declaration_hash": "14fc3620d06eb5bd9784cc68c6a39d77073dc115fa7997644df96314a729ef36"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(input.value.is_absolute());\n        assert_eq!(input.into_path(), canonicalized_path(current_dir));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_missing_root_before_processing"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_non_directory_root"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_symlinked_workspace_root_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput"
+      },
+      "key": {
+        "anchor_text_hash": "cdd6dca644039749c9c15b8b91f7ed0864307cc1e51cf6e1addb36af0dba8558",
+        "bound_tests_set_hash": "324224fce037c6eb727332385800180b58b9e48918105ce9830f743c00db0ace",
+        "declaration_hash": "a6ba8626af4ba84ef7aa4a847aaceead060b8b3fdfe1b4b892059e64f6e6af56"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let result = TrackWorkspaceRootInput::try_new(missing);\n\n        assert!(result.is_err());\n\nlet result = TrackWorkspaceRootInput::try_new(PathBuf::from(\"Cargo.toml\"));\n\n        assert!(result.is_err());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_default_relative_path"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_normalizes_explicit_absolute_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_catalogue_impl_signals_excludes_target_for_default_relative_and_absolute_roots"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput"
+      },
+      "key": {
+        "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
+        "bound_tests_set_hash": "6d455cfc91f2062ed47ba1c3856dbfe268943bdba7f39bfd7dfee78a79d88d05",
+        "declaration_hash": "1d4548fdfec457f230d6a4a321d0fe8a66f1a0599f4e90db131f8ddc9357762e"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let current_dir = std::env::current_dir().unwrap();\n        let input = TrackWorkspaceRootInput::try_new(PathBuf::from(\".\")).unwrap();\n\n        assert!(input.value.is_absolute());\n        assert_eq!(input.into_path(), canonicalized_path(current_dir));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_missing_root_before_processing"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_workspace_root_input_rejects_non_directory_root"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_symlinked_workspace_root_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput"
+      },
+      "key": {
+        "anchor_text_hash": "0ff216167afc3f732cd38bcd8659dde5f2000b995ea10f30db9e68ae9dff8554",
+        "bound_tests_set_hash": "324224fce037c6eb727332385800180b58b9e48918105ce9830f743c00db0ace",
+        "declaration_hash": "41ae2e26ca5462446cabb005bc2fc78e0535081f7c142d5e3851649043877e8d"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let result = TrackWorkspaceRootInput::try_new(missing);\n\n        assert!(result.is_err());\n\n        let result = TrackWorkspaceRootInput::try_new(PathBuf::from(\"Cargo.toml\"));\n\n        assert!(result.is_err());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    }
+  ],
+  "track_id": "2026-09-04-catalogue-impl-signals-absolute-workspace-root"
+}

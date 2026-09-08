@@ -108,7 +108,7 @@ or with impl-block-level generics:
 - `action` — the TDDD operation for this impl entry (`"add"` / `"modify"` / `"reference"` / `"delete"`). **Defaults to `"add"`** (the codec uses `#[serde(default = "default_action")]`), so it may be omitted when `Add` is intended (the common case for new impls). Every `trait_impls` entry carries its own `action` — as a top-level independent entry with no parent `TypeEntry`, the action is not inherited.
 - `trait_ref` — the trait reference as a TypeRef string, **including** the generic args if any (e.g. `"core::convert::From<MyError>"`, `"std::fmt::Display"`, `"FnOnce<(A,), B>"`). Self-crate traits use the bare short name (`"MyTrait"`); external crate traits use a crate-prefixed fully-qualified path. The crate-prefix convention is the same as for any TypeRef (external crate items carry a crate prefix; self-crate items do not), so the A-codec resolves the trait crate via the standard `external_crates` auto-build.
 - `for_type` — the self type of the impl (the `Type` in `impl Trait for Type`) as a TypeRef string. Self-crate types use the bare short name (e.g. `"SelfType"`); external crate types use a crate-prefixed fully-qualified path (e.g. `"std::vec::Vec<i32>"`). Because the impl is a top-level entry (not attached to a `TypeEntry`), an external self type needs no `TypeEntry` to be declared.
-- `impl_generics` — optional array of impl-block-level generic type parameters (`impl<L, R> Trait for Foo<L, R>` → entries for `L`, `R`). **Omit when empty** (DTO uses `#[serde(default, skip_serializing_if = "Vec::is_empty")]`).
+- `impl_generics` — optional array of impl-block-level generic parameters (`impl<L, R> Trait for Foo<L, R>` → entries for `L`, `R`). Lifetime parameters use the identifier **without** a leading `'`: `impl<'de> Trait<'de> for Foo` → `{ "name": "de", "bounds": [] }` while `trait_ref` keeps the quoted form (`"Trait<'de>"`). Const parameters are not part of this surface. **Omit when empty** (DTO uses `#[serde(default, skip_serializing_if = "Vec::is_empty")]`).
 - `impl_where_predicates` — optional array of impl-block-level where-clause predicates on `impl_generics`. **Omit when empty.**
 
 ### InherentImplDeclV2 (each element of the top-level `inherent_impls` array)
@@ -133,10 +133,62 @@ or with impl-block-level generics:
 
 - `type_name` — the name of the type this impl block belongs to. Multiple `InherentImplDeclV2` entries sharing the same `type_name` represent multiple inherent `impl` blocks for one struct in the source.
 - `methods` — method declarations inside this impl block. **Omit or set to `[]` when empty.**
-- `impl_generics` — optional impl-block-level generic type parameters. **Omit when empty.**
+- `impl_generics` — optional impl-block-level generic parameters, including lifetime names **without** a leading `'` (same spelling as `trait_impls.impl_generics`). **Omit when empty.**
 - `impl_where_predicates` — optional impl-block-level where-clause predicates. **Omit when empty.**
 
 **Key difference from `trait_impls`**: `InherentImplDeclV2` has **no `action` field**. The DTO uses `#[serde(deny_unknown_fields)]`, so writing `"action": "add"` on an `inherent_impls` entry will be rejected by the codec. Do not add `action` to inherent impl entries.
+
+### Supported declaration spellings
+
+These rules document the supported catalogue surface. They do not add or rename JSON keys.
+
+#### Lifetime arguments on trait implementations
+
+A trait implementation with lifetime arguments (`impl<'de> serde::Deserialize<'de> for MyType`) uses **two distinct lifetime spellings**:
+
+- `trait_ref` includes the lifetime arguments **with** the leading `'`: `"serde::Deserialize<'de>"`.
+- `impl_generics` declares the same lifetime **without** the leading `'`: `{ "name": "de", "bounds": [] }`.
+
+The evaluator treats `'de` in a type reference and `de` in `impl_generics` as the same lifetime. Omitting the lifetime from `trait_ref`, or writing `"name": "'de"` in `impl_generics`, does not evaluate 🔵.
+
+Supported:
+
+```json
+{
+  "action": "add",
+  "trait_ref": "serde::Deserialize<'de>",
+  "for_type": "MyType",
+  "impl_generics": [{ "name": "de", "bounds": [] }]
+}
+```
+
+Not supported (does not evaluate 🔵):
+
+```json
+{
+  "action": "add",
+  "trait_ref": "serde::Deserialize",
+  "for_type": "MyType",
+  "impl_generics": [{ "name": "de", "bounds": [] }]
+}
+```
+
+```json
+{
+  "action": "add",
+  "trait_ref": "serde::Deserialize<'de>",
+  "for_type": "MyType",
+  "impl_generics": [{ "name": "'de", "bounds": [] }]
+}
+```
+
+#### Inherent method placement
+
+`TypeEntry.methods` is the **normal** location for inherent methods. Top-level `inherent_impls` remain a supported declaration form; reserve them for cases the entry itself cannot express (impl-block-level generics or where-clause predicates). Do not treat `inherent_impls` as unsupported, and never declare the same inherent method in both places.
+
+#### Tuple-struct private fields
+
+For a tuple struct with private fields, structural matching can evaluate 🔵 only when **exactly one private field sits at the trailing position**; all-public tuple structs remain matchable under the normal tuple-field rules. The codec encodes that private-field case as a single trailing `None`. Tuple structs with two or more private fields, or with a private field before a public field, stay 🟡 under the current codec encoding; that limitation is outside this schema surface.
 
 ## TraitEntry (under `traits: { ... }`)
 
@@ -222,22 +274,22 @@ rustdoc **omits private fields** from the public API JSON and sets `has_stripped
 
 - In `fields`, list **only the `pub` fields** — private fields are absent on both sides, so never list them.
 - Set `"has_stripped_fields": true` **iff the struct has ≥1 private field**. Leaving it `false` on a struct that actually has a private field is a permanent 🟡 — the single most common interactor / service-wrapper miss.
-- **`tuple` shape caveat**: the codec encodes `has_stripped_fields: true` for a tuple shape by appending a single trailing `None` placeholder to the field vector. Because the catalogue does not record the exact position of each private field, the trailing-`None` representation will mismatch rustdoc's actual `None`-slot layout whenever any private field is not at the trailing position — producing a permanent 🟡. A dependency-holding struct must therefore use a `plain` shape, not a tuple.
-- **Never declare the same inherent method in both `TypeEntry.methods` and a top-level `inherent_impls` entry** — the contract-map renderer aggregates inherent methods from both, so a method present in both double-renders. Declare each inherent method once; for interactors / service-wrappers, put the constructor in a top-level `inherent_impls` entry (consistent with generic interactors, whose `impl_generics` can only be expressed via `inherent_impls`).
+- **`tuple` shape caveat**: the codec encodes `has_stripped_fields: true` for a tuple shape by appending a single trailing `None` placeholder to the field vector. Because the catalogue does not record the exact position of each private field, the trailing-`None` representation will mismatch rustdoc's actual `None`-slot layout whenever any private field is not the single trailing private field — producing a permanent 🟡. See [Tuple-struct private fields](#tuple-struct-private-fields). A dependency-holding struct must therefore use a `plain` shape, not a tuple.
+- **Inherent methods**: declare them on `TypeEntry.methods` unless the entry cannot express impl-block-level generics or where predicates, in which case use a top-level `inherent_impls` entry. Never declare the same inherent method in both places — the contract-map renderer aggregates inherent methods from both, so a method present in both double-renders.
 
-**Interactor / service-wrapper (the canonical `has_stripped_fields: true` case)** — a struct whose only field is a private injected dependency (`std::sync::Arc<dyn …Port>`, an inner service) has **all** fields private: declare `fields: []` + `has_stripped_fields: true` with `methods: []`, declare the constructor in a top-level `inherent_impls` entry, and declare the implemented ApplicationService as a top-level `trait_impls` entry:
+**Interactor / service-wrapper (the canonical `has_stripped_fields: true` case)** — a struct whose only field is a private injected dependency (`std::sync::Arc<dyn …Port>`, an inner service) has **all** fields private: declare `fields: []` + `has_stripped_fields: true`, put a non-generic constructor on `TypeEntry.methods`, and declare the implemented ApplicationService as a top-level `trait_impls` entry. Generic interactors that need `impl_generics` still use `inherent_impls` for that impl block:
 
 ```json
 "ActiveTrackResolveInteractor": {
   "action":  "add",
   "role":    { "Interactor": {} },
   "kind":    { "kind": "struct", "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true } },
-  "methods": [],
+  "methods": [
+    { "name": "new", "receiver": null, "params": [{ "name": "branch_reader", "ty": "std::sync::Arc<dyn BranchReaderPort>" }], "returns": "Self", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+  ],
   "module_path": "track_resolution", "docs": null, "spec_refs": [], "informal_grounds": []
 }
 // + top-level arrays:
-//   "inherent_impls": [ { "type_name": "ActiveTrackResolveInteractor", "methods": [
-//     { "name": "new", "receiver": null, "params": [{ "name": "branch_reader", "ty": "std::sync::Arc<dyn BranchReaderPort>" }], "returns": "Self", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] } ] } ]
 //   "trait_impls":    [ { "trait_ref": "ActiveTrackResolveService", "for_type": "ActiveTrackResolveInteractor" } ]
 ```
 

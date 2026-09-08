@@ -1,0 +1,222 @@
+{
+  "entries": [
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e1cce90aad450c904e86e204c942732051551520512341c1b090ba74bdbd13c3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "GO-03",
+          "section": "goal",
+          "text_label": "実装 fingerprint の workspace 入力集合から root 直下の再生成可能な .cache だけを除外しつつ、その他の記録対象の変更検知と新規則による再取得を維持する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint の workspace 入力集合から root 直下の再生成可能な .cache だけを除外しつつ、その他の記録対象の変更検知と新規則による再取得を維持する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2ec0eba3d5f38ac5258e199452c173082375bd6e435de3ed1d49d33940a9c16e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "実装 fingerprint の workspace 走査で root 直下の .cache だけを列挙・読取・内容 hash 化・件数または bytes 予算計上から除外し、root .cache 自体が symlink の場合も参照先へ進まない"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint の workspace 走査で root 直下の .cache だけを列挙・読取・内容 hash 化・件数または bytes 予算計上から除外し、root .cache 自体が symlink の場合も参照先へ進まない",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e92fbe764c0541f228a15b8d90b9bc74b16ae894182c14927f004beb61d9f2f0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "新しい入力集合の規則で fingerprint と関連する型シグナルを取得し直し、root .cache 以外の Rust source、Cargo manifest、lockfile など記録対象の内容変更を引き続き input identity に反映する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "新しい入力集合の規則で fingerprint と関連する型シグナルを取得し直し、root .cache 以外の Rust source、Cargo manifest、lockfile など記録対象の内容変更を引き続き input identity に反映する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e23e93d6f843264e8fedf04319dde61410ad019445d9b731b0c3cec138570539",
+      "evidence_origin": {
+        "data": {
+          "element_id": "OS-05",
+          "section": "out_of_scope",
+          "text_label": "深い階層の同名 directory、任意の Git ignored path、または拡張子に基づく一般的な生成物除外と、Cargo の意味的な完全入力集合を独自に保証すること"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "深い階層の同名 directory、任意の Git ignored path、または拡張子に基づく一般的な生成物除外と、Cargo の意味的な完全入力集合を独自に保証すること",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce335fb924b3b4053d56291ab90c6fc1407e284c163eaa172fae4f2274808bd9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "root .cache の限定除外によって、除外対象外の入力に対する既存の件数・サイズ・path・環境値・時間上限、symlink・I/O error・途中変更・metadata 取得失敗の拒否、または fail-closed を弱めない"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "root .cache の限定除外によって、除外対象外の入力に対する既存の件数・サイズ・path・環境値・時間上限、symlink・I/O error・途中変更・metadata 取得失敗の拒否、または fail-closed を弱めない",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "013e7239caeaaa0ac58c3a40392680dbb243076c498ec4bbc23622c968cbb7c3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "評価開始時と終端の入力確認には同じ root .cache 除外規則を適用し、規則変更前の fingerprint または型シグナルを新規則の成功結果として流用しない"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価開始時と終端の入力確認には同じ root .cache 除外規則を適用し、規則変更前の fingerprint または型シグナルを新規則の成功結果として流用しない",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "764e312e4ac3299da3b87b4959c7cb7deaeb1081514db6b5bdb2fb3fa6b77ece",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "workspace root 直下の .cache 配下だけを変更し、そこに 64 MiB を超える生成ファイルが存在しても、実装 fingerprint の取得はその内容を読取・hash・予算計上せず成功し、入力 identity は変化しないことを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "workspace root 直下の .cache 配下だけを変更し、そこに 64 MiB を超える生成ファイルが存在しても、実装 fingerprint の取得はその内容を読取・hash・予算計上せず成功し、入力 identity は変化しないことを決定的な自動テストで確認する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9673c7d9906f3c1f88ec333dc59f5da0bc78d1da4b32ae26f8b1c0f69056d34",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "root 直下ではない同名 .cache directory と任意の非除外 regular file は入力として扱い、後者が 64 MiB 上限を超えると authoritative-input error で失敗することを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "root 直下ではない同名 .cache directory と任意の非除外 regular file は入力として扱い、後者が 64 MiB 上限を超えると authoritative-input error で失敗することを決定的な自動テストで確認する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66355271f8dcfd96b4d04bbce32a487489fbceef711b86adaf518f1642ed5940",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-09-05-hook-explicit-host-input-contract/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d324114e0b9f1cf27f8ddb597bb49965117ae4f74706d0835ce8d840ced02bfa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "新しい除外規則で fingerprint を取得し直し、root .cache 以外の記録対象である Rust source、Cargo manifest、または lockfile の内容変更は入力 identity を変化させ、取得失敗時に旧結果へ fallback しないことを決定的な自動テストで確認する"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "新しい除外規則で fingerprint を取得し直し、root .cache 以外の記録対象である Rust source、Cargo manifest、または lockfile の内容変更は入力 identity を変化させ、取得失敗時に旧結果へ fallback しないことを決定的な自動テストで確認する",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}

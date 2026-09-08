@@ -27,11 +27,13 @@ use super::type_ref_parser::parse_type_ref_with_generics;
 pub(crate) const SYNTHETIC_UNPLACED_CRATE_ID: u32 = u32::MAX;
 
 mod canonicalization;
+mod impl_params;
 mod rustdoc_paths;
 
 use canonicalization::{
     canonicalize_generic_args, canonicalize_type, render_identity_type, unique_resolved_id,
 };
+pub(crate) use impl_params::{strip_impl_params_args, strip_impl_params_type};
 pub(crate) use rustdoc_paths::{
     canonicalize_function_identity_path, canonicalize_rustdoc_root_path,
 };
@@ -109,6 +111,47 @@ pub fn canonicalize_catalogue_type_ref(
     rustdoc_paths: &HashMap<Id, ItemSummary>,
     generic_params: &[ParamName],
 ) -> Result<CanonicalTypeIdentity, NewTypeGraphCodecError> {
+    let canonical = canonicalize_catalogue_type_ref_as_type(
+        type_ref,
+        catalogue_crate,
+        rustdoc_paths,
+        generic_params,
+    )?;
+    let rendered = render_identity_type(&canonical).ok_or_else(|| {
+        invalid_type_ref(type_ref, "the parsed type has no canonical Rust rendering")
+    })?;
+    Ok(CanonicalTypeIdentity(rendered))
+}
+
+/// Canonicalizes a catalogue type using the same structural impl-parameter
+/// normalization used by rustdoc impl identity construction.
+pub(crate) fn canonicalize_catalogue_type_ref_without_impl_params(
+    type_ref: &TypeRef,
+    catalogue_crate: &CrateName,
+    rustdoc_paths: &HashMap<Id, ItemSummary>,
+    generic_params: &[ParamName],
+) -> Result<CanonicalTypeIdentity, NewTypeGraphCodecError> {
+    let canonical = canonicalize_catalogue_type_ref_as_type(
+        type_ref,
+        catalogue_crate,
+        rustdoc_paths,
+        generic_params,
+    )?;
+    let impl_params =
+        generic_params.iter().map(|param| param.as_str().to_owned()).collect::<BTreeSet<_>>();
+    let stripped = strip_impl_params_type(canonical, &impl_params);
+    let rendered = render_identity_type(&stripped).ok_or_else(|| {
+        invalid_type_ref(type_ref, "the parsed type has no canonical Rust rendering")
+    })?;
+    Ok(CanonicalTypeIdentity(rendered))
+}
+
+fn canonicalize_catalogue_type_ref_as_type(
+    type_ref: &TypeRef,
+    catalogue_crate: &CrateName,
+    rustdoc_paths: &HashMap<Id, ItemSummary>,
+    generic_params: &[ParamName],
+) -> Result<Type, NewTypeGraphCodecError> {
     let universe = rustdoc_paths.values().filter_map(summary_identity).collect::<BTreeSet<_>>();
     let generic_names = generic_params.iter().map(|param| param.as_str()).collect::<Vec<_>>();
     let external_crates = HashMap::new();
@@ -122,11 +165,7 @@ pub fn canonicalize_catalogue_type_ref(
     )
     .map_err(|reason| invalid_type_ref(type_ref, reason))?;
     let authority = DefinitionPathAuthority::from_path_maps(rustdoc_paths, &[]);
-    let canonical = canonicalize_type(parsed, type_ref, catalogue_crate, &authority, None)?;
-    let rendered = render_identity_type(&canonical).ok_or_else(|| {
-        invalid_type_ref(type_ref, "the parsed type has no canonical Rust rendering")
-    })?;
-    Ok(CanonicalTypeIdentity(rendered))
+    canonicalize_type(parsed, type_ref, catalogue_crate, &authority, None)
 }
 
 /// Resolves one rustdoc path through the same catalogue-identity boundary used by

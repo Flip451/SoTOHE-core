@@ -1,0 +1,172 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "With the default workspace root, catalogue-impl-signals excludes Cargo's target directory from the rustdoc input corpus."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "With an explicit relative workspace root, catalogue-impl-signals excludes Cargo's target directory from the rustdoc input corpus."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "If the selected workspace root cannot be normalized because it is missing or inaccessible, catalogue-impl-signals stops without processing an input corpus."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "Path comparisons that determine target-directory exclusion use the normalized absolute workspace root, so equivalent relative and absolute root input cannot cause target files to be included."
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "The default and explicitly supplied workspace roots must each be normalized to absolute paths relative to the current directory at command startup."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "Workspace-root normalization failure is fail-closed."
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "Make catalogue-impl-signals reliably exclude Cargo's target directory when invoked with its default or a relative workspace root."
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "Normalize the default and explicit workspace-root inputs to absolute paths at command startup."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "Use normalized absolute paths for target-directory exclusion and other comparable workspace-root path comparisons."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "Reject an unavailable or inaccessible workspace root before catalogue processing begins."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+          }
+        ],
+        "id": "IN-04",
+        "text": "Add regression coverage that proves a relative workspace-root input still excludes target/."
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "Requiring users to supply --workspace-root $PWD is out of scope."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "Adding relative-versus-absolute path handling separately at every comparison site is out of scope."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-04-0058-catalogue-impl-signals-absolute-workspace-root.md"
+          }
+        ],
+        "id": "OS-03",
+        "text": "Supporting multiple workspace roots in one invocation is out of scope."
+      }
+    ]
+  },
+  "signals": {
+    "blue": 14,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "Catalogue Impl Signals Absolute Workspace Root",
+  "version": "1.0"
+}

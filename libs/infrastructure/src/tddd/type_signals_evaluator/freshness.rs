@@ -101,7 +101,7 @@ const MAX_RUSTDOC_INPUT_FILE_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_RUSTDOC_INPUT_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
 const MAX_RUSTDOC_INPUT_PATH_BYTES: usize = 16 * 1024;
 const MAX_CARGO_METADATA_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
-const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerprint-v3\0";
+const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerprint-v4\0";
 
 #[derive(Default)]
 struct FingerprintBudget {
@@ -215,6 +215,23 @@ fn rustdoc_input_digest(
     workspace_root: &Path,
     timeouts: EvaluationStartTimeouts,
 ) -> Result<Sha256Digest, RustdocInputFingerprintError> {
+    rustdoc_input_digest_with_version(workspace_root, timeouts, RUSTDOC_INPUT_FINGERPRINT_VERSION)
+}
+
+#[cfg(test)]
+pub(crate) fn rustdoc_input_fingerprint_with_version(
+    workspace_root: &Path,
+    version: &[u8],
+) -> Result<String, RustdocInputFingerprintError> {
+    rustdoc_input_digest_with_version(workspace_root, EvaluationStartTimeouts::default(), version)
+        .map(|digest| digest.as_str().to_owned())
+}
+
+fn rustdoc_input_digest_with_version(
+    workspace_root: &Path,
+    timeouts: EvaluationStartTimeouts,
+    version: &[u8],
+) -> Result<Sha256Digest, RustdocInputFingerprintError> {
     let deadline = FingerprintDeadline::new(timeouts.execution);
     deadline.check("authoritative input capture")?;
     workspace_root::validate_workspace_root_for_fingerprint(workspace_root, &deadline)?;
@@ -231,7 +248,7 @@ fn rustdoc_input_digest(
         &mut budget,
         &deadline,
     )?;
-    let mut canonical = Vec::from(RUSTDOC_INPUT_FINGERPRINT_VERSION);
+    let mut canonical = Vec::from(version);
     append_len_prefixed_bytes(&mut canonical, b"cargo-metadata-no-deps-locked");
     append_len_prefixed_bytes(&mut canonical, &cargo_inputs.metadata_bytes);
     for input in paths {
@@ -550,12 +567,42 @@ fn is_excluded_rustdoc_directory(
     cargo_target_dir: &Path,
     path: &Path,
 ) -> bool {
-    path == cargo_target_dir
-        || (path.parent() == Some(workspace_root)
+    let normalized_workspace_root = normalize_windows_verbatim_path(workspace_root);
+    let normalized_cargo_target_dir = normalize_windows_verbatim_path(cargo_target_dir);
+    let normalized_path = normalize_windows_verbatim_path(path);
+
+    normalized_path == normalized_cargo_target_dir
+        || (normalized_path.parent() == Some(normalized_workspace_root.as_path())
             && matches!(
-                path.file_name().and_then(OsStr::to_str),
-                Some(".git" | ".harness" | ".codex" | ".claude" | ".agents" | "track" | "tmp",)
+                normalized_path.file_name().and_then(OsStr::to_str),
+                Some(
+                    ".git"
+                        | ".harness"
+                        | ".codex"
+                        | ".claude"
+                        | ".agents"
+                        | ".cache"
+                        | "track"
+                        | "tmp",
+                )
             ))
+}
+
+fn normalize_windows_verbatim_path(path: &Path) -> PathBuf {
+    let Some(path_string) = path.to_str() else {
+        return path.to_path_buf();
+    };
+    let Some(non_verbatim_path) = path_string.strip_prefix(r"\\?\") else {
+        return path.to_path_buf();
+    };
+    if let Some(unc_path) = non_verbatim_path.strip_prefix(r"UNC\") {
+        return PathBuf::from(format!(r"\\{unc_path}"));
+    }
+    let is_drive_path = match non_verbatim_path.as_bytes() {
+        [drive, b':', b'\\', ..] => drive.is_ascii_alphabetic(),
+        _ => false,
+    };
+    if is_drive_path { PathBuf::from(non_verbatim_path) } else { path.to_path_buf() }
 }
 
 fn check_file_size(path: &Path, bytes: u64) -> Result<(), RustdocInputFingerprintError> {
@@ -624,4 +671,59 @@ fn metadata_generation(metadata: &std::fs::Metadata) -> Vec<u8> {
         generation.extend_from_slice(&metadata.ctime_nsec().to_be_bytes());
     }
     generation
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_strips_drive_prefix() {
+        assert_eq!(
+            normalize_windows_verbatim_path(Path::new(r"\\?\C:\repo")),
+            PathBuf::from(r"C:\repo")
+        );
+    }
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_converts_unc_prefix() {
+        let path = PathBuf::from(r"\\?\UNC\server\share");
+
+        assert_eq!(normalize_windows_verbatim_path(&path), PathBuf::from(r"\\server\share"));
+    }
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_preserves_non_drive_namespace() {
+        let path = PathBuf::from(r"\\?\Volume{fixture-guid}\repo");
+
+        assert_eq!(normalize_windows_verbatim_path(&path), path);
+    }
+
+    #[test]
+    fn test_is_excluded_rustdoc_directory_matches_verbatim_target_path() {
+        assert!(is_excluded_rustdoc_directory(
+            Path::new(r"\\?\C:\repo"),
+            Path::new(r"C:\repo\target"),
+            Path::new(r"\\?\C:\repo\target"),
+        ));
+    }
+
+    #[test]
+    fn test_is_excluded_rustdoc_directory_matches_verbatim_unc_target_path() {
+        assert!(is_excluded_rustdoc_directory(
+            Path::new(r"\\server\share\repo"),
+            Path::new(r"\\server\share\repo\target"),
+            Path::new(r"\\?\UNC\server\share\repo\target"),
+        ));
+    }
+
+    #[test]
+    fn test_is_excluded_rustdoc_directory_matches_workspace_child() {
+        assert!(is_excluded_rustdoc_directory(
+            Path::new("/repo"),
+            Path::new("/repo/target"),
+            Path::new("/repo/tmp"),
+        ));
+    }
 }

@@ -304,7 +304,7 @@ mod tests {
         let result = dispatch_track_cmd(TrackCommand::TypeGraph {
             items_dir: PathBuf::from("workspace/track/items"),
             track_id: None,
-            workspace_root: PathBuf::from("workspace"),
+            workspace_root: PathBuf::from("."),
             layer: None,
             cluster_depth: 0,
             edges: "methods".to_owned(),

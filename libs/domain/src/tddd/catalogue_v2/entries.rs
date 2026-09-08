@@ -557,7 +557,10 @@ impl FunctionEntry {
 ///
 /// ## Scope
 ///
-/// - `impl_generics`: type parameters only (lifetime / const parameters are out of scope).
+/// - `impl_generics`: impl-block-level generic parameters. Type parameters use their
+///   identifier names. Lifetime parameters are declared without a leading `'`:
+///   `impl<'de> Foo<'de>` is catalogued as `{ name: "de", bounds: [] }`. Const
+///   parameters remain out of scope.
 /// - `impl_where_predicates`: where-clause predicates on the impl-block-level generics.
 /// - `methods`: all methods declared in this impl block.
 ///
@@ -571,9 +574,11 @@ pub struct InherentImplDeclV2 {
     /// multiple inherent impl blocks for that single struct in the source.
     pub(crate) type_name: CatalogueEntryKey,
 
-    /// Impl-block-level generic type parameters (type parameters only; lifetimes
-    /// and const parameters are out of scope per D2 / IN-05).
+    /// Impl-block-level generic parameters.
     ///
+    /// Type parameters use their identifier names. Lifetime parameters are
+    /// declared without a leading `'`: `impl<'de> Foo<'de>` is catalogued as
+    /// `{ name: "de", bounds: [] }`. Const parameters remain out of scope.
     /// Empty Vec when the impl block is not generic (the common case).
     pub(crate) impl_generics: Vec<MethodGenericParam>,
 

@@ -1,0 +1,17 @@
+{
+  "baseline_hash": "5731f3150cb5fb7da1aa741994ae379ab1a7e7191bd5431a46ecac93c4762c67",
+  "declaration_hash": "14e274c5ae3fc63e9cf97db30e0517fde338c52be9cc7814057366a23c9b97fe",
+  "generated_at": "2026-09-08T04:56:37Z",
+  "head_commit": "7b94750a82b67fbc4185875c61a16691dc481649",
+  "implementation_fingerprint": "97ca649d52b8742f18291c205699302d327e0251e11e874b9212e7c78a6afe00",
+  "resolution_fingerprint": "aa972eeecb7a801ec17e95fb59cf76d2e8d6be794004923b24c80207002bbbd2",
+  "rustdoc_execution_identity": {
+    "crate_name": "infrastructure",
+    "expected_json_path": "target/.sotp-rustdoc/324cee1078f8a03026ea819dd5b313fb69b4ef105e8ec321ae11ceace92fcd49/doc/infrastructure.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/324cee1078f8a03026ea819dd5b313fb69b4ef105e8ec321ae11ceace92fcd49"
+  },
+  "schema_version": 6,
+  "signals": []
+}

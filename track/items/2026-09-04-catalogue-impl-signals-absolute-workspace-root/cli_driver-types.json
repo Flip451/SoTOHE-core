@@ -1,0 +1,519 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackItemsDirectoryInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "delete",
+      "for_type": "cli_driver::track_tddd::TrackItemsDirectoryInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "cli_driver::track_tddd::TrackItemsDirectoryInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "delete",
+      "for_type": "cli_driver::track_tddd::TrackItemsDirectoryInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "delete",
+      "for_type": "cli_driver::track_tddd::TrackItemsDirectoryInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_resolution::TrackWorkspaceRootInput",
+      "trait_ref": "core::convert::TryFrom<std::path::PathBuf>"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::track_tddd::TrackTdddBaselineGraphInput",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "cli_driver::track_resolution::TrackItemsDirectoryInput": {
+      "action": "modify",
+      "docs": "Shared primary-adapter track-items input for resolution and TDDD command families (IN-01, IN-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "action": "reference",
+          "params": [
+            {
+              "name": "value",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "workspace_root",
+          "action": "modify",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<TrackWorkspaceRootInput, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+            },
+            {
+              "anchor": "CN-02",
+              "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "track_resolution",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    },
+    "cli_driver::track_resolution::TrackWorkspaceRootInput": {
+      "action": "modify",
+      "docs": "Primary-adapter workspace-root input used by resolution and TDDD command families (IN-01, IN-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "action": "reference",
+          "params": [
+            {
+              "name": "value",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_path",
+          "action": "reference",
+          "params": [],
+          "receiver": "self",
+          "returns": "std::path::PathBuf"
+        }
+      ],
+      "module_path": "track_resolution",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    },
+    "cli_driver::track_tddd::TrackItemsDirectoryInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "track_tddd",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    },
+    "cli_driver::track_tddd::TrackTdddBaselineGraphInput": {
+      "action": "modify",
+      "docs": "Primary-adapter input for TDDD baseline-graph rendering (IN-01, IN-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "crate::track_resolution::TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layers",
+              "ty": "Option<TrackLayersInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    },
+    "cli_driver::track_tddd::TrackTdddCatalogueSpecSignalsInput": {
+      "action": "modify",
+      "docs": "Primary-adapter input for TDDD catalogue-spec signal calculation (IN-01, IN-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "crate::track_resolution::TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<TrackLayerInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    },
+    "cli_driver::track_tddd::TrackTdddContractMapInput": {
+      "action": "modify",
+      "docs": "Primary-adapter input for TDDD contract-map rendering (IN-01, IN-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "crate::track_resolution::TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layers",
+              "ty": "Option<TrackLayersInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    },
+    "cli_driver::track_tddd::TrackTdddSpecElementHashInput": {
+      "action": "modify",
+      "docs": "Primary-adapter input for TDDD spec-element-hash lookup (IN-01, IN-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "crate::track_resolution::TrackItemsDirectoryInput"
+            },
+            {
+              "name": "anchor",
+              "ty": "Option<TrackSpecAnchorInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    },
+    "cli_driver::track_tddd::TrackTdddTypeGraphInput": {
+      "action": "modify",
+      "docs": "Primary-adapter input for the removed TDDD type-graph command (IN-01, IN-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "crate::track_resolution::TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<TrackLayerInput>"
+            },
+            {
+              "name": "cluster_depth",
+              "ty": "TrackTypeGraphClusterDepthInput"
+            },
+            {
+              "name": "edges",
+              "ty": "TrackTypeGraphEdgeInput"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-04-catalogue-impl-signals-absolute-workspace-root/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -83,9 +83,9 @@ mod tests {
             ),
             items_dir: TrackItemsDirectoryInput::try_new("workspace/track/items".into())
                 .expect("items directory is valid"),
-            workspace_root: TrackWorkspaceRootInput::try_from(std::path::PathBuf::from(
-                "workspace",
-            ))
+            workspace_root: TrackWorkspaceRootInput::try_from(
+                std::env::current_dir().expect("test workspace root is available"),
+            )
             .expect("workspace root is valid"),
             layers: Some(TrackLayersInput::try_new("domain".to_owned()).expect("layer is valid")),
         }
