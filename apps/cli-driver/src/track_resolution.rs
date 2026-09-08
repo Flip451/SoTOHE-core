@@ -1,5 +1,6 @@
 //! Primary adapter for compatibility track-id resolution.
 
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -266,20 +267,33 @@ fn diagnostic_from_error(error: TrackResolutionCompatError) -> TrackResolutionDi
 }
 
 fn normalize_windows_verbatim_path(path: &Path) -> PathBuf {
-    let Some(path_string) = path.to_str() else {
+    let encoded_path = path.as_os_str().as_encoded_bytes();
+    let Some(non_verbatim_path) = encoded_path.strip_prefix(br"\\?\") else {
         return path.to_path_buf();
     };
-    let Some(non_verbatim_path) = path_string.strip_prefix(r"\\?\") else {
-        return path.to_path_buf();
-    };
-    if non_verbatim_path.starts_with(r"UNC\") {
-        return path.to_path_buf();
+    if let Some(unc_path) = non_verbatim_path.strip_prefix(br"UNC\") {
+        let mut normalized = Vec::with_capacity(2 + unc_path.len());
+        normalized.extend_from_slice(br"\\");
+        normalized.extend_from_slice(unc_path);
+        return PathBuf::from(os_string_from_encoded_bytes(normalized));
     }
-    let is_drive_path = match non_verbatim_path.as_bytes() {
+    let is_drive_path = match non_verbatim_path {
         [drive, b':', b'\\', ..] => drive.is_ascii_alphabetic(),
         _ => false,
     };
-    if is_drive_path { PathBuf::from(non_verbatim_path) } else { path.to_path_buf() }
+    if is_drive_path {
+        PathBuf::from(os_string_from_encoded_bytes(non_verbatim_path.to_vec()))
+    } else {
+        path.to_path_buf()
+    }
+}
+
+fn os_string_from_encoded_bytes(bytes: Vec<u8>) -> OsString {
+    // SAFETY:
+    // - bytes is composed of bytes copied from OsStr::as_encoded_bytes.
+    // - Any newly inserted bytes are ASCII, which is valid in the OS encoding.
+    // - Prefix removal and insertion happen only at ASCII boundaries.
+    unsafe { OsString::from_encoded_bytes_unchecked(bytes) }
 }
 
 #[cfg(test)]
@@ -350,10 +364,21 @@ mod tests {
     }
 
     #[test]
-    fn test_normalize_windows_verbatim_path_preserves_unc_prefix() {
+    fn test_normalize_windows_verbatim_path_converts_unc_prefix() {
         let path = PathBuf::from(r"\\?\UNC\server\share");
 
-        assert_eq!(normalize_windows_verbatim_path(&path), path);
+        assert_eq!(normalize_windows_verbatim_path(&path), PathBuf::from(r"\\server\share"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_normalize_windows_verbatim_path_converts_non_unicode_unc_prefix() {
+        use std::os::unix::ffi::OsStringExt as _;
+
+        let path = PathBuf::from(OsString::from_vec(b"\\\\?\\UNC\\server\\share\\\xff".to_vec()));
+        let expected = PathBuf::from(OsString::from_vec(b"\\\\server\\share\\\xff".to_vec()));
+
+        assert_eq!(normalize_windows_verbatim_path(&path), expected);
     }
 
     #[test]

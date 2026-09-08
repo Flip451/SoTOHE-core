@@ -239,6 +239,35 @@
           "hash": "rvw1:sha256:e0e0ebeb5cc182d18b0fc00c2e6f82e7ec0d2f8b03e77f4f1e3fb2b5d8651b14",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:26:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1863254c26a55e9948071913627fc2edd433f6b7a240bfb38b6524547c56b1d5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:38:21Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 275,
+              "message": "The UNC normalization relies on undeclared external-boundary assumptions: `Path::to_str()` must succeed, Windows canonicalization must produce `\\\\?\\UNC\\...`, and Cargo must report the equivalent target as ordinary UNC. The spec does not define UNC behavior, while `environment-assumptions.md` leaves input encoding unspecified and declares Windows unsupported for the relevant evaluator. Consequently, non-Unicode UNC roots remain verbatim and the intended path match is not guaranteed. Declare the supported Windows/UNC and encoding contract, reject unsupported inputs explicitly, or normalize without requiring Unicode conversion.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:1863254c26a55e9948071913627fc2edd433f6b7a240bfb38b6524547c56b1d5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T04:53:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:db7255bd7894d81aba9a2cad4525ed483ea0b6c34d2797d34d82efd2c5a993a2",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -351,6 +380,20 @@
           "at": "2026-09-08T03:01:11Z",
           "findings": [],
           "hash": "rvw1:sha256:3a844a831426f65939af6caadf6442fc0aa4c75b23bd7b65bf748f2ce9750fba",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:26:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e6ca12f01698e9ec3fe0683954fb8d853615beb91efb009e7bd0cfbda181853",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T04:36:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e6ca12f01698e9ec3fe0683954fb8d853615beb91efb009e7bd0cfbda181853",
           "type": "final",
           "verdict": "zero_findings"
         }

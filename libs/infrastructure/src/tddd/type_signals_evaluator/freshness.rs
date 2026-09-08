@@ -595,10 +595,14 @@ fn normalize_windows_verbatim_path(path: &Path) -> PathBuf {
     let Some(non_verbatim_path) = path_string.strip_prefix(r"\\?\") else {
         return path.to_path_buf();
     };
-    if non_verbatim_path.starts_with(r"UNC\") {
-        return path.to_path_buf();
+    if let Some(unc_path) = non_verbatim_path.strip_prefix(r"UNC\") {
+        return PathBuf::from(format!(r"\\{unc_path}"));
     }
-    PathBuf::from(non_verbatim_path)
+    let is_drive_path = match non_verbatim_path.as_bytes() {
+        [drive, b':', b'\\', ..] => drive.is_ascii_alphabetic(),
+        _ => false,
+    };
+    if is_drive_path { PathBuf::from(non_verbatim_path) } else { path.to_path_buf() }
 }
 
 fn check_file_size(path: &Path, bytes: u64) -> Result<(), RustdocInputFingerprintError> {
@@ -683,8 +687,15 @@ mod tests {
     }
 
     #[test]
-    fn test_normalize_windows_verbatim_path_preserves_unc_prefix() {
+    fn test_normalize_windows_verbatim_path_converts_unc_prefix() {
         let path = PathBuf::from(r"\\?\UNC\server\share");
+
+        assert_eq!(normalize_windows_verbatim_path(&path), PathBuf::from(r"\\server\share"));
+    }
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_preserves_non_drive_namespace() {
+        let path = PathBuf::from(r"\\?\Volume{fixture-guid}\repo");
 
         assert_eq!(normalize_windows_verbatim_path(&path), path);
     }
@@ -695,6 +706,15 @@ mod tests {
             Path::new(r"\\?\C:\repo"),
             Path::new(r"C:\repo\target"),
             Path::new(r"\\?\C:\repo\target"),
+        ));
+    }
+
+    #[test]
+    fn test_is_excluded_rustdoc_directory_matches_verbatim_unc_target_path() {
+        assert!(is_excluded_rustdoc_directory(
+            Path::new(r"\\server\share\repo"),
+            Path::new(r"\\server\share\repo\target"),
+            Path::new(r"\\?\UNC\server\share\repo\target"),
         ));
     }
 
