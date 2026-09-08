@@ -85,7 +85,7 @@ impl TrackWorkspaceRootInput {
             ))
         })?;
 
-        Ok(Self { value: normalized })
+        Ok(Self { value: normalize_windows_verbatim_path(&normalized) })
     }
 
     /// Consumes the input and returns its path.
@@ -265,6 +265,23 @@ fn diagnostic_from_error(error: TrackResolutionCompatError) -> TrackResolutionDi
     TrackResolutionDiagnostic::new(error.to_string())
 }
 
+fn normalize_windows_verbatim_path(path: &Path) -> PathBuf {
+    let Some(path_string) = path.to_str() else {
+        return path.to_path_buf();
+    };
+    let Some(non_verbatim_path) = path_string.strip_prefix(r"\\?\") else {
+        return path.to_path_buf();
+    };
+    if non_verbatim_path.starts_with(r"UNC\") {
+        return path.to_path_buf();
+    }
+    let is_drive_path = match non_verbatim_path.as_bytes() {
+        [drive, b':', b'\\', ..] => drive.is_ascii_alphabetic(),
+        _ => false,
+    };
+    if is_drive_path { PathBuf::from(non_verbatim_path) } else { path.to_path_buf() }
+}
+
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
@@ -318,12 +335,39 @@ mod tests {
     }
 
     #[test]
+    fn test_normalize_windows_verbatim_path_strips_drive_prefix() {
+        assert_eq!(
+            normalize_windows_verbatim_path(Path::new(r"\\?\C:\repo")),
+            PathBuf::from(r"C:\repo")
+        );
+    }
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_preserves_unc_prefix() {
+        let path = PathBuf::from(r"\\?\UNC\server\share");
+
+        assert_eq!(normalize_windows_verbatim_path(&path), path);
+    }
+
+    #[test]
+    fn test_normalize_windows_verbatim_path_preserves_non_drive_namespace() {
+        let path = PathBuf::from(r"\\?\Volume{fixture-guid}\repo");
+
+        assert_eq!(normalize_windows_verbatim_path(&path), path);
+    }
+
+    fn canonicalized_path(path: impl AsRef<Path>) -> PathBuf {
+        let canonicalized = std::fs::canonicalize(path).unwrap();
+        normalize_windows_verbatim_path(&canonicalized)
+    }
+
+    #[test]
     fn test_track_workspace_root_input_normalizes_default_relative_path() {
         let current_dir = std::env::current_dir().unwrap();
         let input = TrackWorkspaceRootInput::try_new(PathBuf::from(".")).unwrap();
 
         assert!(input.value.is_absolute());
-        assert_eq!(input.into_path(), std::fs::canonicalize(current_dir).unwrap());
+        assert_eq!(input.into_path(), canonicalized_path(current_dir));
     }
 
     #[test]
@@ -364,7 +408,7 @@ mod tests {
 
     #[test]
     fn test_track_items_directory_input_normalizes_relative_workspace_root() {
-        let expected = std::fs::canonicalize(std::env::current_dir().unwrap()).unwrap();
+        let expected = canonicalized_path(std::env::current_dir().unwrap());
         let items_dir = TrackItemsDirectoryInput::try_new(PathBuf::from("track/items")).unwrap();
 
         let workspace_root = items_dir.workspace_root().unwrap();
@@ -376,7 +420,7 @@ mod tests {
     fn test_track_items_directory_input_derives_non_default_workspace_root() {
         let items_dir =
             TrackItemsDirectoryInput::try_new(PathBuf::from("src/track/items")).unwrap();
-        let expected = std::fs::canonicalize(PathBuf::from("src")).unwrap();
+        let expected = canonicalized_path(PathBuf::from("src"));
 
         let workspace_root = items_dir.workspace_root().unwrap();
 

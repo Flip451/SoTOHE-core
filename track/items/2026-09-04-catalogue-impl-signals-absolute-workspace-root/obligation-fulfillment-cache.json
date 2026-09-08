@@ -17,7 +17,7 @@
       },
       "key": {
         "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
-        "bound_tests_set_hash": "b7184a3d574742434ffd75df564b05c4f4059413b8db38edfa30fd23cdfa43c4",
+        "bound_tests_set_hash": "ea3506b5ed2d7674b75fb5e1c59f60034a89e0d5481f40249281188be22b0d79",
         "declaration_hash": "2575b6b443402bd7ae32372a74ced9fc64b22141bf1d0dadebd85dd454ec43ce"
       },
       "obligation_id": {
@@ -26,7 +26,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let items_dir =\n            TrackItemsDirectoryInput::try_new(PathBuf::from(\"src/track/items\")).unwrap();\n        let expected = std::fs::canonicalize(PathBuf::from(\"src\")).unwrap();\n\n        let workspace_root = items_dir.workspace_root().unwrap();\n\n        assert_eq!(workspace_root.into_path(), expected);",
+        "citation": "let expected = canonicalized_path(PathBuf::from(\"src\"));\n\n        let workspace_root = items_dir.workspace_root().unwrap();\n\n        assert_eq!(workspace_root.into_path(), expected);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -79,7 +79,7 @@
       },
       "key": {
         "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
-        "bound_tests_set_hash": "b7184a3d574742434ffd75df564b05c4f4059413b8db38edfa30fd23cdfa43c4",
+        "bound_tests_set_hash": "ea3506b5ed2d7674b75fb5e1c59f60034a89e0d5481f40249281188be22b0d79",
         "declaration_hash": "91c9033eed5a34ab680fa830a7582c7de91d0d2cc133a14bba018d1332b784de"
       },
       "obligation_id": {
@@ -88,7 +88,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let items_dir =\n            TrackItemsDirectoryInput::try_new(PathBuf::from(\"src/track/items\")).unwrap();\n        let expected = std::fs::canonicalize(PathBuf::from(\"src\")).unwrap();\n\n        let workspace_root = items_dir.workspace_root().unwrap();\n\n        assert_eq!(workspace_root.into_path(), expected);",
+        "citation": "let items_dir =\n            TrackItemsDirectoryInput::try_new(PathBuf::from(\"src/track/items\")).unwrap();\n        let expected = canonicalized_path(PathBuf::from(\"src\"));\n\n        let workspace_root = items_dir.workspace_root().unwrap();\n\n        assert_eq!(workspace_root.into_path(), expected);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -151,7 +151,7 @@
       },
       "key": {
         "anchor_text_hash": "d0744328bbace9b5f0bdf514920c7cb99e81c69378d0a600fdc5325d933f7e45",
-        "bound_tests_set_hash": "6306efd3ba540fc87337862bed3ff8cd9350ba3199c9b260603502251761cdbd",
+        "bound_tests_set_hash": "6d455cfc91f2062ed47ba1c3856dbfe268943bdba7f39bfd7dfee78a79d88d05",
         "declaration_hash": "14fc3620d06eb5bd9784cc68c6a39d77073dc115fa7997644df96314a729ef36"
       },
       "obligation_id": {
@@ -160,7 +160,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let current_dir = std::env::current_dir().unwrap();\n        let input = TrackWorkspaceRootInput::try_new(PathBuf::from(\".\")).unwrap();\n\n        assert!(input.value.is_absolute());\n        assert_eq!(input.into_path(), std::fs::canonicalize(current_dir).unwrap());",
+        "citation": "assert!(input.value.is_absolute());\n        assert_eq!(input.into_path(), canonicalized_path(current_dir));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -233,7 +233,7 @@
       },
       "key": {
         "anchor_text_hash": "8208a6a9d90ceb2707e86f09cc2a368df4e3e9977325ad50257c2b79c419afcc",
-        "bound_tests_set_hash": "6306efd3ba540fc87337862bed3ff8cd9350ba3199c9b260603502251761cdbd",
+        "bound_tests_set_hash": "6d455cfc91f2062ed47ba1c3856dbfe268943bdba7f39bfd7dfee78a79d88d05",
         "declaration_hash": "1d4548fdfec457f230d6a4a321d0fe8a66f1a0599f4e90db131f8ddc9357762e"
       },
       "obligation_id": {
@@ -242,7 +242,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let input = TrackWorkspaceRootInput::try_new(PathBuf::from(\".\")).unwrap();\n\n        assert!(input.value.is_absolute());\n        assert_eq!(input.into_path(), std::fs::canonicalize(current_dir).unwrap());",
+        "citation": "let current_dir = std::env::current_dir().unwrap();\n        let input = TrackWorkspaceRootInput::try_new(PathBuf::from(\".\")).unwrap();\n\n        assert!(input.value.is_absolute());\n        assert_eq!(input.into_path(), canonicalized_path(current_dir));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

@@ -189,6 +189,42 @@
           "hash": "rvw1:sha256:f15e317f2a62b3b98541fb2029f03a4421cf6c78c4d110fa1d2062b530371a71",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T02:12:33Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 278,
+              "message": "The helper strips `\\\\?\\` from every non-UNC verbatim path, including valid volume/device namespaces such as `\\\\?\\Volume{GUID}\\...`, producing a relative/malformed workspace root. Restrict stripping to drive-letter paths (`[A-Za-z]:\\`) and preserve other namespaces.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-correctness",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 354,
+              "message": "Windows canonicalization tests still compare against the raw `std::fs::canonicalize` result, which retains the `\\\\?\\C:\\` prefix while production code now strips it. The tests at lines 354, 400, and 411 will fail on Windows; normalize the expected paths through the same platform-aware expectation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f0c35ad47c0d4d2c674ce4cb3a9271a5180bc038161c48313538c9397c5016a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T02:20:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1481bb62c4424ff3590722b3a39fadc2d1ce1e4d8d7f8a3e55d7141eef8efc60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T02:38:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1481bb62c4424ff3590722b3a39fadc2d1ce1e4d8d7f8a3e55d7141eef8efc60",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -287,6 +323,20 @@
           "at": "2026-09-08T01:22:34Z",
           "findings": [],
           "hash": "rvw1:sha256:bde8ba5ca0478b716a153ce3d840ab534efa436c5ede96159372ad88bdac2a89",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T02:12:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a844a831426f65939af6caadf6442fc0aa4c75b23bd7b65bf748f2ce9750fba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T03:01:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a844a831426f65939af6caadf6442fc0aa4c75b23bd7b65bf748f2ce9750fba",
           "type": "final",
           "verdict": "zero_findings"
         }
