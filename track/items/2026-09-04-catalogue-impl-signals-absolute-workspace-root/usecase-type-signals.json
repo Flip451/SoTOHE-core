@@ -1,10 +1,10 @@
 {
-  "baseline_hash": "4df5d1216329397d761ad262f7f03cf5d85e788af5df06fd8d21c6bdcdc957a4",
+  "baseline_hash": "e2ee577e3cda3a0bdef57af343b7092be26372777ca97174e375b5beb0c2374a",
   "declaration_hash": "13b2812e7d20c49659aa60475c46bc175c9a37692430e6cb0e4c6fad98ac92d8",
-  "generated_at": "2026-09-08T03:44:00Z",
-  "head_commit": "f8316648d5f383aee31690a55b5aa4c617a03e83",
-  "implementation_fingerprint": "2d0a368f2c53317f9f54700d3a289756f51a1a23230f1bf2e92d005ee54a80c1",
-  "resolution_fingerprint": "a1efe12010c5294a7873c63cd03167d7d31e57e7a6aaf6d0860f7760bf88364b",
+  "generated_at": "2026-09-08T03:59:56Z",
+  "head_commit": "b0b29afdde6d0e637b2ddab80637fbb59b42da5a",
+  "implementation_fingerprint": "fac3a597044f1efb230db09ff995095d463106d4fc08a967829f44ce75a70deb",
+  "resolution_fingerprint": "aa972eeecb7a801ec17e95fb59cf76d2e8d6be794004923b24c80207002bbbd2",
   "rustdoc_execution_identity": {
     "crate_name": "usecase",
     "expected_json_path": "target/.sotp-rustdoc/e5758d72e53e14fbcc9ed1ad087d88fb0f293dfeb2c34fb3253fae26490026dd/doc/usecase.json",
