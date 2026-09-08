@@ -419,6 +419,9 @@ impl HookDriver {
             let prompt = match parse_prompt_envelope(stdin_buf.trim()) {
                 Ok(prompt) => prompt,
                 Err(e) => {
+                    // Direct dispatch is fail-closed for malformed input. The
+                    // provider connection wrapper may normalize this exit code
+                    // for its advisory UserPromptSubmit hook.
                     return HookExecution::InputError(make_hook_error(is_post, &e.to_string()));
                 }
             };
@@ -847,13 +850,19 @@ mod tests {
     }
 
     #[test]
-    fn test_hook_driver_skill_parse_failure_is_input_error_for_outer_advisory_absorption() {
+    fn test_hook_driver_skill_parse_failure_is_input_error() {
         let (driver, service) = driver_with(Response::Advisory);
         let execution =
             driver.dispatch_agent_input(HookName::SkillCompliance, HookHost::Claude, "not json");
 
         assert!(matches!(execution, HookExecution::InputError(_)));
         assert_eq!(outcome(&execution).exit_code, 2);
+        assert!(
+            outcome(&execution)
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.starts_with("error: failed to parse prompt JSON"))
+        );
         assert!(service.calls.lock().unwrap().is_empty());
     }
 

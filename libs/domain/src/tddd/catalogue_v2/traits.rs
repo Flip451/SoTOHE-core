@@ -65,9 +65,11 @@ pub enum TraitRefScope {
 ///   short name (e.g. `"SelfType"`); external-crate types use the fully-qualified path
 ///   (e.g. `"std::vec::Vec<i32>"`).
 ///
-/// - `impl_generics`: impl-block-level generic type parameters (type parameters only;
-///   lifetimes and const parameters are out of scope per IN-06). Empty Vec for
-///   non-generic impls.
+/// - `impl_generics`: impl-block-level generic parameters. Type parameters use
+///   their identifier names. Lifetime parameters are declared without a leading
+///   `'`: `impl<'de> Trait<'de> for T` is catalogued as `trait_ref`
+///   `"Trait<'de>"` and `impl_generics` name `"de"`. Const parameters remain
+///   out of scope. Empty Vec for non-generic impls.
 ///
 /// - `impl_where_predicates`: impl-block-level where-clause predicates. Empty Vec
 ///   when there are no impl-level constraints.
@@ -106,8 +108,12 @@ pub struct TraitImplDeclV2 {
     /// - `"std::vec::Vec<i32>"` — external-crate type
     for_type: TypeRef,
 
-    /// Impl-block-level generic type parameters (type parameters only; lifetimes and
-    /// const parameters are out of scope per IN-06).
+    /// Impl-block-level generic parameters.
+    ///
+    /// Type parameters use their identifier names. Lifetime parameters are
+    /// declared without a leading `'`: `impl<'de> Trait<'de> for T` is
+    /// catalogued as `trait_ref` `"Trait<'de>"` and `impl_generics` name
+    /// `"de"`. Const parameters remain out of scope.
     ///
     /// Allows cataloguing `impl<L, R, W> Trait for Foo<L, R, W>` where the impl block
     /// itself introduces generic parameters. Empty Vec when the trait impl is not generic
