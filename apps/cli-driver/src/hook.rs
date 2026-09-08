@@ -419,9 +419,10 @@ impl HookDriver {
             let prompt = match parse_prompt_envelope(stdin_buf.trim()) {
                 Ok(prompt) => prompt,
                 Err(e) => {
-                    // UserPromptSubmit is advisory-only: malformed input must
-                    // warn without blocking the host hook.
-                    return HookExecution::Allow(make_advisory_hook_warning(&e.to_string()));
+                    // Direct dispatch is fail-closed for malformed input. The
+                    // provider connection wrapper may normalize this exit code
+                    // for its advisory UserPromptSubmit hook.
+                    return HookExecution::InputError(make_hook_error(is_post, &e.to_string()));
                 }
             };
             HookDispatchCommand {
@@ -537,11 +538,6 @@ fn make_hook_error(is_post_tool_use: bool, message: &str) -> CommandOutcome {
         // PreToolUse: exit 2 (fail-closed)
         CommandOutcome { stdout: None, stderr: Some(format!("error: {message}")), exit_code: 2 }
     }
-}
-
-/// Build a non-blocking warning outcome for advisory hook input failures.
-fn make_advisory_hook_warning(message: &str) -> CommandOutcome {
-    CommandOutcome { stdout: None, stderr: Some(format!("warning: {message}")), exit_code: 0 }
 }
 
 #[cfg(test)]
@@ -854,14 +850,19 @@ mod tests {
     }
 
     #[test]
-    fn test_hook_driver_skill_parse_failure_is_non_blocking_advisory_warning() {
+    fn test_hook_driver_skill_parse_failure_is_input_error() {
         let (driver, service) = driver_with(Response::Advisory);
         let execution =
             driver.dispatch_agent_input(HookName::SkillCompliance, HookHost::Claude, "not json");
 
-        assert!(matches!(execution, HookExecution::Allow(_)));
-        assert_eq!(outcome(&execution).exit_code, 0);
-        assert!(outcome(&execution).stderr.as_deref().unwrap().starts_with("warning:"));
+        assert!(matches!(execution, HookExecution::InputError(_)));
+        assert_eq!(outcome(&execution).exit_code, 2);
+        assert!(
+            outcome(&execution)
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.starts_with("error: failed to parse prompt JSON"))
+        );
         assert!(service.calls.lock().unwrap().is_empty());
     }
 
