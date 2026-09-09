@@ -41,6 +41,176 @@
         }
       ]
     },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-08T20:27:31Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 107,
+              "message": "T006 changes `ReviewerError` variants/payloads, but existing infrastructure constructors still use `ReviewerError::Unexpected(String)` and related old variants. T006 cannot leave the workspace compiling until T007 updates those callers. Make the API change and required call-site migration one independently passing task boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 148,
+              "message": "T004 is unnecessarily placed in B2. T001–T003 have non-overlapping harness-policy targets and total 275 production lines; adding T004 totals 385, below the 500-line ceiling, with no dependency or ownership conflict. Move T004 into B1 (or document a concrete conflict).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5e670ecc7d3df9ff5a061727d088a5bf23baeb64841b92d049462147ebe4f6d8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:33:13Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 107,
+              "message": "T006 now includes existing callers under `libs/infrastructure/src/review_v2/`, while T007 also owns `claude_reviewer.rs` in that directory. Their concrete write targets overlap within B1; narrow T006’s migration boundary or separate the ownership before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 148,
+              "message": "T004 is unnecessarily placed in B2. T001–T003 have non-overlapping harness-policy targets and total 275 production lines; adding T004 totals 385, below the 500-line ceiling, with no dependency conflict. Move T004 into B1 or document a concrete ownership conflict.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:662b8260c91ba3f197bb7c8f55f4e9ad3255d6b95d20c0d5cd09ef9909819b25",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:37:18Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 147,
+              "message": "T004 is unnecessarily placed in B2. T001–T003 are dependency-ready, have non-overlapping harness-policy targets, and total 275 production lines; adding T004 totals 385, below the 500-line ceiling. Move T004 into B1 or document a concrete ownership conflict.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:be64e7b2062876ed3bd256cf0a6f9e1c9edc654d7c48ae86a257b0224a7e4cf7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:47:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f2c2580673702483507c6bdbf5805739a1226c7eae8502ccf48f8cd30e754fa8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T21:04:23Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 70,
+              "message": "`plan.summary` claims H/IN/AC coverage but does not trace either spec goal. Goal traceability is intentionally absent from `task-coverage.json`, so the summary must explicitly map GO-01 to T001–T004 and GO-02 to T005–T010 (or equivalent task sets).",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 83,
+              "message": "T002 bundles independently verifiable units: Claude dispatcher behavior (AC-02), the distribution allowlist (AC-03), and PreCompact/adapter-list alignment (AC-01/CN-01). Split these into separately executable tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 95,
+              "message": "T004 bundles two independent behaviors: framework PR-review prompt/reference wiring (AC-05/CN-03) and completion-result labeling (AC-06). Split them into separate tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 101,
+              "message": "T005's target, “PR-review workflow and related review/recovery policy,” does not identify specific files or symbols. The executor must invent which workflow and policy artifacts form the boundary; name the exact targets while retaining the operation and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 131,
+              "message": "T009's target, “Fulfillment-verifier prompt/input and cache-identity modules plus structural regression fixtures,” does not identify files or symbols. Multiple verifier, evaluation, cache, and fixture modules match this wording, so the implementation boundary must be made explicit.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/task-contract.json",
+              "line": 10,
+              "message": "T006 omits the `usecase::review_v2::error::ReviewCycleError` reference entry even though it owns convergence of `review_v2/error.rs` and must preserve the existing `From<ReviewerError>` conversion. Attribute that catalogue entry to T006; the current coverage check reports it as `OrphanEntry`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f2c2580673702483507c6bdbf5805739a1226c7eae8502ccf48f8cd30e754fa8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T21:23:40Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/task-coverage.json",
+              "line": 31,
+              "message": "OUT-01 remains mapped only to T001/T002, but the split moved both constrained surfaces—`.claude/settings.json` `hooks.PreCompact` and `.claude/agents/README.md`—to T012. Map OUT-01 to T012 so the prohibition on new persistence and fixed provider-assignment descriptions follows the task that owns those surfaces.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/task-coverage.json",
+              "line": 39,
+              "message": "OUT-03 is mapped only to T004, while T013 now owns the approved-deviation completion path. AC-06 distinguishes the displayed results but does not itself preserve the existing explicit-user-approval requirement; map OUT-03 to T013 as well.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 124,
+              "message": "T005 claims AC-08 but no task targets `.harness/policies/review-protocol.md`. That policy currently sends writer-owned corrections from downstream planning convergence directly to local review/commit, without the required full-cycle branch when replanning creates unfinished tasks. Add the policy update to T005 or another AC-08 task.",
+              "severity": "P1"
+            },
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 145,
+              "message": "T008 owns the catalogue change to `ObligationFulfillmentVerifierPort::verify_pair`, but its task stops at the domain port/pair and usecase constructors. Existing implementations and calls in `libs/infrastructure/src/test_obligation/{fulfillment_verifier,fulfillment_escalation_driver}.rs` and `apps/cli-composition/src/test_obligation.rs` retain the old signature; T009 depends on T008 and now names only usecase files despite carrying infrastructure estimates. Consequently T008 cannot close as an independently compiling task. Put the port change and all implementor/caller migrations in one task, or reattribute and reorder the tasks so every boundary compiles, including the missing CLI-composition scope.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 193,
+              "message": "B2 groups ready tasks T013 and T005 even though both explicitly write `.harness/workflows/track/pr-review.md` and T005 targets Step 3, where T013's completion-result distinction also belongs. With no dependency between them, their write ownership overlaps; serialize them through a declared dependency or place them in non-overlapping batches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:581454d00dc15df45721b1c2e2a275d02924bb632e5e7df0a2d0b49b7f6d2da7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T21:29:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9473b4c65d2132d34590bf45d0d8599035760e81be2ddd184f80c9c88e9511d0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -69,6 +239,114 @@
           "at": "2026-09-08T17:00:50Z",
           "findings": [],
           "hash": "rvw1:sha256:a589617620a78a3a03d3048946fdab71b755545b566291bb65b3f0ff7927a826",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T20:26:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4c850c6a0398cbdd3abdc3a1503acbdcb5481bea56bba5b87cb1d7d8ba0d58e4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T20:31:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4c850c6a0398cbdd3abdc3a1503acbdcb5481bea56bba5b87cb1d7d8ba0d58e4",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-08T17:18:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:313c39aa0af263e0b8742a982539111328294f6db9a65499764ce71e513b28db",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T17:28:33Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+              "line": 101,
+              "message": "AC-10 は自由文診断を「長さを制限」とするだけで、上限値、単位（bytes / characters）、超過時の切り詰めまたは固定分類への縮退動作を定義していません。環境前提宣言の Resource Limits は `gate-output` の子プロセス捕捉専用で reviewer 診断を対象にしていないため、下流フェーズが境界を発明する必要があり、有界出力を決定論的に検証できません。これは未宣言の前提への依存です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:313c39aa0af263e0b8742a982539111328294f6db9a65499764ce71e513b28db",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T17:34:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4422963b12f38e71e99075b73c9c808f61b667c20822d9b420212b623ca66de0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-08T18:40:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50e41e54ccbd654a59ab78bdfcbde8f09d1dbafae98c44cb0ef75de4dd8320d3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T18:53:52Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+              "line": 29,
+              "message": "`ObligationFulfillmentVerifierPort::verify_pair` invokes an external semantic-verifier provider but remains synchronous, while entry `ObligationFulfillmentVerifierPort` does not acknowledge the intentional blocking boundary or the existing `SpawnBlocking` isolation. Record that choice in the type contract or expose an asynchronous port before callers are fixed to this shape.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 8,
+              "message": "The `action: delete` declaration for `ReviewCycleError: From<ReviewerError>` is not required by AC-09/AC-10. The existing conversion preserves the structured `ReviewerError` inside `ReviewCycleError::Reviewer` without losing provider, exit-code, or diagnostic data, and remains the appropriate boundary conversion. Keep it unchanged instead of introducing an unrelated public API deletion.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+              "line": 31,
+              "message": "The `docs` fields for entries `ObligationFulfillmentVerifierPort` and `domain::tddd::test_obligation::pair::ObligationFulfillmentPair` reproduce AC-11/AC-12’s entry-local responsibility behavior in prose. Replace the behavioral restatement with concise type identification and rely on `spec_refs`, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 88,
+              "message": "The `docs` fields for entries `ReviewerDiagnostic`, `ReviewerProcessDiagnostic`, and `usecase::review_v2::error::ReviewerError` restate AC-09/AC-10’s redaction limit, unavailable fallback, preserved diagnostics, and error distinctions. Reduce them to concise type-purpose labels and rely on their `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:50e41e54ccbd654a59ab78bdfcbde8f09d1dbafae98c44cb0ef75de4dd8320d3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:03:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc31df31a42cc23f12a622f6a2830b733f9a8583f5c7df5c19f0d16b12c5fc73",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T20:08:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc31df31a42cc23f12a622f6a2830b733f9a8583f5c7df5c19f0d16b12c5fc73",
           "type": "final",
           "verdict": "zero_findings"
         }

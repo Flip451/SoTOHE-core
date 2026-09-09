@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "90ef81602614ff770fd630c889b86077281a47bcbc6824e6d148e982fbe13403",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "18aa32f05cc7d36d9babecb185abcf376725c337536244c9e69a24e799ab19da",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+    },
+    {
+      "entry_hash": "1e770082b7d928fd007c0bb814ef292381ba2c22397e88a1bd19f80e5a846d93",
+      "signal": "blue",
+      "type_name": "ObligationFulfillmentVerifierPort"
+    }
+  ]
+}
