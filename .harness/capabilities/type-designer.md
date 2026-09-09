@@ -150,8 +150,8 @@ The pipeline is fixed at **13 steps**. Step 0 and steps 1–5 prepare the declar
      ```
      Shape fragments are **validated Rust declaration fragments** — the CLI parses them (syn) and fails closed on anything the catalogue cannot encode (unsupported generic forms, enum discriminants, malformed signatures):
      - `--field "name: Type"` (repeatable) — plain-struct fields
-     - `--method "fn name(&self, x: T) -> U"` (repeatable) — trait / entry methods
-     - `--inherent-method "fn new(...) -> Self"` (repeatable) — inherent impl methods
+     - `--method "fn name(&self, x: T) -> U"` (repeatable) — trait methods and normal inherent methods on the entry (`TypeEntry.methods`)
+     - `--inherent-method "fn new(...) -> Self"` (repeatable) — inherent impl methods requiring impl-block-level generics or `where` predicates; use `--method` for ordinary inherent methods
      - `--variant "Name"` / `--variant "Name(T)"` / `--variant "Name { f: T }"` (repeatable) — enum variants
      - `--trait-impl "TraitRef"` (repeatable) — trait impl declarations. Pass **only the trait reference** (e.g. `--trait-impl "core::fmt::Debug"`); the CLI sets `for_type` to the entry named by `--name`. Do NOT write an `impl … for …` fragment — the whole argument is taken as `trait_ref`
      - `--generic "T: Bound"` / `--where "Vec<T>: Clone"` — declaration-level generics
@@ -380,9 +380,16 @@ Pre-condition: the entry is **NOT in baseline (B)**. This track introduces it.
 
 **Requirement**: the catalogue declaration must be **structurally identical** with the rust source produced in this track. All of the following must be covered by the generation fragments plus annotation:
 
-- `methods` (for traits and structs — `TraitEntry.methods` AND `TypeEntry.methods` for inherent impls), `fields` (for `plain` / `tuple` struct shapes), `params` / `returns` (for functions / methods)
+- `methods` (for traits and structs — `TraitEntry.methods` for trait methods and
+  `TypeEntry.methods` for normal inherent methods; use a top-level `inherent_impls` entry only
+  when impl-block-level generics or `where` predicates require that representation), `fields`
+  (for `plain` / `tuple` struct shapes), `params` / `returns` (for functions / methods)
 - `has_default_impl` on each `MethodDeclaration` in a `TraitEntry`: `true` for trait methods with a default body, `false` for required methods (for inherent methods in `TypeEntry` the codec always sets `has_body: true` regardless of `has_default_impl` — inherent methods always have a body in Rust; write `has_default_impl: false`)
-- `trait_impls` / `inherent_impls` (**top-level arrays**, not `TypeEntry` fields — Phase 2 compares impl identity; an impl whose `for_type` (for `trait_impls`) or `type_name` (for `inherent_impls`) names this entry must be declared as a top-level entry; incomplete declarations cause impl-drift signals → 🟡 / 🔴)
+- `trait_impls` / `inherent_impls` (**top-level arrays**, not `TypeEntry` fields). Trait impl
+  blocks are declared in `trait_impls`; an inherent impl block may be declared in
+  `inherent_impls` when its block-level generics or `where` predicates cannot be expressed on
+  the `TypeEntry`. Normal inherent methods stay on `TypeEntry.methods`; never declare the same
+  method in both places. Incomplete top-level declarations cause impl-drift signals → 🟡 / 🔴.
   - **Derive- and macro-generated impls are NOT exempt from declaration.** `#[derive(Debug, Clone, PartialEq, Eq, Hash, Default, ...)]`, `#[derive(thiserror::Error)]` (which generates `core::fmt::Display` + `core::error::Error`), `#[from]` on an enum variant (which generates `core::convert::From<…>`), and serde derives (`serde::Serialize` / `serde::Deserialize`) all emit **real impl blocks that appear in rustdoc**. Each is part of the type's contract surface and MUST be declared as a top-level `trait_impls` entry (`--trait-impl "core::fmt::Debug"` at generation — the CLI sets `for_type` from `--name` — or a hand-added entry afterwards). Treating these as "boilerplate that needn't be declared" is a recurring, **wrong** instinct — once the type exists in source, every undeclared derive/macro impl surfaces as an extra-item 🟡/🔴, and the catalogue is incomplete per the requirement above. For the established pattern, consult existing tracks' `<layer>-types.json` `trait_impls` arrays, where derive impls such as `core::fmt::Debug` / `core::clone::Clone` / `core::default::Default` / `core::fmt::Display` / `core::error::Error` are declared as explicit entries. This applies identically to `modify` entries (see below).
 - `supertrait_bounds` (for `TraitEntry` — Phase 2 compares these; omitting or misdeclaring them produces `Mismatch`)
 - `generics` / `where_predicates` on the entry or its methods
@@ -401,10 +408,18 @@ Pre-condition: the entry **IS in baseline (B)** and **this track will change its
 
 **Requirement**: the catalogue declaration must be **structurally identical with the rust source POST-modification** (= the source state at track end). `sotp catalog import --action modify` imports the CURRENT shape as the editing baseline; apply the intended delta during annotation so the declaration reflects the post-modification state. This is a strong claim:
 
-- **trait AND struct must declare ALL methods** (`TypeEntry.methods` for inherent impls, `TraitEntry.methods` for trait methods; partial enumeration produces `len(a.methods) != len(b.methods)` → `Mismatch_Modify` → 🟡)
+- **trait AND struct must declare ALL methods** (`TraitEntry.methods` for trait methods and
+  `TypeEntry.methods` for normal inherent methods; methods in a top-level `inherent_impls` entry
+  belong to that impl block and must be complete there). Do not duplicate a method across the
+  two inherent-method locations; partial enumeration produces `len(a.methods) != len(b.methods)`
+  → `Mismatch_Modify` → 🟡.
 - **for `TraitEntry` methods: `MethodDeclaration.has_default_impl` must reflect the post-modification state** — `true` if the trait method has a default body, `false` if it is required. A trait method that flips between required and default changes the structural equality; wrong value → `Mismatch_Modify` → 🟡. For `TypeEntry` inherent methods, the codec always sets `has_body: true` regardless of `has_default_impl` (inherent methods always have a body); always write `has_default_impl: false`
 - **trait must declare correct `supertrait_bounds`** (Phase 2 compares bounds; wrong or missing bounds → `Mismatch_Modify` → 🟡)
-- **all impl blocks for the struct must be declared** as top-level `trait_impls` entries (using `for_type`) and `inherent_impls` entries (using `type_name`) naming the struct (incomplete impl declarations produce impl-drift signals → 🟡 / 🔴)
+- **all trait impl blocks for the struct must be declared** as top-level `trait_impls` entries
+  using `for_type`. Use a top-level `inherent_impls` entry with `type_name` only for an inherent
+  impl block that needs block-level generics or `where` predicates; ordinary inherent methods
+  remain on `TypeEntry.methods`, and incomplete declarations produce impl-drift signals → 🟡 /
+  🔴.
 - **struct must declare ALL fields** in `kind.shape.fields` (partial fields → length mismatch → 🟡)
 - **enum must declare ALL variants** in `kind.variants`, each with the correct `payload` shape (missing variant or wrong payload → 🟡)
 - **type alias must restate the correct `kind.target`** — the post-modification target type (wrong target → 🟡)
@@ -480,7 +495,7 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 ## Scope Ownership
 
 - **Writes permitted**: `track/items/<id>/tddd-features.json` — author this declaration directly with Write/Edit in Step 0 before baseline capture; and `track/items/<id>/<layer>-types.json` — generated and appended by the `bin/sotp catalog` verbs (`init` / `add` / `import` / `cite`), with Edit only for annotation (`$todo` fill-in) and post-generation adjustment. In `conflict-preparation` mode, only existing conflict-hunk selection and required derived-view regeneration are allowed; semantic type design remains reserved for the normal dispatch. Do NOT compose a whole catalogue document by hand with the Write tool. Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these generated files directly via Write/Edit.
-- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json`, `batch-plan.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. The test-obligation enrollment artifacts (`obligations.json` / `test-bindings.json`) are also outside this capability's write set: the enclosing `type-design` workflow materializes them in the mandatory terminal derive step it owns (`.harness/workflows/track/type-design.md` Step 4), re-running `bin/sotp test-obligation derive` after every catalogue (re-)generation — never delete or edit them from this capability. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `bin/sotp track views sync` (Step 11), which is required by this pipeline.
+- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json`, `batch-plan.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. The test-obligation enrollment artifacts (`obligations.json` / `test-bindings.json`) are also outside this capability's write set: the enclosing `type-design` workflow materializes them in the mandatory terminal derive step it owns (`.harness/workflows/track/type-design.md` Step 5), re-running `bin/sotp test-obligation derive` after every catalogue (re-)generation — never delete or edit them from this capability. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `bin/sotp track views sync` (Step 11), which is required by this pipeline.
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp catalog init` / `add` / `import` / `cite` / `check`, `bin/sotp catalogue-lint check-active-track`, `bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp signal calc-catalog-spec`, `bin/sotp signal calc-impl-catalog`, `bin/sotp track views sync`, `bin/sotp signal check-catalog-spec`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).
 - If architectural clarification is needed (decisions not in the ADR), note it in `## Open Questions` and advise the orchestrator to consult the `adr-editor` agent rather than improvising.

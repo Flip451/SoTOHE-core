@@ -29,7 +29,11 @@ pub use check_zero_findings::{
     ReviewCheckZeroFindingsStatePort, ReviewCheckZeroFindingsValidationError,
 };
 pub use cycle::ReviewCycle;
-pub use error::{DiffGetError, ReviewCycleError, ReviewHasherError, ReviewerError};
+pub use error::{
+    DiffGetError, ReviewCycleError, ReviewHasherError, ReviewerDiagnostic,
+    ReviewerDiagnosticValidationError, ReviewerError, ReviewerExecutionProvenance,
+    ReviewerProcessDiagnostic,
+};
 pub use ports::{DiffGetter, ResolvedReviewer, ResolvedReviewerAssignment, ReviewHasher, Reviewer};
 pub use review_aux::{
     NonEmptyReviewerFindingsOutput, ReviewAuxError, ReviewClassifyInteractor,

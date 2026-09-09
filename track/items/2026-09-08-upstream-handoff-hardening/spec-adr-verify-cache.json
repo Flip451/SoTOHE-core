@@ -231,12 +231,12 @@
       }
     },
     {
-      "claim_hash": "04fc91bd6be53bfb33e2d132bd71450a0d137fc5336e88fe38ae278bcb75d3b8",
+      "claim_hash": "fbb3fb767291294fc47e8d06e5ae61e9106a062dde430750ae4ce07f87a2cf87",
       "claim_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "reviewer subprocess 失敗の provider、終了コード、分類を、秘匿と有界化を保った診断として上位へ伝える。"
+          "text_label": "reviewer subprocess 失敗について、provider、取得できた終了コード、失敗を区別できる安全な分類を、秘匿と有界化を保った診断として上位 CLI へ伝える。利用者中断・timeout・出力形式不正と区別し、失敗から成功 verdict を生成しない。"
         },
         "kind": "spec_element"
       },
@@ -249,7 +249,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "reviewer adapter が `ReviewVerdict::ProcessFailed` を情報のない `ReviewerError::ReviewerAbort` に変換する経路で、provider、取得できた終了コード、失敗を区別できる安全な理由を失わず上位 CLI へ伝える。",
+        "citation": "reviewer adapter が `ReviewVerdict::ProcessFailed` を情報のない `ReviewerError::ReviewerAbort` に変換する経路で、provider、取得できた終了コード、失敗を区別できる安全な理由を失わず上位 CLI へ伝える。利用者中断、timeout、出力形式不正と区別し、失敗から成功 verdict を生成しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "67fb19a94695889bae892c4c4464a404161e9c8c4f1c49f92e794526d94218e5",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "review_v2 の状態照会専用構成を、infrastructure 所有の NullReviewer を composition root が構築して ReviewCycle へ注入する局所的な adapter 修正として整える。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "84d6d6cd991c5b80f78eaea4db31aee98ba46b44f28808270001bad986db8d90",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`NullReviewer` は infrastructure 層に置く非実行の secondary adapter とする。composition root はこの adapter を構築して `ReviewCycle` へ注入するだけであり、`Reviewer` port の実装を所有しない。",
         "kind": "pass"
       }
     },
@@ -825,6 +848,52 @@
       },
       "verdict": {
         "citation": "較正には、メモリ上の独立した名前の共存を所有する対象と、保存場所を所有する対象について、それぞれ対象部分が検証済みの合格例と未検証の不合格例を用意する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "60192af927bd932f9665481a9b41eec85a911d76251f1cc5c21b262900408484",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "review_v2 の状態照会専用構成では、NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。既存の Reviewer port の method 契約は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "84d6d6cd991c5b80f78eaea4db31aee98ba46b44f28808270001bad986db8d90",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`NullReviewer` は infrastructure 層に置く非実行の secondary adapter とする。composition root はこの adapter を構築して `ReviewCycle` へ注入するだけであり、`Reviewer` port の実装を所有しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6a74ec13bff32c5f72edf5363c4104d5bd0f8480e8eea37e115959987a3e9798",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "review results の state-summary は get_review_states で状態を読み、review check-approved は evaluate_approval を通じて同じ get_review_states を用いる。どちらも Reviewer を実行しない。NullReviewer の review または fast_review が誤って呼ばれた場合は、成功 verdict または provider 実行を生成せず、型付き PreSpawn / Unavailable 診断で fail-closed に失敗する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "84d6d6cd991c5b80f78eaea4db31aee98ba46b44f28808270001bad986db8d90",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`review results` の state-summary 経路は `get_review_states` を用い、`review check-approved` は `evaluate_approval` 経由で同じ `get_review_states` を用いる。いずれも `NullReviewer` の `Reviewer::review` および `fast_review` を呼ばない。両 method が誤って呼ばれた場合は、成功 verdict や provider 実行を生成せず、確立済みの型付き `PreSpawn` / `Unavailable` 診断で失敗する。",
         "kind": "pass"
       }
     }

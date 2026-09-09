@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 32, yellow: 0, red: 0 }
+signals: { blue: 35, yellow: 0, red: 0 }
 ---
 
 # 共通ハーネスの責務・復旧・検証契約を整える
@@ -18,7 +18,8 @@ signals: { blue: 32, yellow: 0, red: 0 }
 - [IN-02] Claude 配布 allowlist と type-designer の成果物案内を、現行のコマンドおよび type catalogue 契約に整合させる。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D2] [tasks: T011, T003]
 - [IN-03] 自動 PR review の共通方法論の正本化、custom focus との分離、完了結果の区別を整える。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D3] [tasks: T004, T013]
 - [IN-04] open PR に結び付く track で発見された実在の残作業を正規 task として復旧し、再計画後に通常の実装・検証・review・PR 再審査へ戻す。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D4] [tasks: T005]
-- [IN-05] reviewer subprocess 失敗の provider、終了コード、分類を、秘匿と有界化を保った診断として上位へ伝える。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
+- [IN-05] reviewer subprocess 失敗について、provider、取得できた終了コード、失敗を区別できる安全な分類を、秘匿と有界化を保った診断として上位 CLI へ伝える。利用者中断・timeout・出力形式不正と区別し、失敗から成功 verdict を生成しない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
+- [IN-07] review_v2 の状態照会専用構成を、infrastructure 所有の NullReviewer を composition root が構築して ReviewCycle へ注入する局所的な adapter 修正として整える。 [adr: knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md#D1] [tasks: T006, T007]
 - [IN-06] 複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009, T010]
 
 ### Out of Scope
@@ -48,8 +49,10 @@ signals: { blue: 32, yellow: 0, red: 0 }
 - [ ] [AC-08] PR writer の修正後は下流成果物を依存順に再収束し、未完了 task があれば通常の full-cycle を完了してから PR を再審査する。対応する PR 状態を確認できない場合は復旧を仮定せず原因を報告する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D4] [tasks: T005]
 - [ ] [AC-09] reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
 - [ ] [AC-10] 自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
-- [ ] [AC-11] 複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009]
+- [ ] [AC-11] 複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009, T010]
 - [ ] [AC-12] 較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009, T010]
+- [ ] [AC-14] review_v2 の状態照会専用構成では、NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。既存の Reviewer port の method 契約は変更しない。 [adr: knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md#D1] [tasks: T006, T007]
+- [ ] [AC-15] review results の state-summary は get_review_states で状態を読み、review check-approved は evaluate_approval を通じて同じ get_review_states を用いる。どちらも Reviewer を実行しない。NullReviewer の review または fast_review が誤って呼ばれた場合は、成功 verdict または provider 実行を生成せず、型付き PreSpawn / Unavailable 診断で fail-closed に失敗する。 [adr: knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md#D1] [tasks: T006, T007]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
@@ -58,5 +61,5 @@ signals: { blue: 32, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 32  🟡 0  🔴 0
+🔵 35  🟡 0  🔴 0
 

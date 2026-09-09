@@ -8,6 +8,7 @@ use domain::review_v2::{
     FastVerdict, MainScopeName, ReviewOutcome, ReviewWriter, ScopeName, Verdict,
 };
 use infrastructure::review_v2::{FsReviewStore, GitDiffGetter, SystemReviewHasher};
+use usecase::review_v2::ReviewerExecutionProvenance;
 use usecase::review_v2::error::{ReviewCycleError, ReviewerError};
 use usecase::review_v2::{DiffGetter, ReviewCycle, ReviewHasher, Reviewer};
 
@@ -130,10 +131,8 @@ where
                 })
             }
             // Map only subprocess-involved reviewer failures to SubprocessFailed.
-            // Unexpected(_) is overloaded by the adapters: some messages happen
-            // before spawn, while the prefixes recognized by
-            // reviewer_error_is_subprocess_failure happen after the child exists or
-            // after it has produced a verdict-like payload.
+            // Unexpected carries its lifecycle provenance from the adapter, so
+            // this layer only matches that typed classification.
             // verdict_parse_failed=true only for IllegalVerdict (stdout unparseable).
             // Pre-subprocess errors (UnknownScope, Diff, Hash) propagate as Err.
             Err(ReviewCycleError::Reviewer(inner)) => {
@@ -546,20 +545,13 @@ fn findings_count_fast(verdict: &domain::review_v2::FastVerdict) -> u32 {
 fn reviewer_error_is_subprocess_failure(error: &ReviewerError) -> bool {
     match error {
         ReviewerError::UserAbort
-        | ReviewerError::ReviewerAbort
+        | ReviewerError::ProcessFailed { .. }
         | ReviewerError::Timeout
         | ReviewerError::IllegalVerdict => true,
-        ReviewerError::Unexpected(message) => reviewer_unexpected_after_spawn(message),
+        ReviewerError::Unexpected { provenance, .. } => {
+            matches!(provenance, ReviewerExecutionProvenance::PostSpawn)
+        }
     }
-}
-
-fn reviewer_unexpected_after_spawn(message: &str) -> bool {
-    message.starts_with("failed to poll reviewer child:")
-        || message.starts_with("failed to reap reviewer child:")
-        || message.starts_with("failed to read output-last-message ")
-        || message.starts_with("verdict construction:")
-        || message.starts_with("failed to serialize reviewer final payload:")
-        || message.starts_with("Grok provider failed:")
 }
 
 #[cfg(test)]
@@ -577,11 +569,12 @@ mod tests {
     use infrastructure::telemetry::TelemetryConfig;
     use usecase::{
         capability_exec::{ModelName, ProviderName, ReasoningEffort},
+        program_runner::ProgramExitCode,
         provider_session::{
             ProviderSessionCacheEntry, ProviderSessionCacheError, ProviderSessionCacheKey,
             ProviderSessionCachePort, ReviewerPrompt,
         },
-        review_v2::{ResolvedReviewer, ResolvedReviewerAssignment},
+        review_v2::{ResolvedReviewer, ResolvedReviewerAssignment, ReviewerProcessDiagnostic},
     };
 
     use super::*;
@@ -1011,26 +1004,59 @@ mod tests {
 
     #[test]
     fn test_reviewer_unexpected_after_spawn_classifies_child_poll_failure() {
-        let error = ReviewerError::Unexpected("failed to poll reviewer child: io".to_owned());
+        let diagnostic = usecase::review_v2::ReviewerDiagnostic::try_new(
+            "failed to poll reviewer child: io".to_owned(),
+        )
+        .unwrap();
+        let error = ReviewerError::Unexpected {
+            provenance: ReviewerExecutionProvenance::PostSpawn,
+            diagnostic: ReviewerProcessDiagnostic::Available(diagnostic),
+        };
 
         assert!(reviewer_error_is_subprocess_failure(&error));
     }
 
     #[test]
     fn test_reviewer_unexpected_after_spawn_classifies_grok_provider_failure() {
-        let error = ReviewerError::Unexpected(
+        let diagnostic = usecase::review_v2::ReviewerDiagnostic::try_new(
             "Grok provider failed: provider declined structured output".to_owned(),
-        );
+        )
+        .unwrap();
+        let error = ReviewerError::Unexpected {
+            provenance: ReviewerExecutionProvenance::PostSpawn,
+            diagnostic: ReviewerProcessDiagnostic::Available(diagnostic),
+        };
 
         assert!(reviewer_error_is_subprocess_failure(&error));
     }
 
     #[test]
     fn test_reviewer_unexpected_before_spawn_is_not_subprocess_failure() {
-        let error =
-            ReviewerError::Unexpected("failed to write output-schema: disk full".to_owned());
+        let diagnostic = usecase::review_v2::ReviewerDiagnostic::try_new(
+            "failed to write output-schema: disk full".to_owned(),
+        )
+        .unwrap();
+        let error = ReviewerError::Unexpected {
+            provenance: ReviewerExecutionProvenance::PreSpawn,
+            diagnostic: ReviewerProcessDiagnostic::Available(diagnostic),
+        };
 
         assert!(!reviewer_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_reviewer_unexpected_provenance_classifies_unavailable_without_text_inference() {
+        let pre_spawn = ReviewerError::Unexpected {
+            provenance: ReviewerExecutionProvenance::PreSpawn,
+            diagnostic: ReviewerProcessDiagnostic::Unavailable,
+        };
+        let post_spawn = ReviewerError::Unexpected {
+            provenance: ReviewerExecutionProvenance::PostSpawn,
+            diagnostic: ReviewerProcessDiagnostic::Unavailable,
+        };
+
+        assert!(!reviewer_error_is_subprocess_failure(&pre_spawn));
+        assert!(reviewer_error_is_subprocess_failure(&post_spawn));
     }
 
     struct StaticDiffGetter;
@@ -1125,8 +1151,12 @@ mod tests {
 
     impl Reviewer for FindingsReviewer {
         fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
-            let verdict = Verdict::findings_remain(Self::findings())
-                .map_err(|e| ReviewerError::Unexpected(e.to_string()))?;
+            let verdict = Verdict::findings_remain(Self::findings()).map_err(|_| {
+                ReviewerError::Unexpected {
+                    provenance: ReviewerExecutionProvenance::PreSpawn,
+                    diagnostic: ReviewerProcessDiagnostic::Unavailable,
+                }
+            })?;
             Ok((verdict, LogInfo::new("test log")))
         }
 
@@ -1134,8 +1164,12 @@ mod tests {
             &self,
             _target: &ReviewTarget,
         ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
-            let verdict = FastVerdict::findings_remain(Self::findings())
-                .map_err(|e| ReviewerError::Unexpected(e.to_string()))?;
+            let verdict = FastVerdict::findings_remain(Self::findings()).map_err(|_| {
+                ReviewerError::Unexpected {
+                    provenance: ReviewerExecutionProvenance::PreSpawn,
+                    diagnostic: ReviewerProcessDiagnostic::Unavailable,
+                }
+            })?;
             Ok((verdict, LogInfo::new("test log")))
         }
     }
@@ -1375,6 +1409,80 @@ mod tests {
             }
             _ => panic!("expected subprocess failure"),
         }
+    }
+
+    #[test]
+    fn test_dispatch_process_failed_preserves_exit_and_unavailable_diagnostic() {
+        struct ProcessFailedReviewer;
+
+        impl Reviewer for ProcessFailedReviewer {
+            fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
+                Err(ReviewerError::ProcessFailed {
+                    provider: ProviderName::try_new("codex").unwrap(),
+                    exit_code: Some(ProgramExitCode::new(23)),
+                    diagnostic: ReviewerProcessDiagnostic::Unavailable,
+                })
+            }
+
+            fn fast_review(
+                &self,
+                _target: &ReviewTarget,
+            ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
+                Err(ReviewerError::ProcessFailed {
+                    provider: ProviderName::try_new("codex").unwrap(),
+                    exit_code: Some(ProgramExitCode::new(23)),
+                    diagnostic: ReviewerProcessDiagnostic::Unavailable,
+                })
+            }
+        }
+
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = TrackId::try_new("process-failed-boundary-2026").unwrap();
+        let scope_config = domain::review_v2::ReviewScopeConfig::new(
+            &track_id,
+            vec![("infra".to_owned(), vec!["src/**".to_owned()], None, None)],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
+        let base = domain::CommitHash::try_new("0".repeat(40)).unwrap();
+        let review_store =
+            FsReviewStore::new(dir.path().join("review.json"), dir.path().to_path_buf());
+        let cycle = ReviewCycle::new(
+            base,
+            scope_config,
+            ProcessFailedReviewer,
+            StaticDiffGetter,
+            ChangingHasher::new(),
+        );
+
+        let outcome = dispatch_review_cycle("infra", "final", cycle, review_store, None)
+            .expect("a launched reviewer failure is represented as a CLI outcome");
+
+        match outcome {
+            CodexReviewOutcome::SubprocessFailed { error, verdict_parse_failed, .. } => {
+                assert!(!verdict_parse_failed);
+                assert!(error.contains("provider=codex"));
+                assert!(error.contains("exit_code=23"));
+                assert!(error.contains("diagnostic=diagnostic_unavailable"));
+            }
+            CodexReviewOutcome::FinalCompleted { .. }
+            | CodexReviewOutcome::FastCompleted { .. }
+            | CodexReviewOutcome::Skipped { .. }
+            | CodexReviewOutcome::WithDiagnostics { .. } => {
+                panic!("a ProcessFailed reviewer error must never become a successful verdict")
+            }
+        }
+
+        let process_failed = ReviewerError::ProcessFailed {
+            provider: ProviderName::try_new("codex").unwrap(),
+            exit_code: Some(ProgramExitCode::new(23)),
+            diagnostic: ReviewerProcessDiagnostic::Unavailable,
+        };
+        assert_ne!(process_failed.to_string(), ReviewerError::UserAbort.to_string());
+        assert_ne!(process_failed.to_string(), ReviewerError::Timeout.to_string());
+        assert_ne!(process_failed.to_string(), ReviewerError::IllegalVerdict.to_string());
     }
 
     #[test]

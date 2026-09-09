@@ -296,7 +296,7 @@ impl ReviewDriver {
         };
         match self.service.run_codex(input) {
             Ok(out) => run_review_output_to_outcome(out),
-            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+            Err(e) => run_review_error_to_outcome(e),
         }
     }
 
@@ -326,7 +326,7 @@ impl ReviewDriver {
         };
         match self.service.run_claude(input) {
             Ok(out) => run_review_output_to_outcome(out),
-            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+            Err(e) => run_review_error_to_outcome(e),
         }
     }
 
@@ -604,6 +604,10 @@ fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> Com
     // `findings_remain` returns exit 2 (distinguishing review findings from
     // subprocess failures) survives the cli_driver boundary.
     CommandOutcome { stdout: out.summary, stderr: None, exit_code: out.exit_code }
+}
+
+fn run_review_error_to_outcome(error: usecase::review_v2::RunReviewError) -> CommandOutcome {
+    CommandOutcome::failure(Some(error.to_string()))
 }
 
 fn subagent_dispatch_to_outcome(instruction: SubagentDispatchInstruction) -> CommandOutcome {

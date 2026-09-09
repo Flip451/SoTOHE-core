@@ -11,7 +11,8 @@ use domain::{CommitHash, TrackId};
 use usecase::capability_exec::{CODEX_PROVIDER_NAME, ModelName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
 use usecase::review_v2::{
-    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ports::Reviewer,
+    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ReviewerExecutionProvenance,
+    ports::Reviewer,
 };
 use usecase::review_workflow::{
     REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict,
@@ -23,6 +24,7 @@ use super::codex_process::{
     initialize_output_last_message, prepare_output_last_message_path, run_codex_child,
     spawn_codex_reviewer, write_runtime_artifact,
 };
+use super::diagnostics::{process_failed_from_text, unexpected_from_text};
 use super::session::{ReviewerSession, effort_value};
 use crate::codex_common::{
     REVIEW_RUNTIME_DIR, resolve_codex_runtime_for_current_repository, runtime_path,
@@ -152,12 +154,12 @@ impl CodexReviewer {
     ) -> Result<ReviewOutcomeRaw, ReviewerError> {
         let prompt = self.build_full_prompt(target, scope_label);
 
-        let output_last_message =
-            prepare_output_last_message_path(None).map_err(ReviewerError::Unexpected)?;
+        let output_last_message = prepare_output_last_message_path(None)
+            .map_err(|error| unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error))?;
         let output_schema = runtime_path(REVIEW_RUNTIME_DIR, "codex-output-schema", "json")
-            .map_err(ReviewerError::Unexpected)?;
+            .map_err(|error| unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error))?;
         let session_log = runtime_path(REVIEW_RUNTIME_DIR, "codex-session", "log")
-            .map_err(ReviewerError::Unexpected)?;
+            .map_err(|error| unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error))?;
 
         // Auto-managed: output-last-message and output-schema are cleaned up on drop.
         // Session log is NOT auto-managed — it persists for post-run debugging.
@@ -165,15 +167,19 @@ impl CodexReviewer {
 
         // Write output schema file.
         write_runtime_artifact(&output_schema, REVIEW_OUTPUT_SCHEMA_JSON.as_bytes()).map_err(
-            |e| ReviewerError::Unexpected(format!("failed to write output-schema: {e}")),
+            |e| {
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PreSpawn,
+                    format!("failed to write output-schema: {e}"),
+                )
+            },
         )?;
 
         #[cfg(test)]
         let runtime = if self.bin_override.is_none() {
-            Some(
-                resolve_codex_runtime_for_current_repository()
-                    .map_err(ReviewerError::Unexpected)?,
-            )
+            Some(resolve_codex_runtime_for_current_repository().map_err(|error| {
+                unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error)
+            })?)
         } else {
             None
         };
@@ -182,12 +188,15 @@ impl CodexReviewer {
             (Some(bin), _) => (bin.clone(), None),
             (None, Some(runtime)) => (runtime.executable().to_os_string(), Some(runtime)),
             (None, None) => {
-                return Err(ReviewerError::Unexpected("test Codex runtime missing".to_owned()));
+                return Err(unexpected_from_text(
+                    ReviewerExecutionProvenance::PreSpawn,
+                    "test Codex runtime missing",
+                ));
             }
         };
         #[cfg(not(test))]
-        let runtime =
-            resolve_codex_runtime_for_current_repository().map_err(ReviewerError::Unexpected)?;
+        let runtime = resolve_codex_runtime_for_current_repository()
+            .map_err(|error| unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error))?;
         #[cfg(not(test))]
         let (bin, runtime_for_spawn) = (runtime.executable().to_os_string(), Some(&runtime));
 
@@ -197,7 +206,10 @@ impl CodexReviewer {
             // authoritative output before every child so a failed resume
             // cannot donate its verdict to the fresh retry.
             initialize_output_last_message(&output_last_message).map_err(|e| {
-                ReviewerError::Unexpected(format!("failed to initialize output-last-message: {e}"))
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PreSpawn,
+                    format!("failed to initialize output-last-message: {e}"),
+                )
             })?;
             let invocation = build_codex_reviewer_invocation(
                 self.model.as_str(),
@@ -208,8 +220,9 @@ impl CodexReviewer {
                 &output_schema,
             );
             let (child, stderr, stdout) =
-                spawn_codex_reviewer(&bin, &invocation, &session_log, runtime_for_spawn)
-                    .map_err(ReviewerError::Unexpected)?;
+                spawn_codex_reviewer(&bin, &invocation, &session_log, runtime_for_spawn).map_err(
+                    |error| unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error),
+                )?;
             run_codex_child(
                 child,
                 stderr,
@@ -269,7 +282,10 @@ fn convert_raw_to_final(raw: ReviewOutcomeRaw) -> Result<(Verdict, LogInfo), Rev
         ReviewPayloadVerdict::FindingsRemain => {
             let findings = convert_findings_to_domain(&payload.findings);
             Verdict::findings_remain(findings).map_err(|e: VerdictError| {
-                ReviewerError::Unexpected(format!("verdict construction: {e}"))
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PostSpawn,
+                    format!("verdict construction: {e}"),
+                )
             })?
         }
     };
@@ -289,7 +305,10 @@ fn convert_raw_to_fast(raw: ReviewOutcomeRaw) -> Result<(FastVerdict, LogInfo), 
         ReviewPayloadVerdict::FindingsRemain => {
             let findings = convert_findings_to_domain(&payload.findings);
             FastVerdict::findings_remain(findings).map_err(|e: VerdictError| {
-                ReviewerError::Unexpected(format!("verdict construction: {e}"))
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PostSpawn,
+                    format!("verdict construction: {e}"),
+                )
             })?
         }
     };
@@ -303,7 +322,13 @@ fn require_successful_payload(
     match raw.verdict {
         ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain => {}
         ReviewVerdict::Timeout => return Err(ReviewerError::Timeout),
-        ReviewVerdict::ProcessFailed => return Err(ReviewerError::ReviewerAbort),
+        ReviewVerdict::ProcessFailed => {
+            return Err(process_failed_from_text(
+                &CODEX_PROVIDER_NAME,
+                raw.exit_code,
+                raw.final_message.as_deref(),
+            ));
+        }
         ReviewVerdict::LastMessageMissing => return Err(ReviewerError::IllegalVerdict),
     }
 
@@ -1056,6 +1081,56 @@ exit 0
             matches!(verdict, domain::review_v2::Verdict::ZeroFindings),
             "expected ZeroFindings, got: {verdict:?}"
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_codex_reviewer_subprocess_failure_preserves_provider_and_exit_code() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let script = dir.path().join("fake-codex-fail.sh");
+        std::fs::write(&script, "#!/bin/sh\nexit 7\n").unwrap();
+        let mut perms = std::fs::metadata(&script).unwrap().permissions();
+        perms.set_mode(0o755);
+        std::fs::set_permissions(&script, perms).unwrap();
+
+        let reviewer = test_reviewer(Duration::from_secs(10), "Review.").with_bin(&script);
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let result = reviewer.review(&target);
+
+        assert!(
+            matches!(
+                result,
+                Err(ReviewerError::ProcessFailed {
+                    ref provider,
+                    exit_code: Some(ref code),
+                    diagnostic: usecase::review_v2::ReviewerProcessDiagnostic::Unavailable,
+                }) if provider.as_str() == "codex" && code.as_i32() == 7
+            ),
+            "a real failed Codex subprocess must retain its provider and exit code: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_codex_reviewer_unavailable_binary_reports_pre_spawn_provenance() {
+        let directory = tempfile::tempdir().unwrap();
+        let unavailable_binary = directory.path().join("codex-that-is-not-installed");
+        let reviewer =
+            test_reviewer(Duration::from_secs(10), "Review.").with_bin(&unavailable_binary);
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+
+        let result = reviewer.review(&target);
+
+        assert!(matches!(
+            result,
+            Err(ReviewerError::Unexpected {
+                provenance: ReviewerExecutionProvenance::PreSpawn,
+                ..
+            })
+        ));
     }
 
     #[test]

@@ -4,47 +4,45 @@
 
 ## Why the frontmatter carries `model` and `effort`
 
-`bin/sotp capability exec` returns one of two outcomes. When the resolved provider differs from the host it runs the provider subprocess itself and passes `--model` / `--effort` from `.harness/config/agent-profiles.json`. When the resolved provider **is** the host — a Claude orchestrator dispatching a `provider: claude` capability — it returns `delegate-in-host`, and that payload carries only `capability`, `briefing_file`, and `discipline`. It carries neither model nor effort.
+`bin/sotp capability exec` resolves the capability's provider and model from
+`.harness/config/agent-profiles.json`. When the resolved provider differs from the host, the
+dispatcher runs that provider's subprocess. When the resolved provider is Claude and the host is
+Claude, it returns `delegate-in-host`; that payload carries the capability, briefing path, and
+discipline body, but not model or effort. The selected Claude adapter's frontmatter supplies those
+in-host values. Keep them aligned with the profile when a capability is configured for this path.
 
-So on the `delegate-in-host` path the frontmatter in these files is the *only* surface that sets model and effort. A file whose `effort:` disagrees with its capability's `reasoning_effort` in `agent-profiles.json` produces different behaviour depending on which host runs it. Keep the two in sync.
+## Available adapters
 
-## Included agents
+The following is an inventory of adapter files shipped in this checkout. It describes available
+Claude invocation surfaces, not the current provider assignment or a fixed set of active workers;
+`.harness/config/agent-profiles.json` remains the routing authority.
 
-One file per `provider: claude` capability. `orchestrator` has no file — it is the main session itself.
-
-| agent file | capability | model | effort | invoked by |
-|---|---|---|---|---|
-| `spec-designer.md` | spec-designer | `claude-opus-5` | `high` | `/track:spec-design` (Phase 1) — authors `spec.json` |
-| `type-designer.md` | type-designer | `claude-opus-5` | `high` | `/track:type-design` (Phase 2) — authors `<layer>-types.json` |
-| `impl-planner.md` | impl-planner | `claude-opus-5` | `high` | `/track:impl-plan` (Phase 3) — authors `impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` |
-| `adr-editor.md` | adr-editor | `claude-opus-5` | `high` | the sole in-track writer for `knowledge/adr/*.md` |
-| `adr-diagnoser.md` | adr-diagnoser | `claude-opus-5` | `high` | guardian for recorded ADR decisions; read-only verdicts, no `Edit`/`Write` |
-| `rollback-diagnoser.md` | rollback-diagnoser | `claude-opus-5` | `high` | `/track:diagnose` — routes a finding back to the phase owning its root cause |
-| `implementer.md` | implementer | `claude-opus-5` | `medium` | `/track:implement` — implements assigned plan tasks |
-| `review-fix-lead.md` | review-fix-lead | `claude-opus-5` | `medium` | `/track:review` — owns one scope's fix+review loop |
-| `researcher.md` | researcher | `claude-opus-5` | `high` | crate research, codebase-wide analysis, external research |
-
-The four retuned delegate-in-host Claude lanes — `impl-planner`, `researcher` (in the Claude-heavy profile), `rollback-diagnoser`, and `adr-diagnoser` — use `high` effort. The diagnosers produce high-leverage verdicts, while the planner and researcher produce small structured outputs. The typed-pipeline verifier lanes are configured separately in `.harness/config/agent-profiles.json` and are not represented by these Claude adapter files.
-
-`dry-fix-lead.md` is present but dormant: `capabilities.dry-fix-lead` routes to codex, and `cargo make track-local-dry-fix` contains codex and grok provider paths. The grok path is admitted only when the dry-fix-lead adapter declares `grok-sandbox`; without that declaration, a Grok resolution fails closed. A Claude resolution also fails closed rather than reaching this file. It declares no `effort:` for that reason. Unlike `review-fix-lead`, the dry wrapper has no subagent-dispatch sentinel; adding one spans usecase, infrastructure, cli-composition, and cli-driver, and is deliberately left as separate work.
-
-## Capabilities with no agent file
-
-These resolve to a non-Claude provider or to the host, and are never dispatched as Claude subagents.
-
-| capability | provider | how it runs |
+| agent file | capability | invoked by |
 |---|---|---|
-| `orchestrator` | claude | the Claude Code main session itself |
-| `reviewer` | codex | dispatched internally by `bin/sotp review local` |
-| `dry-checker` | codex | invoked by the `sotp dry` CLI |
-| `pr-reviewer` | codex | fail-closes unless the provider supports structured PR review output |
-| `ref-verifier-chain1` / `ref-verifier-chain2` | codex | invoked by the reference-verification pipeline |
-| `obligation-fulfillment-verifier` / `waiver-verifier` | codex | invoked by the obligation pipeline |
+| `spec-designer.md` | spec-designer | `/track:spec-design` (Phase 1) — authors `spec.json` |
+| `type-designer.md` | type-designer | `/track:type-design` (Phase 2) — authors `<layer>-types.json` |
+| `impl-planner.md` | impl-planner | `/track:impl-plan` (Phase 3) — authors the Phase 3 plan artifacts |
+| `adr-editor.md` | adr-editor | the ADR editing lanes — owns `knowledge/adr/*.md` |
+| `adr-diagnoser.md` | adr-diagnoser | ADR baseline guardian lane — read-only verdicts |
+| `rollback-diagnoser.md` | rollback-diagnoser | `/track:diagnose` — routes a finding to its owning phase |
+| `implementer.md` | implementer | `/track:implement` and focused implementation corrections |
+| `review-fix-lead.md` | review-fix-lead | `/track:review` — owns one scope's fix loop |
+| `researcher.md` | researcher | research and codebase analysis lanes |
+| `dry-fix-lead.md` | dry-fix-lead | the DRY-fix adapter surface when selected by its workflow |
+
+The orchestrator has no adapter file because it is the host's main session. A capability without
+an adapter in this directory is executed by the provider-resolving workflow or typed pipeline that
+owns it; this README does not infer or pin that provider.
 
 ## Dispatch rule
 
-Never invoke these agents directly through the Agent tool. Direct invocation bypasses provider and model resolution. The canonical route is `bin/sotp capability exec <capability> --host <host> --briefing-file <path>`.
+Never invoke these agents directly through the Agent tool. Direct invocation bypasses provider and
+model resolution. From a Claude host, the canonical route is
+`bin/sotp capability exec <capability> --host claude --briefing-file <path>`. If the dispatcher
+returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host`, invoke the returned adapter with its briefing
+path and discipline body. Otherwise, let the dispatcher run the resolved provider subprocess.
 
-`review-fix-lead` is the exception: dispatch it through `cargo make track-local-review-fix`, which resolves the profile and, on a Claude resolution, emits a subagent-dispatch sentinel for the caller to act on. `cargo make track-local-dry-fix` has no such sentinel — it executes the codex provider directly or the grok provider only after `grok-sandbox` admission, and fails closed on any other resolution (including claude), which is why `dry-fix-lead` stays on codex.
+Phase writers still enter through their matching `bin/sotp phase enter` command. Review and DRY
+fix lanes use their workflow-owned wrappers, which resolve the profile internally.
 
 `.harness/config/agent-profiles.json` is the routing SSoT. `.harness/config/samples/agent-profiles.*.json` hold alternative provider mixes.

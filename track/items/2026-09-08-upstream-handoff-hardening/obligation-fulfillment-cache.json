@@ -1,4 +1,609 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_plan_fulfillment_trait_method_anchors_limits_each_obligation_to_owned_and_shared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_calibration_probes_exercise_all_three_ac08_categories"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_local_responsibility_calibration_has_executable_positive_and_negative_pairs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_known_bad_probe_undetected_category_fails_closed_without_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_changed_fulfillment_obligation_brief_invalidates_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-11",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ObligationFulfillmentVerifierPort"
+      },
+      "key": {
+        "anchor_text_hash": "bb5ccca77c65bf9010f252a65ac3182543782ae2237bff5428329fb93f8a544e",
+        "bound_tests_set_hash": "26233bc08e2e4fdbce21cceeb8c3276dd13e86840e6d1e628aca35cf4dc234b5",
+        "declaration_hash": "a1473d7d5853ecb224c9bb6c9aef6f5f75754eaf5874aca6d82e18d449931fde"
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "\"let verdict = verifier\\n                .verify_pair(\\n                    &pair_for(tests_source, entry_key, item_identifier, brief, declaration),\\n                    ModelTier::Fast,\\n                )\\n                .unwrap();\\n            assert_eq!(\\n                matches!(verdict, ObligationFulfillmentVerdict::Fulfilled { .. }),\\n                expect_pass,\\n                \\\"unexpected {case} verdict: {verdict:?}\\\"\\n            );\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_plan_fulfillment_trait_method_anchors_limits_each_obligation_to_owned_and_shared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_calibration_probes_exercise_all_three_ac08_categories"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_local_responsibility_calibration_has_executable_positive_and_negative_pairs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_known_bad_probe_undetected_category_fails_closed_without_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_changed_fulfillment_obligation_brief_invalidates_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ObligationFulfillmentVerifierPort"
+      },
+      "key": {
+        "anchor_text_hash": "50d2f02b9dc3ce5a59925564379c13f54ee8cec2084e55d024e403ee4f7882c2",
+        "bound_tests_set_hash": "26233bc08e2e4fdbce21cceeb8c3276dd13e86840e6d1e628aca35cf4dc234b5",
+        "declaration_hash": "a1473d7d5853ecb224c9bb6c9aef6f5f75754eaf5874aca6d82e18d449931fde"
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "(\n                \"memory-positive\",\n                memory_positive,\n                \"InMemoryNameIndex\",\n                \"method:lookup\",\n                \"verify independently named values remain distinct and available in memory\",\n                \"InMemoryNameIndex { names: mapping of independently named values }\",\n                true,\n            ),\n            (\n                \"memory-negative\",\n                memory_negative,\n                \"InMemoryNameIndex\",\n                \"method:lookup\",\n                \"verify independently named values remain distinct and available in memory\",\n                \"InMemoryNameIndex { names: mapping of independently named values }\",\n                false,\n            ),",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-11",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+      },
+      "key": {
+        "anchor_text_hash": "bb5ccca77c65bf9010f252a65ac3182543782ae2237bff5428329fb93f8a544e",
+        "bound_tests_set_hash": "2421c7205ba6d984fee10e42694ec0167982e4613192cfb08b796af1be3ae68d",
+        "declaration_hash": "fe18d2e47db6ba220254da93f8b82bf4cf6722a67e1822f331f35d223d5ec5d1"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "item_identifier": "voluntary:AC-11",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let pair = ObligationFulfillmentPair::new(\n            TestsSource::try_new(\"tests\".to_owned()).unwrap(),\n            EntryDeclaration::try_new(\"decl\".to_owned()).unwrap(),\n            AnchorText::try_new(\"anchor\".to_owned()).unwrap(),\n            obligation_id(),\n            obligation_brief(),\n        );\n        assert_eq!(pair.tests_source().as_str(), \"tests\");\n        assert_eq!(pair.entry_declaration().as_str(), \"decl\");\n        assert_eq!(pair.anchor_text().as_str(), \"anchor\");\n        assert_eq!(pair.obligation_id(), &obligation_id());\n        assert_eq!(pair.obligation_brief(), &obligation_brief());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_changed_fulfillment_obligation_brief_invalidates_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+      },
+      "key": {
+        "anchor_text_hash": "50d2f02b9dc3ce5a59925564379c13f54ee8cec2084e55d024e403ee4f7882c2",
+        "bound_tests_set_hash": "76bcb6a8d8d53dc57e9aeddfca19cd1f410cc9d30e4fd48109ad5104f06982de",
+        "declaration_hash": "97480b9b0ed9083902840e281564b61b070c3bfc10e20ad3fd9d72de3fd3c379"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "item_identifier": "voluntary:AC-12",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(\n        saved.entries()[0].key().declaration_hash(),\n        cached_fulfillment_doc(fulfilled()).entries()[0].key().declaration_hash(),\n        \"a changed responsibility brief must not reuse the old cache identity\"\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_diagnostic_enforces_nonempty_and_utf8_byte_bound"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ReviewerDiagnostic"
+      },
+      "key": {
+        "anchor_text_hash": "81884be1488d97ce83127c49afe912e926a9056a2d6dc6e91de67868112825ca",
+        "bound_tests_set_hash": "73d59a26487c7d9122b82170b73c70bd05408036d251ae030b42a2d8e518aab9",
+        "declaration_hash": "c60d27b700ab612714650e966bd81ac5a68fb7e2bbf546c52e295cc1444aa7b6"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewerDiagnostic",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let exact_boundary = \"b\".repeat(4096);\n        assert_eq!(\n            ReviewerDiagnostic::try_new(exact_boundary.clone())\n                .expect(\"4096 UTF-8 bytes fit\")\n                .as_str(),\n            exact_boundary\n        );\n\n        let multibyte = \"界\".repeat(1365);\n        let diagnostic = ReviewerDiagnostic::try_new(multibyte.clone()).expect(\"4095 bytes fit\");\n        assert_eq!(diagnostic.as_str(), multibyte);\n\n        let multibyte_over_boundary = \"界\".repeat(1366);\n        assert_eq!(\n            ReviewerDiagnostic::try_new(multibyte_over_boundary),\n            Err(ReviewerDiagnosticValidationError::TooLong)\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_diagnostic_enforces_nonempty_and_utf8_byte_bound"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ReviewerDiagnosticValidationError"
+      },
+      "key": {
+        "anchor_text_hash": "81884be1488d97ce83127c49afe912e926a9056a2d6dc6e91de67868112825ca",
+        "bound_tests_set_hash": "73d59a26487c7d9122b82170b73c70bd05408036d251ae030b42a2d8e518aab9",
+        "declaration_hash": "c67d1f8a385de35008ebd6a92be6812357b231b79d729697f1b567a212534e40"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewerDiagnosticValidationError",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            ReviewerDiagnostic::try_new(\"a\".repeat(4097)),\n            Err(ReviewerDiagnosticValidationError::TooLong)\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_unexpected_retains_provenance_independently_of_diagnostic"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_reviewer_unexpected_provenance_classifies_unavailable_without_text_inference"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_oversized_failure_diagnostic_retains_post_spawn_provenance"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_unavailable_binary_reports_pre_spawn_provenance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-09",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ReviewerExecutionProvenance"
+      },
+      "key": {
+        "anchor_text_hash": "265cc2de84aedde31c5d1cb2f37510884837b40ee37aaee7e60ac3387dae8aec",
+        "bound_tests_set_hash": "10ba9058e0de7c8894d99e79b0b795cac588eb4ebbaa673dae66bf52b4ab6bf0",
+        "declaration_hash": "9ca5294581c0edb0136e85a6e6277071d237091cc2e383c3e740e773a953b0e3"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewerExecutionProvenance",
+        "item_identifier": "voluntary:AC-09",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            pre_spawn,\n            ReviewerError::Unexpected {\n                provenance: ReviewerExecutionProvenance::PreSpawn,\n                diagnostic: ReviewerProcessDiagnostic::Unavailable,\n            }\n        ));\n        assert!(matches!(\n            post_spawn,\n            ReviewerError::Unexpected {\n                provenance: ReviewerExecutionProvenance::PostSpawn,\n                diagnostic: ReviewerProcessDiagnostic::Unavailable,\n            }\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-09",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ReviewerProcessDiagnostic"
+      },
+      "key": {
+        "anchor_text_hash": "265cc2de84aedde31c5d1cb2f37510884837b40ee37aaee7e60ac3387dae8aec",
+        "bound_tests_set_hash": "efd88e1a8af22a046f7217ad841f137b00abc0275bef72626865ddff71740869",
+        "declaration_hash": "56894ada2a3661b13305263f8fa323885714825721564b0c99cab158362a40fb"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewerProcessDiagnostic",
+        "item_identifier": "voluntary:AC-09",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            error.to_string(),\n            \"reviewer process failed: provider=codex, exit_code=23, diagnostic=redacted failure\"\n        );\n\n        let unavailable = ReviewerError::Unexpected {\n            provenance: ReviewerExecutionProvenance::PostSpawn,\n            diagnostic: ReviewerProcessDiagnostic::Unavailable,\n        };\n        assert!(unavailable.to_string().contains(\"diagnostic_unavailable\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "raw_diagnostic_boundary_suppresses_invalid_and_oversized_input_preserving_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "test_diagnostic_redaction_covers_claude_and_grok_credentials"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_oversized_failure_diagnostic_retains_post_spawn_provenance"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_dispatch_process_failed_preserves_exit_and_unavailable_diagnostic"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ReviewerProcessDiagnostic"
+      },
+      "key": {
+        "anchor_text_hash": "81884be1488d97ce83127c49afe912e926a9056a2d6dc6e91de67868112825ca",
+        "bound_tests_set_hash": "ed4914f01728e93f2b9419586fd05dc1cb32f5615a0bbf53366f8287e2f8d2fb",
+        "declaration_hash": "093c1c3e774081ace89759fab377cc7e1971be0deb02c47931503fb8f8a42cae"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewerProcessDiagnostic",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(!value.as_str().contains(anthropic_key));\nassert!(!value.as_str().contains(anthropic_token));\nassert!(!value.as_str().contains(xai_key));\nassert!(value.as_str().contains(\"[REDACTED:ANTHROPIC_API_KEY]\"));\nassert!(value.as_str().contains(\"[REDACTED:ANTHROPIC_AUTH_TOKEN]\"));\nassert!(value.as_str().contains(\"[REDACTED:XAI_API_KEY]\"));\n\nassert_eq!(\n    error.to_string(),\n    \"reviewer process failed: provider=codex, exit_code=23, diagnostic=diagnostic_unavailable\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_lifts_through_review_cycle_error"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_dispatch_process_failed_preserves_exit_and_unavailable_diagnostic"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_review_subprocess_failure_preserves_provider_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_nonzero_exit_is_reviewer_abort_before_envelope_decode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_subprocess_failure_preserves_provider_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_unavailable_binary_reports_pre_spawn_provenance"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_oversized_failure_diagnostic_retains_post_spawn_provenance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-09",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "usecase::review_v2::error::ReviewerError"
+      },
+      "key": {
+        "anchor_text_hash": "265cc2de84aedde31c5d1cb2f37510884837b40ee37aaee7e60ac3387dae8aec",
+        "bound_tests_set_hash": "6a68530bb505634c53e96303358c24a6210a6d042bf24b795949fa9c09990c28",
+        "declaration_hash": "afe2072b7d4df6aba238a77917e33a0889d09d3f4d7e4aab6de5ec288f61e4c6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::review_v2::error::ReviewerError",
+        "item_identifier": "voluntary:AC-09",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "match outcome {\n    CodexReviewOutcome::SubprocessFailed { error, verdict_parse_failed, .. } => {\n        assert!(!verdict_parse_failed);\n        assert!(error.contains(\"provider=codex\"));\n        assert!(error.contains(\"exit_code=23\"));\n        assert!(error.contains(\"diagnostic=diagnostic_unavailable\"));\n    }\n    CodexReviewOutcome::FinalCompleted { .. }\n    | CodexReviewOutcome::FastCompleted { .. }\n    | CodexReviewOutcome::Skipped { .. }\n    | CodexReviewOutcome::WithDiagnostics { .. } => {\n        panic!(\"a ProcessFailed reviewer error must never become a successful verdict\")\n    }\n}\n\nlet process_failed = ReviewerError::ProcessFailed {\n    provider: ProviderName::try_new(\"codex\").unwrap(),\n    exit_code: Some(ProgramExitCode::new(23)),\n    diagnostic: ReviewerProcessDiagnostic::Unavailable,\n};\nassert_ne!(process_failed.to_string(), ReviewerError::UserAbort.to_string());\nassert_ne!(process_failed.to_string(), ReviewerError::Timeout.to_string());\nassert_ne!(process_failed.to_string(), ReviewerError::IllegalVerdict.to_string());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "raw_diagnostic_boundary_suppresses_invalid_and_oversized_input_preserving_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::session_log::tests",
+          "test_name": "test_redact_credentials_replaces_non_empty_value_in_captured_output"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_dispatch_process_failed_preserves_exit_and_unavailable_diagnostic"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "test_diagnostic_redaction_covers_claude_and_grok_credentials"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::session_log::tests",
+          "test_name": "test_redact_credentials_handles_multiple_provider_vars_independently"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "usecase::review_v2::error::ReviewerError"
+      },
+      "key": {
+        "anchor_text_hash": "81884be1488d97ce83127c49afe912e926a9056a2d6dc6e91de67868112825ca",
+        "bound_tests_set_hash": "ca9059e01189a17086762c12222d192bcbf3e27e7084ae1ed702b6d31dc2c036",
+        "declaration_hash": "cf75204083c15d76e611918034a0080abdd1751e1739772ee4b90d7577ddd2d4"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::review_v2::error::ReviewerError",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for raw in [oversized, invalid_utf8] {\n            let error = process_failed_from_bytes(&provider, Some(23), Some(raw.as_slice()));\n            assert_eq!(\n                error.to_string(),\n                \"reviewer process failed: provider=codex, exit_code=23, diagnostic=diagnostic_unavailable\"\n            );\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_review_fails_closed_before_provider_invocation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_fast_review_fails_closed_before_provider_invocation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-14",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "NullReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "73ffcbc0116ee4a325cfda0e56b98bc00d6468c3173f013cad2de6f485615a50",
+        "bound_tests_set_hash": "2bac6879e521f201b0a08938ed9feeb39c817f153dd2b60db684242da53ec283",
+        "declaration_hash": "fae8801a7f6aa769bdb13f5cb8b474668268565e063c3e5d3fb8f90c155004af"
+      },
+      "obligation_id": {
+        "entry_key": "NullReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let result = NullReviewer.review(&ReviewTarget::new(Vec::new()));\n\n        assert!(matches!(\n            result,\n            Err(ReviewerError::Unexpected {\n                provenance: ReviewerExecutionProvenance::PreSpawn,\n                diagnostic: ReviewerProcessDiagnostic::Unavailable,\n            })\n        ));\n\n        let result = NullReviewer.fast_review(&ReviewTarget::new(Vec::new()));\n\n        assert!(matches!(\n            result,\n            Err(ReviewerError::Unexpected {\n                provenance: ReviewerExecutionProvenance::PreSpawn,\n                diagnostic: ReviewerProcessDiagnostic::Unavailable,\n            })\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_query_paths_read_state_without_reviewer_execution"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "NullReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "8c89175a1a142ff4dadfff0c39e233403942ad79a120eddaada9b1c3d5dc4744",
+        "bound_tests_set_hash": "9fa43ce2fedcd23e2779527f7c38fa9e4064ffe8d907bd706b362c8d421d0284",
+        "declaration_hash": "b5469fb0d24e264735628c2ed2d979a44e3639e79f989e797217c9296e2737fb"
+      },
+      "obligation_id": {
+        "entry_key": "NullReviewer",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"expect(\\\"review results state-summary must read state without a reviewer\\\")\" ... \"expect(\\\"review check-approved must evaluate state without a reviewer\\\")\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_review_fails_closed_before_provider_invocation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_fast_review_fails_closed_before_provider_invocation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::tests",
+          "test_name": "test_query_state_and_approval_paths_do_not_invoke_reviewer"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_query_paths_read_state_without_reviewer_execution"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-15",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "NullReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "d5d06fa78d178cc1748b5266825cc4a516007a1a5879078ea85afdcb2b067cf0",
+        "bound_tests_set_hash": "81227d6427e7c8ac17fc1c73467de5b897118522250cc5b33e3c3e396b6cbd8c",
+        "declaration_hash": "a2544cf28b3be1f1f329fdfb78851f64d06183c3a43c47ad6e463855bb55582b"
+      },
+      "obligation_id": {
+        "entry_key": "NullReviewer",
+        "item_identifier": "voluntary:AC-15",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let result = NullReviewer.review(&ReviewTarget::new(Vec::new()));\n\n        assert!(matches!(\n            result,\n            Err(ReviewerError::Unexpected {\n                provenance: ReviewerExecutionProvenance::PreSpawn,\n                diagnostic: ReviewerProcessDiagnostic::Unavailable,\n            })\n        ));\n\nlet result = NullReviewer.fast_review(&ReviewTarget::new(Vec::new()));\n\n        assert!(matches!(\n            result,\n            Err(ReviewerError::Unexpected {\n                provenance: ReviewerExecutionProvenance::PreSpawn,\n                diagnostic: ReviewerProcessDiagnostic::Unavailable,\n            })\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    }
+  ],
   "track_id": "2026-09-08-upstream-handoff-hardening"
 }

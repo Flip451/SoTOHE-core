@@ -344,13 +344,33 @@ mod tests {
     use cli_driver::test_obligation::check::TestObligationCheckInput;
     use cli_driver::test_obligation::derive::TestObligationDeriveInput;
     use cli_driver::test_obligation::results::TestObligationResultsInput;
+    use domain::tddd::catalogue_v2::CatalogueEntryKey;
     use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort;
+    use domain::tddd::test_obligation::ids::{
+        TestObligationBrief, TestObligationId, TestObligationItemIdentifier,
+    };
+    use domain::tddd::test_obligation::pair::{AnchorText, EntryDeclaration, TestsSource};
+    use domain::tddd::test_obligation::vocab::TestObligationKind;
     use domain::{ModelTier, TrackStatus};
     use infrastructure::agent_profiles::{ResolvedExecution, RoundType};
     use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
     use usecase::dry_write_driver::CapabilityName;
 
     use super::*;
+
+    fn fulfillment_pair() -> ObligationFulfillmentPair {
+        ObligationFulfillmentPair::new(
+            TestsSource::try_new("assert!(covered)".to_owned()).unwrap(),
+            EntryDeclaration::try_new("entry".to_owned()).unwrap(),
+            AnchorText::try_new("anchor".to_owned()).unwrap(),
+            TestObligationId::new(
+                CatalogueEntryKey::try_new("Entry".to_owned()).unwrap(),
+                TestObligationKind::Contract,
+                TestObligationItemIdentifier::try_new("trait_method:verify".to_owned()).unwrap(),
+            ),
+            TestObligationBrief::try_new("verify the entry-local contract".to_owned()).unwrap(),
+        )
+    }
 
     #[test]
     fn test_composition_root_new_holds_paths() {
@@ -935,7 +955,7 @@ mod tests {
 
         let fulfillment_error = root
             .fulfillment_verifier()
-            .verify_pair("assert!(covered)", "entry", "anchor", ModelTier::Fast)
+            .verify_pair(&fulfillment_pair(), ModelTier::Fast)
             .unwrap_err();
         let waiver_error = root
             .waiver_verifier()
@@ -983,7 +1003,7 @@ mod tests {
 
         let fulfillment_error = root
             .fulfillment_verifier()
-            .verify_pair("assert!(covered)", "entry", "anchor", ModelTier::Fast)
+            .verify_pair(&fulfillment_pair(), ModelTier::Fast)
             .unwrap_err();
         let waiver_error = root
             .waiver_verifier()

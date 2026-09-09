@@ -30,7 +30,7 @@ after the block.
 2. Dispatch the read-only capability:
 
    ```
-   bin/sotp capability exec adr-diagnoser --host <current-host> --briefing-file <path>
+   bin/sotp capability exec adr-diagnoser --briefing-file <path>
    ```
 
 3. Return its structured `{verdict, reason, recommended_next_action}` output verbatim to the
@@ -86,13 +86,14 @@ For an ADR-baseline byte mismatch, follow the dedicated route above and invoke
 Use the caller-provided diagnostic briefing and invoke:
 
 ```
-bin/sotp capability exec rollback-diagnoser --host <current-host> --briefing-file <path>
+bin/sotp capability exec rollback-diagnoser --briefing-file <path>
 ```
 
 The dispatcher resolves the provider and model internally from
 `.harness/config/agent-profiles.json`, validates the provider-native definition, and keeps the
-capability read-only. A `delegate-in-host` outcome is an instruction for the current host;
-otherwise the dispatcher performs the provider subprocess execution.
+capability read-only. This provider-neutral workflow omits `--host`, so the dispatcher performs
+the configured provider subprocess execution; provider adapters add their host identity only when
+their host-side delegation contract requires it.
 
 **Step 2: Receive the corresponding structured verdict**
 
@@ -128,7 +129,10 @@ For a `rollback-diagnoser` routing decision, the calling orchestrator inspects `
 - `spec` → re-invoke the `spec-design` workflow (Phase 1 partial re-entry)
 - `type` → re-invoke the `type-design` workflow (Phase 2 partial re-entry)
 - `impl_plan` → re-invoke the `impl-plan` workflow (Phase 3 partial re-entry)
-- `impl` → apply a source edit task (no writer subagent)
+- `impl` → dispatch the `implementer` capability with a focused source-edit briefing. The
+  briefing must carry the architecture constraints required by
+  `.harness/policies/implementation-delegation.md`; the parent orchestrator must not edit the
+  source inline as the normal route.
 
 For an `adr-diagnoser` verdict, it performs only the post-diagnosis recovery actions documented
 above. The orchestrator may override a rollback target if it judges `reason` insufficiently
@@ -152,7 +156,8 @@ This workflow does NOT:
   task-coverage.json / task-contract.json).
 - Stage or commit any file.
 - Invoke any writer subagent (adr-editor / spec-designer / type-designer / impl-planner).
-- Apply source-edit tasks (the orchestrator translates `impl` targets to source edits).
+- Apply source edits. An `impl` result is handed to the `implementer` capability by the caller;
+  this workflow only returns the routing decision.
 - Run any mutating `bin/sotp` subcommand, including `signal calc-*` refreshes. Signal refresh
   is orchestrator-owned before invocation; the capability may only read persisted signal JSON
   or use true read-only inspection (`ref-verify results`, `task-contract coverage` / `check`,

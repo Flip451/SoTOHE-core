@@ -8,13 +8,11 @@ use domain::{CommitHash, TrackId};
 
 use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::review_v2::{
-    ClaudeReviewer, CodexReviewer, FsCommitHashStore, FsReviewStore, GitDiffGetter,
+    ClaudeReviewer, CodexReviewer, FsCommitHashStore, FsReviewStore, GitDiffGetter, NullReviewer,
     SystemReviewHasher, load_v2_scope_config,
 };
 use thiserror::Error;
 use usecase::review_v2::{ReviewCycle, ScopeQueryInteractor};
-
-use super::null_reviewer::NullReviewer;
 
 /// Typed error for shared v2 review composition helpers.
 ///
@@ -40,7 +38,8 @@ pub enum ReviewSharedError {
     InvalidInput(String),
 }
 
-/// All v2 adapters needed for status/check-approved operations (NullReviewer).
+/// All v2 adapters needed for `review results` state-summary and `review check-approved`
+/// operations (`NullReviewer`).
 ///
 /// Fields are intentionally private — callers access behaviour through the
 /// string-accepting free functions in this module (`check_approved_str`,
@@ -388,7 +387,8 @@ pub(crate) fn build_review_v2_with_reviewer(
 /// 3. Loads review-scope.json → `ReviewScopeConfig`
 /// 4. Reads `.commit_hash` → `CommitHash` (fallback: `git rev-parse <configured base branch>`)
 /// 5. Constructs `FsReviewStore`, `FsCommitHashStore`
-/// 6. Returns `ReviewCycle` with `NullReviewer` (status/check-approved only)
+/// 6. Returns `ReviewCycle` with the infrastructure `NullReviewer`; the query operations use
+///    `get_review_states` / `evaluate_approval` and never invoke a provider.
 ///
 /// # Errors
 /// Returns `ReviewSharedError` on failure.

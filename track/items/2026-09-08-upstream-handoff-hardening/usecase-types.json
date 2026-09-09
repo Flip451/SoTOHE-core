@@ -79,9 +79,67 @@
     {
       "for_type": "ReviewerProcessDiagnostic",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewerExecutionProvenance",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewerExecutionProvenance",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewerExecutionProvenance",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
-  "traits": {},
+  "traits": {
+    "Reviewer": {
+      "action": "reference",
+      "docs": "Baseline reviewer secondary port carried unchanged for NullReviewer implementation-edge visibility.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::types::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::types::Verdict, domain::review_v2::types::LogInfo), ReviewerError>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::types::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::types::FastVerdict, domain::review_v2::types::LogInfo), ReviewerError>"
+        }
+      ],
+      "module_path": "review_v2::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-14",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    }
+  },
   "types": {
     "ReviewerDiagnostic": {
       "action": "add",
@@ -92,7 +150,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [
@@ -169,6 +227,39 @@
       "spec_refs": [
         {
           "anchor": "AC-10",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "ReviewerExecutionProvenance": {
+      "action": "add",
+      "docs": "Application-boundary finite value for reviewer subprocess execution provenance.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PreSpawn",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PostSpawn",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-09",
           "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
         }
       ]
@@ -352,9 +443,16 @@
             "name": "Unexpected",
             "payload": {
               "fields": [
-                "ReviewerProcessDiagnostic"
+                {
+                  "name": "provenance",
+                  "ty": "ReviewerExecutionProvenance"
+                },
+                {
+                  "name": "diagnostic",
+                  "ty": "ReviewerProcessDiagnostic"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           }
         ]

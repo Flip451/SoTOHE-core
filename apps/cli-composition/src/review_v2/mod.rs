@@ -7,7 +7,6 @@ mod helpers;
 #[cfg(test)]
 pub(crate) use helpers::process_guards;
 mod inputs;
-pub(crate) mod null_reviewer;
 mod pre_review_command;
 pub(crate) mod run;
 pub mod run_fix;
@@ -2858,6 +2857,39 @@ exit 0
         assert!(blocked_outcome.stderr.as_deref().is_some_and(|message| {
             message.contains("[BLOCKED]") && message.contains("cli_composition")
         }));
+    }
+
+    #[test]
+    fn test_review_query_paths_read_state_without_reviewer_execution() {
+        use usecase::review_v2::{
+            ReviewApprovalDecision, ReviewScopeResultState, ReviewScopeSelectionRequest,
+            aggregate_service::ReviewService as _,
+        };
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-query-paths-no-reviewer-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let state_summary = super::shim::review_results_service()
+            .results(
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+                ReviewScopeSelectionRequest::All,
+            )
+            .expect("review results state-summary must read state without a reviewer");
+        let cli_scope =
+            state_summary.scopes.iter().find(|scope| scope.scope.as_str() == "cli_composition");
+        assert!(matches!(
+            cli_scope.map(|scope| &scope.state),
+            Some(ReviewScopeResultState::RequiredNotStarted)
+        ));
+
+        let approval = super::shim::review_service_impl()
+            .check_approved(repo.track_id.clone(), repo.items_dir.clone())
+            .expect("review check-approved must evaluate state without a reviewer");
+        assert_eq!(approval.decision, ReviewApprovalDecision::ApprovedWithBypass);
+        assert_eq!(approval.bypass_scope_count, Some(1));
     }
 
     #[test]

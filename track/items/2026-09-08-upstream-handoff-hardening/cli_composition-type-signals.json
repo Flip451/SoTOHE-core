@@ -1,10 +1,10 @@
 {
   "baseline_hash": "5a9d686870b8ef3cccd57c94e7e66ae4ed24456436dc19d0e6fcc7e9d4e577bf",
   "declaration_hash": "73195bcbc1efed6e699d825b92988bc24e2ab755f33ea8d9ce7ec2240de382a2",
-  "generated_at": "2026-09-09T00:11:23Z",
-  "head_commit": "c17dd7b462e2b5cd0833e5c49090effcf7c5be60",
-  "implementation_fingerprint": "0915939229ab86ee86aad4ff8b07ffb194ae9b0531170b6f1f0c7fafee785131",
-  "resolution_fingerprint": "028f5320376f599783c6e3b6718a3970c527519984a3fc84c02765fb630b3be1",
+  "generated_at": "2026-09-09T12:40:49Z",
+  "head_commit": "cd242a74f3dcd1eb0616205c54844a5194a0609c",
+  "implementation_fingerprint": "c802b102531b8a5b1db5e9ea99e427b6990e1e312a5a9183251a91b6deee6f9b",
+  "resolution_fingerprint": "e740e165d94e0d84db4a14fbd9689fd1783da080e109d2a8cf79198c1cae435d",
   "rustdoc_execution_identity": {
     "crate_name": "cli_composition",
     "expected_json_path": "target/.sotp-rustdoc/43779b440851abe02c4d79ac20023fa80263204913163f768a4f79224f81ff5a/doc/cli_composition.json",

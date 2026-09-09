@@ -27,12 +27,12 @@
 
 use std::collections::VecDeque;
 use std::ffi::OsString;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use usecase::review_v2::ReviewerError;
+use usecase::review_v2::{ReviewerError, ReviewerExecutionProvenance};
 use usecase::review_workflow::{
     REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewVerdict, classify_review_verdict,
     normalize_final_message, parse_review_final_message, render_review_payload,
@@ -40,11 +40,28 @@ use usecase::review_workflow::{
 
 use crate::codex_common::POLL_INTERVAL;
 
+use super::diagnostics::{safe_log_text, unexpected_from_text};
+
 /// Return type of `spawn_claude`: child process, stderr collector handle, and stdout collector handle.
 ///
 /// Both handles collect the respective streams into `String` in memory (no files written — CN-05).
 type SpawnClaudeResult =
-    Result<(Child, thread::JoinHandle<String>, thread::JoinHandle<Option<String>>), String>;
+    Result<(Child, thread::JoinHandle<CapturedStderr>, thread::JoinHandle<Option<String>>), String>;
+
+pub(super) struct CapturedStderr {
+    text: String,
+    valid_utf8: bool,
+}
+
+impl CapturedStderr {
+    fn empty() -> Self {
+        Self { text: String::new(), valid_utf8: true }
+    }
+
+    fn unavailable() -> Self {
+        Self { text: String::new(), valid_utf8: false }
+    }
+}
 
 /// Environment variable for overriding the `claude` binary path in tests.
 #[cfg(any(test, feature = "test-helpers"))]
@@ -57,6 +74,7 @@ pub(super) struct ReviewOutcomeRaw {
     /// Captured stderr output (in-memory; no files written — CN-05).
     pub(super) session_stderr: String,
     pub(super) session_id: Option<String>,
+    pub(super) exit_code: Option<i32>,
 }
 
 pub(super) fn claude_bin() -> OsString {
@@ -212,7 +230,7 @@ pub(super) fn spawn_claude(
     // Collect bounded stderr in memory (echoed to the process stderr for observability).
     let stderr_collector = match child.stderr.take() {
         Some(pipe) => thread::spawn(move || collect_claude_stderr(pipe)),
-        None => thread::spawn(String::new),
+        None => thread::spawn(CapturedStderr::empty),
     };
 
     // Claude emits one final JSON envelope on stdout. Retain it only within the
@@ -227,21 +245,25 @@ pub(super) fn spawn_claude(
 
 pub(super) fn run_claude_child(
     mut child: Child,
-    stderr_collector: thread::JoinHandle<String>,
+    stderr_collector: thread::JoinHandle<CapturedStderr>,
     stdout_collector: thread::JoinHandle<Option<String>>,
     timeout: Duration,
 ) -> Result<ReviewOutcomeRaw, ReviewerError> {
     let start = Instant::now();
     let mut timed_out = false;
     let mut exit_success = false;
+    let mut exit_code = None;
 
     loop {
-        match child
-            .try_wait()
-            .map_err(|e| ReviewerError::Unexpected(format!("failed to poll reviewer child: {e}")))?
-        {
+        match child.try_wait().map_err(|e| {
+            unexpected_from_text(
+                ReviewerExecutionProvenance::PostSpawn,
+                format!("failed to poll reviewer child: {e}"),
+            )
+        })? {
             Some(status) => {
                 exit_success = status.success();
+                exit_code = status.code();
                 break;
             }
             None => {
@@ -249,7 +271,10 @@ pub(super) fn run_claude_child(
                     timed_out = true;
                     let _ = child.kill();
                     child.wait().map_err(|e| {
-                        ReviewerError::Unexpected(format!("failed to reap reviewer child: {e}"))
+                        unexpected_from_text(
+                            ReviewerExecutionProvenance::PostSpawn,
+                            format!("failed to reap reviewer child: {e}"),
+                        )
                     })?;
                     break;
                 }
@@ -264,8 +289,11 @@ pub(super) fn run_claude_child(
     let stdout_raw = if timed_out { None } else { stdout_collector.join().unwrap_or_default() };
 
     // Collect stderr similarly — skip join on timeout to avoid blocking.
-    let session_stderr =
-        if timed_out { String::new() } else { stderr_collector.join().unwrap_or_default() };
+    let captured_stderr = if timed_out {
+        CapturedStderr::empty()
+    } else {
+        stderr_collector.join().unwrap_or_else(|_| CapturedStderr::unavailable())
+    };
 
     // Parse the --output-format json envelope from stdout and extract structured_output.
     let final_message = stdout_raw
@@ -278,16 +306,28 @@ pub(super) fn run_claude_child(
 
     // Re-render to canonical form if successfully parsed.
     let rendered_message = match &final_message_state {
-        ReviewFinalMessageState::Parsed(payload) => Some(
-            render_review_payload(payload).map_err(|e| ReviewerError::Unexpected(e.to_string()))?,
-        ),
+        ReviewFinalMessageState::Parsed(payload) => {
+            Some(render_review_payload(payload).map_err(|e| {
+                unexpected_from_text(ReviewerExecutionProvenance::PostSpawn, e.to_string())
+            })?)
+        }
         _ => normalized.or(final_message),
     };
 
     let verdict = classify_review_verdict(timed_out, exit_success, &final_message_state);
 
     let session_id = stdout_raw.as_deref().and_then(extract_claude_session_id);
-    Ok(ReviewOutcomeRaw { verdict, final_message: rendered_message, session_stderr, session_id })
+    Ok(ReviewOutcomeRaw {
+        verdict,
+        final_message: rendered_message,
+        session_stderr: if captured_stderr.valid_utf8 {
+            safe_log_text(&captured_stderr.text)
+        } else {
+            "diagnostic_unavailable".to_owned()
+        },
+        session_id,
+        exit_code,
+    })
 }
 
 /// Reads at most one Claude final envelope into memory, then drains any remaining stdout.
@@ -304,21 +344,34 @@ fn collect_claude_stdout<R: Read>(mut pipe: R) -> Option<String> {
 }
 
 /// Drains Claude stderr while retaining only a bounded diagnostic prefix and suffix.
-fn collect_claude_stderr<R: Read>(pipe: R) -> String {
-    collect_claude_stderr_with_limits(
+fn collect_claude_stderr<R: Read>(pipe: R) -> CapturedStderr {
+    let bytes = collect_claude_stderr_with_limits_bytes(
         pipe,
         MAX_CLAUDE_STDERR_BYTES,
         CLAUDE_STDERR_PREFIX_BYTES,
-        true,
-    )
+    );
+    CapturedStderr {
+        text: String::from_utf8_lossy(&bytes).into_owned(),
+        valid_utf8: std::str::from_utf8(&bytes).is_ok(),
+    }
 }
 
+#[cfg(test)]
 fn collect_claude_stderr_with_limits<R: Read>(
+    pipe: R,
+    max_bytes: usize,
+    prefix_bytes: usize,
+    _echo_to_stderr: bool,
+) -> String {
+    String::from_utf8_lossy(&collect_claude_stderr_with_limits_bytes(pipe, max_bytes, prefix_bytes))
+        .into_owned()
+}
+
+fn collect_claude_stderr_with_limits_bytes<R: Read>(
     mut pipe: R,
     max_bytes: usize,
     prefix_bytes: usize,
-    echo_to_stderr: bool,
-) -> String {
+) -> Vec<u8> {
     let prefix_bytes = prefix_bytes.min(max_bytes);
     let suffix_bytes = max_bytes.saturating_sub(prefix_bytes);
     let mut prefix = Vec::with_capacity(prefix_bytes);
@@ -334,9 +387,6 @@ fn collect_claude_stderr_with_limits<R: Read>(
         let Some(bytes) = chunk.get(..read) else {
             break;
         };
-        if echo_to_stderr {
-            let _ = std::io::stderr().write_all(bytes);
-        }
         total_bytes = total_bytes.saturating_add(read);
 
         let prefix_remaining = prefix_bytes.saturating_sub(prefix.len());
@@ -355,17 +405,17 @@ fn collect_claude_stderr_with_limits<R: Read>(
     retained.extend(suffix);
     if total_bytes > max_bytes {
         let Some(prefix) = retained.get(..prefix_bytes) else {
-            return String::from_utf8_lossy(&retained).into_owned();
+            return retained;
         };
         let Some(suffix) = retained.get(prefix_bytes..) else {
-            return String::from_utf8_lossy(&retained).into_owned();
+            return retained;
         };
-        let mut rendered = String::from_utf8_lossy(prefix).into_owned();
-        rendered.push_str(CLAUDE_STDERR_TRUNCATION_NOTICE);
-        rendered.push_str(&String::from_utf8_lossy(suffix));
+        let mut rendered = prefix.to_vec();
+        rendered.extend_from_slice(CLAUDE_STDERR_TRUNCATION_NOTICE.as_bytes());
+        rendered.extend_from_slice(suffix);
         rendered
     } else {
-        String::from_utf8_lossy(&retained).into_owned()
+        retained
     }
 }
 

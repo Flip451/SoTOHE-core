@@ -38,7 +38,9 @@ use domain::ContentHash;
 use domain::TrackId;
 use domain::tddd::catalogue_v2::{CatalogueDocument, TraitImplDeclV2};
 use domain::tddd::semantic_verify::{CatalogueEntryRef, CatalogueSectionKey};
-use domain::tddd::test_obligation::ids::DiagnosticMessage;
+use domain::tddd::test_obligation::ids::{
+    DiagnosticMessage, TestObligationBrief, TestObligationEdgeId, TestObligationId,
+};
 use domain::tddd::test_obligation::obligations::TestObligation;
 use domain::tddd::test_obligation::vocab::TargetEntryRoleKind;
 
@@ -153,6 +155,40 @@ pub(crate) fn sha256_content_hash(bytes: &[u8]) -> ContentHash {
 #[must_use]
 pub(crate) fn declaration_with_obligation_item(declaration: &str, item_identifier: &str) -> String {
     format!("{declaration}\n## Obligation item\n{item_identifier}")
+}
+
+/// Builds the canonical fulfillment declaration evidence, including every
+/// entry-local responsibility input that the fulfillment prompt receives.
+///
+/// The fulfillment cache has a fixed three-component key, so the declaration
+/// component carries the obligation kind and brief in addition to the
+/// existing item identifier. Evaluate, check, and results all use this helper
+/// so a changed responsibility input cannot reuse an old verdict.
+#[must_use]
+pub(crate) fn declaration_with_obligation_context(
+    declaration: &str,
+    obligation_id: &TestObligationId,
+    obligation_brief: &TestObligationBrief,
+) -> String {
+    let declaration =
+        declaration_with_obligation_item(declaration, obligation_id.item_identifier().as_str());
+    format!(
+        "{declaration}\n## Obligation identity\nentry_key: {}\nobligation_kind: {}\n## Obligation brief\n{}",
+        obligation_id.entry_key().as_str(),
+        obligation_id.obligation_kind().as_kebab(),
+        obligation_brief.as_str(),
+    )
+}
+
+/// Returns the stable responsibility brief used for ownerless voluntary
+/// bindings, which have no derived [`TestObligation`] record.
+pub(crate) fn synthetic_voluntary_obligation_brief(
+    edge_id: &TestObligationEdgeId,
+) -> Result<TestObligationBrief, domain::ValidationError> {
+    TestObligationBrief::try_new(format!(
+        "verify the voluntary binding for anchor {}",
+        edge_id.anchor_id().element_id()
+    ))
 }
 
 /// Canonical declaration text for the catalogue entry named `key` in the
@@ -464,12 +500,38 @@ fn push_method_cited_anchor_ids(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod declaration_item_tests {
+    use domain::tddd::test_obligation::ids::{TestObligationBrief, TestObligationId};
+
     #[test]
     fn test_declaration_with_obligation_item_appends_identifier() {
         assert_eq!(
             super::declaration_with_obligation_item("TypeEntry { .. }", "method:load"),
             "TypeEntry { .. }\n## Obligation item\nmethod:load"
         );
+    }
+
+    #[test]
+    fn test_declaration_with_obligation_context_includes_responsibility_inputs() {
+        let entry_key =
+            domain::tddd::semantic_verify::CatalogueEntryKey::try_new("Entry".to_owned()).unwrap();
+        let obligation_id = TestObligationId::new(
+            entry_key,
+            domain::tddd::test_obligation::vocab::TestObligationKind::Contract,
+            domain::tddd::test_obligation::ids::TestObligationItemIdentifier::try_new(
+                "trait_method:verify".to_owned(),
+            )
+            .unwrap(),
+        );
+        let brief = TestObligationBrief::try_new("verify the local contract".to_owned()).unwrap();
+
+        let declaration =
+            super::declaration_with_obligation_context("Entry { .. }", &obligation_id, &brief);
+
+        assert!(declaration.contains("## Obligation item\ntrait_method:verify"));
+        assert!(declaration.contains("entry_key: Entry"));
+        assert!(declaration.contains("obligation_kind: contract"));
+        assert!(declaration.contains("## Obligation brief\nverify the local contract"));
     }
 }

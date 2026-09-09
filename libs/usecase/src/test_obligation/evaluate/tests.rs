@@ -64,6 +64,7 @@ use domain::{
 
 use domain::SpecDocumentLoaderPort;
 
+use super::calibration::{LocalResponsibilityExpectation, local_responsibility_probe_shapes};
 use super::plan::PlannedAction;
 use super::{
     EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
@@ -152,6 +153,16 @@ impl
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
         Box::pin(async move {
             let source = pair.tests_source().as_str();
+            if source.contains("local_responsibility_probe_memory_positive")
+                || source.contains("local_responsibility_probe_persistence_positive")
+            {
+                return Ok(fulfilled());
+            }
+            if source.contains("local_responsibility_probe_memory_negative")
+                || source.contains("local_responsibility_probe_persistence_negative")
+            {
+                return Ok(fulfillment_fail());
+            }
             if source.contains("known_bad_calibration_probe") {
                 *self.calibration_calls.lock().unwrap() += 1;
                 self.calibration_probe_sources.lock().unwrap().push(source.to_owned());
@@ -329,7 +340,11 @@ impl
         _initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
         let source = pair.tests_source().as_str();
-        let verdict = if source.contains("_contradiction_") {
+        let verdict = if source.contains("local_responsibility_probe_memory_negative")
+            || source.contains("local_responsibility_probe_persistence_negative")
+        {
+            fulfillment_fail()
+        } else if source.contains("_contradiction_") {
             fulfillment_fail_for_category(FulfillmentFailCategory::Contradiction)
         } else if source.contains("_substitution_") {
             fulfillment_fail_for_category(FulfillmentFailCategory::Substitution)
@@ -338,7 +353,9 @@ impl
         } else {
             fulfilled()
         };
-        let tracker = if source.contains("calibration_probe") {
+        let tracker = if source.contains("calibration_probe")
+            || source.contains("local_responsibility_probe")
+        {
             self.tracker.clone()
         } else {
             self.real_tracker.clone().unwrap_or_else(|| self.tracker.clone())
@@ -495,6 +512,10 @@ fn edge() -> TestObligationEdgeId {
 }
 
 fn obligation() -> TestObligation {
+    obligation_with_brief("cover positivity")
+}
+
+fn obligation_with_brief(brief: &str) -> TestObligation {
     let entry_key = CatalogueEntryKey::try_new("Money".to_owned()).unwrap();
     TestObligation::new(
         TestObligationId::new(
@@ -508,7 +529,7 @@ fn obligation() -> TestObligation {
             entry_key,
         ),
         TargetEntryRoleKind::DataRole(DataRole::value_object()),
-        TestObligationBrief::try_new("cover positivity".to_owned()).unwrap(),
+        TestObligationBrief::try_new(brief.to_owned()).unwrap(),
         DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
         vec![anchor()],
     )
@@ -1244,9 +1265,10 @@ fn cached_fulfillment_doc_with_fingerprint(
     let declaration =
         crate::test_obligation::obligation_declaration_text(&[money_catalogue()], &obligation)
             .unwrap();
-    let declaration = crate::test_obligation::declaration_with_obligation_item(
+    let declaration = crate::test_obligation::declaration_with_obligation_context(
         &declaration,
-        obligation.id().item_identifier().as_str(),
+        obligation.id(),
+        obligation.brief(),
     );
     let key = ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes())),
@@ -1793,6 +1815,35 @@ fn test_calibration_probes_exercise_all_three_ac08_categories() {
         probes.iter().any(|s| s.contains("known_bad_calibration_probe_central_unverified_")),
         "central-unverified probe missing: {probes:?}"
     );
+}
+
+#[test]
+fn test_local_responsibility_calibration_has_executable_positive_and_negative_pairs() {
+    let probes = local_responsibility_probe_shapes();
+
+    assert_eq!(probes.len(), 4);
+    assert_eq!(
+        probes
+            .iter()
+            .filter(|probe| probe.expectation == LocalResponsibilityExpectation::Fulfilled)
+            .count(),
+        2
+    );
+    assert_eq!(
+        probes
+            .iter()
+            .filter(|probe| probe.expectation == LocalResponsibilityExpectation::Rejected)
+            .count(),
+        2
+    );
+    for probe in probes {
+        assert!(probe.tests_source.starts_with("#[test]"));
+        assert!(
+            probe.tests_source.contains("assert_eq!") || probe.tests_source.contains("assert!(")
+        );
+        assert!(!probe.tests_source.contains("mock"));
+        assert!(!probe.tests_source.contains("stub"));
+    }
 }
 
 #[test]
@@ -2559,6 +2610,33 @@ fn test_matching_waiver_cache_reuses_frozen_verdict() {
     assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 0);
     let saved = h.waiver_cache.saved.lock().unwrap().clone().unwrap();
     assert!(matches!(saved.entries()[0].verdict(), WaiverVerdict::Waived { .. }));
+}
+
+#[test]
+fn test_changed_fulfillment_obligation_brief_invalidates_cache() {
+    let h = harness_with_existing_caches(
+        Some(ObligationsDocument::new(
+            track(),
+            vec![obligation_with_brief("cover positivity and rejection")],
+        )),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        Some(cached_fulfillment_doc(fulfilled())),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_ne!(
+        saved.entries()[0].key().declaration_hash(),
+        cached_fulfillment_doc(fulfilled()).entries()[0].key().declaration_hash(),
+        "a changed responsibility brief must not reuse the old cache identity"
+    );
 }
 
 #[test]

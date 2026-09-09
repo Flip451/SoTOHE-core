@@ -1,10 +1,10 @@
 {
   "baseline_hash": "34e477b6c3e1bf8fd53bbff20cb73d4bc70c3aaba791080fe4b5bf4dbeb92496",
-  "declaration_hash": "279eae0061b44b939dc14edc20a81d0a3a66d3c1b3b090e476a5ba317c7bc541",
-  "generated_at": "2026-09-09T00:10:49Z",
-  "head_commit": "c17dd7b462e2b5cd0833e5c49090effcf7c5be60",
-  "implementation_fingerprint": "0915939229ab86ee86aad4ff8b07ffb194ae9b0531170b6f1f0c7fafee785131",
-  "resolution_fingerprint": "028f5320376f599783c6e3b6718a3970c527519984a3fc84c02765fb630b3be1",
+  "declaration_hash": "0429108685c3e9ad1dd49e48546689b76af4203f6ae998b090aab1ee68459c24",
+  "generated_at": "2026-09-09T12:40:13Z",
+  "head_commit": "cd242a74f3dcd1eb0616205c54844a5194a0609c",
+  "implementation_fingerprint": "c802b102531b8a5b1db5e9ea99e427b6990e1e312a5a9183251a91b6deee6f9b",
+  "resolution_fingerprint": "e740e165d94e0d84db4a14fbd9689fd1783da080e109d2a8cf79198c1cae435d",
   "rustdoc_execution_identity": {
     "crate_name": "usecase",
     "expected_json_path": "target/.sotp-rustdoc/f855b69b5c9e87ebfe506c211426b5d3c50fd843a7f90d2fa08b3355ddb5fcea/doc/usecase.json",
@@ -15,22 +15,20 @@
   "schema_version": 6,
   "signals": [
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug"
       ],
+      "found_type": true,
+      "kind_tag": "value_object",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "ReviewerDiagnostic"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -38,29 +36,50 @@
         "core::fmt::Debug",
         "core::fmt::Display"
       ],
+      "found_type": true,
+      "kind_tag": "error_type",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "ReviewerDiagnosticValidationError"
     },
     {
       "found_type": true,
       "kind_tag": "error_type",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "usecase::review_v2::error::ReviewerError"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "missing_items": [
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ReviewerExecutionProvenance"
+    },
+    {
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug"
       ],
+      "found_type": true,
+      "kind_tag": "enum",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "ReviewerProcessDiagnostic"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "Reviewer"
     },
     {
       "found_type": true,

@@ -52,9 +52,9 @@ use super::status_lanes::{
     target_for_direct_edge, target_for_obligation, targets_for_scope,
 };
 use super::{
-    LoadedCatalogueDocument, declaration_with_obligation_item, diag,
-    find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
-    sha256_content_hash,
+    LoadedCatalogueDocument, declaration_with_obligation_context, declaration_with_obligation_item,
+    diag, find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
+    sha256_content_hash, synthetic_voluntary_obligation_brief,
 };
 
 use super::ports::ObligationFulfillmentCachePort;
@@ -432,9 +432,10 @@ impl CheckTestObligationsInteractor {
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
-        let declaration = declaration_with_obligation_item(
+        let declaration = declaration_with_obligation_context(
             &obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
-            obligation.id().item_identifier().as_str(),
+            obligation.id(),
+            obligation.brief(),
         );
         self.resolve_fulfillment_cache_entry(
             edge,
@@ -460,10 +461,16 @@ impl CheckTestObligationsInteractor {
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
         let obligation_id = synthetic_voluntary_obligation_id(edge);
-        let declaration = declaration_with_obligation_item(
+        let obligation_brief = synthetic_voluntary_obligation_brief(edge).map_err(|error| {
+            ObligationCheckError::InvalidCatalogueState(diag(&format!(
+                "invalid voluntary obligation brief for {edge:?}: {error}"
+            )))
+        })?;
+        let declaration = declaration_with_obligation_context(
             &find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
                 .unwrap_or_default(),
-            obligation_id.item_identifier().as_str(),
+            &obligation_id,
+            &obligation_brief,
         );
         self.resolve_fulfillment_cache_entry(
             edge,

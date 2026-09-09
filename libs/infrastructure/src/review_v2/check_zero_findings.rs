@@ -2,15 +2,15 @@
 
 use std::path::Path;
 
-use domain::review_v2::{FastVerdict, LogInfo, ReviewState, ReviewTarget, ScopeName, Verdict};
+use domain::review_v2::{ReviewState, ScopeName};
 use domain::{CommitHash, FreeText, TrackId};
-use usecase::review_v2::{ReviewCheckZeroFindingsStatePort, ReviewCycle, Reviewer, ReviewerError};
+use usecase::review_v2::{ReviewCheckZeroFindingsStatePort, ReviewCycle};
 
 use crate::git_cli::{SystemGitRepo, isolated_bounded_git_output};
 use crate::track_artifact::{TrackArtifactReadError, read_track_artifact};
 
 use super::{
-    FsCommitHashStore, FsReviewStore, RootedGitDiffGetter, RootedSystemReviewHasher,
+    FsCommitHashStore, FsReviewStore, NullReviewer, RootedGitDiffGetter, RootedSystemReviewHasher,
     load_v2_scope_config,
 };
 
@@ -23,8 +23,8 @@ const METADATA_FILE: &str = "metadata.json";
 ///
 /// The adapter owns the infrastructure assembly needed to compare the current
 /// diff hash against the persisted final verdict. It deliberately does not run
-/// a reviewer: the private placeholder below exists only because
-/// [`ReviewCycle`] is generic over its reviewer port.
+/// a reviewer; [`NullReviewer`] exists only because [`ReviewCycle`] is generic
+/// over its reviewer port.
 pub struct ReviewCheckZeroFindingsStateAdapter;
 
 impl ReviewCheckZeroFindingsStatePort for ReviewCheckZeroFindingsStateAdapter {
@@ -68,7 +68,7 @@ impl ReviewCheckZeroFindingsStatePort for ReviewCheckZeroFindingsStateAdapter {
         let cycle = ReviewCycle::new(
             base,
             scope_config,
-            StateReaderReviewer,
+            NullReviewer,
             RootedGitDiffGetter::new(git.clone()),
             RootedSystemReviewHasher::new(git),
         );
@@ -173,20 +173,4 @@ fn resolve_diff_base(
     }
     CommitHash::try_new(String::from_utf8_lossy(&output.stdout).trim().to_owned())
         .map_err(|error| FreeText::new(format!("git rev-parse {base_branch}: {error}")))
-}
-
-struct StateReaderReviewer;
-
-impl Reviewer for StateReaderReviewer {
-    fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
-        Err(ReviewerError::Unexpected(
-            "StateReaderReviewer: review() must not be called".to_owned(),
-        ))
-    }
-
-    fn fast_review(&self, _target: &ReviewTarget) -> Result<(FastVerdict, LogInfo), ReviewerError> {
-        Err(ReviewerError::Unexpected(
-            "StateReaderReviewer: fast_review() must not be called".to_owned(),
-        ))
-    }
 }

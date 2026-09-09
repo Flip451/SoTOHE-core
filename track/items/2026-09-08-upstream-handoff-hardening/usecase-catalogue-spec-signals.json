@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "279eae0061b44b939dc14edc20a81d0a3a66d3c1b3b090e476a5ba317c7bc541",
+  "catalogue_declaration_hash": "0429108685c3e9ad1dd49e48546689b76af4203f6ae998b090aab1ee68459c24",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "fe99cba3018f19e528c7dec84265ded224c5095500656562a1a2380d8a3163a1",
+      "entry_hash": "9e9895752a6a9f39c5946b01ed27448e8b325103cf6e29f42bd3f802830867ce",
       "signal": "blue",
       "type_name": "ReviewerDiagnostic"
     },
@@ -11,6 +11,11 @@
       "entry_hash": "3887cb64197f409e23b008037e68e9da9435a945cf9faee947c3d48cee43c35d",
       "signal": "blue",
       "type_name": "ReviewerDiagnosticValidationError"
+    },
+    {
+      "entry_hash": "77010c3f79c9edfa323e42459339541b7a107b195f373f1a5ac207440fa510db",
+      "signal": "blue",
+      "type_name": "ReviewerExecutionProvenance"
     },
     {
       "entry_hash": "ec08214913f1ea4afb61bbf4b64b07a4290d45c36959a9d4a4aa200bdc31aa8d",
@@ -23,9 +28,14 @@
       "type_name": "usecase::review_v2::error::ReviewCycleError"
     },
     {
-      "entry_hash": "6f13b8b3d756138cfdfdc97f27f49093457fbe0cb0bf2c866509eb6002f96f0b",
+      "entry_hash": "4bf3978e8eed86cf1ad0e94beca6dd8bbe066407b6fdf120e90bd3959dc5556b",
       "signal": "blue",
       "type_name": "usecase::review_v2::error::ReviewerError"
+    },
+    {
+      "entry_hash": "7635fd344a02a4179933ac03e9afce9d83349826a9d0504472757fbd14efb490",
+      "signal": "blue",
+      "type_name": "Reviewer"
     }
   ]
 }

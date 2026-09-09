@@ -326,3 +326,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`sotp review results` の scope selector と列挙範囲を一致させる](2026-08-10-0814-review-results-scope-selection.md) | Proposed | 2026-08-10 |
 | [review-fix コマンド群の delivery boundary と briefing の信頼境界](2026-08-11-1857-review-fix-delivery-boundary.md) | Deprecated | 2026-08-11 |
 | [review-yield を計測する](2026-08-14-0428-review-yield-measurement.md) | Proposed | 2026-08-14 |
+| [クエリ専用 ReviewCycle における非実行 Reviewer の安全契約](2026-09-09-0916-query-only-reviewer-safety.md) | Proposed | 2026-09-09 |

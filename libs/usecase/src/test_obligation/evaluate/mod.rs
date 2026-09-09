@@ -21,19 +21,14 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use domain::tddd::semantic_verify::ModelTier;
 use domain::tddd::test_obligation::binding::{TestBindingRecord, TestBindingsDocument};
 use domain::tddd::test_obligation::drift::{EdgeVerdictRecord, NonEmptyEdgeVerdictRecords};
 use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, ObligationEvaluateError, SemanticVerifierError,
 };
-use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint,
-};
+use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::obligations::ObligationsDocument;
-use domain::tddd::test_obligation::pair::{
-    AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
-};
+use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 use domain::tddd::test_obligation::ports::{
     ObligationsArtifactPort, TestBindingsArtifactPort, TestSourceScannerPort, WaiverCachePort,
 };
@@ -53,16 +48,15 @@ use super::{LoadedCatalogueDocument, diag, is_active_branch};
 
 mod cache;
 mod calibration;
+mod calibration_runner;
 mod concurrency;
 mod edges;
 mod plan;
 mod records;
 mod verify;
 
-use calibration::{CategoryTally, calibration_probe_count, probe_shape_for};
 use concurrency::drive_bounded_in_order;
 use plan::PlannedAction;
-use verify::map_verifier_error;
 
 /// Command input for [`EvaluateTestObligationsApplicationService`] (IN-09).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -366,114 +360,6 @@ impl EvaluateTestObligationsInteractor {
         }
         Ok(catalogues)
     }
-
-    async fn known_bad_detection_rate(
-        &self,
-        production_pair_count: usize,
-    ) -> Result<DetectionRatePercent, ObligationEvaluateError> {
-        let probe_count =
-            calibration_probe_count(production_pair_count, self.config.injection_rate());
-        if probe_count == 0 {
-            return DetectionRatePercent::try_new(100)
-                .map_err(|_| invalid_input_error("known_bad_detection_rate"));
-        }
-
-        // Plan every calibration probe up front so their verdict futures can
-        // be fanned out through the same bounded multiplexer the production
-        // pairs use. Categories are tallied here rather than after the fan-out
-        // so the per-category gate remains deterministic w.r.t. probe index.
-        let mut category_tally = CategoryTally::default();
-        let mut probe_categories: Vec<
-            domain::tddd::test_obligation::vocab::FulfillmentFailCategory,
-        > = Vec::with_capacity(probe_count);
-        let mut probe_futures = Vec::with_capacity(probe_count);
-        for index in 0..probe_count {
-            let shape = probe_shape_for(index);
-            category_tally.record_issued(&shape.category);
-            probe_categories.push(shape.category.clone());
-            probe_futures.push(self.calibration_probe_future(shape));
-        }
-
-        // Fan out the probe verdicts under the configured concurrency ceiling;
-        // results come back in `probe_index` order.
-        let verdicts = drive_bounded_in_order(probe_futures, self.config.parallelism()).await?;
-
-        let mut detected = 0usize;
-        for (verdict, expected_category) in verdicts.into_iter().zip(probe_categories.into_iter()) {
-            if let ObligationFulfillmentVerdict::Fail { category, .. } = verdict
-                && category == expected_category
-            {
-                detected += 1;
-                category_tally.record_detected(&expected_category);
-            }
-        }
-
-        // Per-category gate (AC-08): any exercised category that ends with
-        // zero detected probes fails the calibration through the same
-        // `VerifierPort` path as the threshold breach, but with a message
-        // that names the missed category.
-        let undetected = category_tally.undetected_categories();
-        if !undetected.is_empty() {
-            return Err(ObligationEvaluateError::VerifierPort(
-                SemanticVerifierError::VerifierPort(diag(&format!(
-                    "known-bad calibration detected 0 probes for categories: {}",
-                    undetected.join(", ")
-                ))),
-            ));
-        }
-
-        let rate = ((detected * 100) / probe_count) as u8;
-        let detection_rate = DetectionRatePercent::try_new(rate)
-            .map_err(|_| invalid_input_error("known_bad_detection_rate"))?;
-        if detection_rate.value() < self.config.detection_threshold().get() {
-            return Err(ObligationEvaluateError::VerifierPort(
-                SemanticVerifierError::VerifierPort(diag(&format!(
-                    "known-bad detection rate {} below threshold {}",
-                    detection_rate.value(),
-                    self.config.detection_threshold().get()
-                ))),
-            ));
-        }
-        Ok(detection_rate)
-    }
-
-    /// Builds one calibration-probe verdict future.
-    ///
-    /// Split out so the concurrency helper can fan the probes out under the
-    /// same bounded ceiling as production pairs; the future's success value
-    /// is a fulfillment verdict for the probe's category.
-    fn calibration_probe_future<'a>(
-        &'a self,
-        shape: calibration::CalibrationProbeShape,
-    ) -> Pin<
-        Box<
-            dyn Future<Output = Result<ObligationFulfillmentVerdict, ObligationEvaluateError>>
-                + Send
-                + 'a,
-        >,
-    > {
-        let key = ObligationFulfillmentCacheKey::new(
-            BoundTestsSetHash::new(self.hasher.sha256(shape.tests_source.as_bytes())),
-            DeclarationHash::new(self.hasher.sha256(shape.declaration.as_bytes())),
-            AnchorTextHash::new(self.hasher.sha256(shape.anchor_text.as_bytes())),
-        );
-        let calibration::CalibrationProbeShape { tests_source, declaration, anchor_text, .. } =
-            shape;
-        Box::pin(async move {
-            let pair = ObligationFulfillmentPair::new(
-                TestsSource::try_new(tests_source)
-                    .map_err(|_| invalid_input_error("tests_source"))?,
-                EntryDeclaration::try_new(declaration.to_owned())
-                    .map_err(|_| invalid_input_error("entry_declaration"))?,
-                AnchorText::try_new(anchor_text.to_owned())
-                    .map_err(|_| invalid_input_error("anchor_text"))?,
-            );
-            self.fulfillment_driver
-                .evaluate_with_escalation(&pair, &key, ModelTier::Fast)
-                .await
-                .map_err(map_verifier_error)
-        })
-    }
 }
 
 /// Maps a validated-input construction failure to a verifier-input error.
@@ -573,8 +459,9 @@ impl EvaluateTestObligationsInteractor {
         validate_voluntary_bindings(&obligations, &bindings)
             .map_err(ObligationEvaluateError::BindingConsistency)?;
 
-        let detection_rate =
-            self.known_bad_detection_rate(production_pair_count(&obligations, &bindings)).await?;
+        let production_pair_count = production_pair_count(&obligations, &bindings);
+        let detection_rate = self.known_bad_detection_rate(production_pair_count).await?;
+        self.local_responsibility_calibration(production_pair_count).await?;
         let catalogues = self.load_catalogues(cmd)?;
         let spec =
             self.spec_reader.load(&cmd.spec_path).map_err(ObligationEvaluateError::SpecLoad)?;

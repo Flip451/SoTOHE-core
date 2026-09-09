@@ -18,6 +18,10 @@
       },
       {
         "layer": "usecase",
+        "entry_key": "ReviewerExecutionProvenance"
+      },
+      {
+        "layer": "usecase",
         "entry_key": "ReviewerProcessDiagnostic"
       },
       {
@@ -27,6 +31,14 @@
       {
         "layer": "usecase",
         "entry_key": "usecase::review_v2::error::ReviewCycleError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "NullReviewer"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "Reviewer"
       }
     ],
     "T007": [],

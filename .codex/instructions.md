@@ -67,11 +67,12 @@ are thin wrappers that reference it. Read that SSoT when acting as a specialist.
 - `type-designer`: writes per-layer type catalogues; use the `type-designer` skill.
 - `impl-planner`: sole writer of `impl-plan.json`, `task-coverage.json`, `task-contract.json`, and `batch-plan.json`; use the `impl-planner` skill.
 - `adr-editor`: edits target ADRs during back-and-forth planning; use the `adr-editor` skill.
-- `implementer`: edits source code within the current task.
+- `implementer`: edits source code within the current task; source corrections from rollback
+  diagnosis are dispatched here rather than edited inline by the root.
 - `reviewer`: reviews correctness and safety only.
 - `review-fix-lead`: fixes actionable review findings; use the existing `review-fix-lead` skill.
 - `dry-fix-lead`: fixes DRY findings; use the existing `dry-fix-lead` skill.
-- `rollback-diagnoser`: diagnose-only specialist invoked by `/track:diagnose` when an impl-phase or later finding (PreReviewGate Blocked, SoT-scope review finding on adr/spec/types/impl-plan, external PR-reviewer comment) needs phase-rollback routing; returns a structured `{routing_target, reason, recommended_next_action}` decision the orchestrator dispatches. Never edits any SoT artifact; the dispatch belongs to the orchestrator. Use the `rollback-diagnoser` skill.
+- `rollback-diagnoser`: diagnose-only specialist invoked by `/track:diagnose` when an impl-phase or later finding (PreReviewGate Blocked, SoT-scope review finding on adr/spec/types/impl-plan, external PR-reviewer comment) needs phase-rollback routing; returns a structured `{routing_target, reason, recommended_next_action}` decision the orchestrator dispatches. An `impl` result is sent to `implementer` with a focused source-edit briefing. Never edits any SoT artifact; the dispatch belongs to the orchestrator. Use the `rollback-diagnoser` skill.
 - `researcher`: follows the provider assigned in the capability map.
 
 ## Command Policy

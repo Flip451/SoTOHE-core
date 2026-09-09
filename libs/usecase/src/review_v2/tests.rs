@@ -1,5 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use domain::review_v2::{
     FastVerdict, FilePath, LogInfo, MainScopeName, NotRequiredReason, RequiredReason,
@@ -42,7 +44,7 @@ impl Reviewer for MockReviewer {
         &self,
         _target: &domain::review_v2::ReviewTarget,
     ) -> Result<(Verdict, LogInfo), ReviewerError> {
-        let v = self.verdict.borrow().clone().ok_or(ReviewerError::ReviewerAbort)?;
+        let v = self.verdict.borrow().clone().ok_or(ReviewerError::UserAbort)?;
         Ok((v, LogInfo::new("mock review log")))
     }
 
@@ -50,8 +52,30 @@ impl Reviewer for MockReviewer {
         &self,
         _target: &domain::review_v2::ReviewTarget,
     ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
-        let v = self.fast_verdict.borrow().clone().ok_or(ReviewerError::ReviewerAbort)?;
+        let v = self.fast_verdict.borrow().clone().ok_or(ReviewerError::UserAbort)?;
         Ok((v, LogInfo::new("mock fast review log")))
+    }
+}
+
+struct QueryReviewerSpy {
+    invocations: Arc<AtomicUsize>,
+}
+
+impl Reviewer for QueryReviewerSpy {
+    fn review(
+        &self,
+        _target: &domain::review_v2::ReviewTarget,
+    ) -> Result<(Verdict, LogInfo), ReviewerError> {
+        self.invocations.fetch_add(1, Ordering::SeqCst);
+        Err(ReviewerError::UserAbort)
+    }
+
+    fn fast_review(
+        &self,
+        _target: &domain::review_v2::ReviewTarget,
+    ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
+        self.invocations.fetch_add(1, Ordering::SeqCst);
+        Err(ReviewerError::UserAbort)
     }
 }
 
@@ -516,6 +540,32 @@ fn test_get_review_states_not_started() {
         states.get(&domain_scope()),
         Some(&ReviewState::Required(RequiredReason::NotStarted))
     );
+}
+
+#[test]
+fn test_query_state_and_approval_paths_do_not_invoke_reviewer() {
+    let invocations = Arc::new(AtomicUsize::new(0));
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        QueryReviewerSpy { invocations: Arc::clone(&invocations) },
+        MockDiffGetter::new(&["libs/domain/src/lib.rs"]),
+        MockHasher,
+    );
+
+    let states = cycle
+        .get_review_states(&MockReviewReader::empty())
+        .expect("state-summary query should not need a reviewer");
+    assert_eq!(
+        states.get(&domain_scope()),
+        Some(&ReviewState::Required(RequiredReason::NotStarted))
+    );
+
+    let approval = cycle
+        .evaluate_approval(&MockReviewReader::empty(), false)
+        .expect("check-approved query should not need a reviewer");
+    assert_eq!(approval, ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 1 });
+    assert_eq!(invocations.load(Ordering::SeqCst), 0);
 }
 
 #[test]

@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "fe99cba3018f19e528c7dec84265ded224c5095500656562a1a2380d8a3163a1",
+      "claim_hash": "9e9895752a6a9f39c5946b01ed27448e8b325103cf6e29f42bd3f802830867ce",
       "claim_origin": {
         "data": {
           "entry_key": "ReviewerDiagnostic",
@@ -45,6 +45,30 @@
       },
       "verdict": {
         "citation": "秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "77010c3f79c9edfa323e42459339541b7a107b195f373f1a5ac207440fa510db",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewerExecutionProvenance",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c2ae65c66ce5cf05f5e3fb521cc5bfaeabe2fb2a9627fc8e2f90025eabf2411",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり",
         "kind": "pass"
       }
     },
@@ -121,7 +145,7 @@
       }
     },
     {
-      "claim_hash": "6f13b8b3d756138cfdfdc97f27f49093457fbe0cb0bf2c866509eb6002f96f0b",
+      "claim_hash": "4bf3978e8eed86cf1ad0e94beca6dd8bbe066407b6fdf120e90bd3959dc5556b",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::review_v2::error::ReviewerError",
@@ -140,12 +164,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。",
+        "citation": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "6f13b8b3d756138cfdfdc97f27f49093457fbe0cb0bf2c866509eb6002f96f0b",
+      "claim_hash": "4bf3978e8eed86cf1ad0e94beca6dd8bbe066407b6fdf120e90bd3959dc5556b",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::review_v2::error::ReviewerError",
@@ -164,7 +188,31 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。",
+        "citation": "上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7635fd344a02a4179933ac03e9afce9d83349826a9d0504472757fbd14efb490",
+      "claim_origin": {
+        "data": {
+          "entry_key": "Reviewer",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "60192af927bd932f9665481a9b41eec85a911d76251f1cc5c21b262900408484",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "review_v2 の状態照会専用構成では、NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。既存の Reviewer port の method 契約は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の Reviewer port の method 契約は変更しない。",
         "kind": "pass"
       }
     }

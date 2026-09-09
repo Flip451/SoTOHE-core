@@ -1,5 +1,11 @@
 {
-  "catalogue_declaration_hash": "14e274c5ae3fc63e9cf97db30e0517fde338c52be9cc7814057366a23c9b97fe",
+  "catalogue_declaration_hash": "d8b040509a55c7ac9a933e0e25d7cd4e18c1345a51e076017ee9a1deffc4d445",
   "schema_version": 1,
-  "signals": []
+  "signals": [
+    {
+      "entry_hash": "4cefb84a473b7f772325925537674e24353323b23f062e8ee03b5d473d251584",
+      "signal": "blue",
+      "type_name": "NullReviewer"
+    }
+  ]
 }

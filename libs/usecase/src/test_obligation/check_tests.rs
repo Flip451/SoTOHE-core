@@ -87,9 +87,10 @@ use crate::test_obligation::hasher::ContentHasherPort;
 use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use crate::test_obligation::results::TestObligationStatusLaneSummary;
 use crate::test_obligation::{
-    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, declaration_with_obligation_item,
-    find_declaration_text, obligation_declaration_text, obligation_declaration_text_from_loaded,
-    sha256_content_hash,
+    LoadedCatalogueDocument, TestObligationCatalogueCommandInput,
+    declaration_with_obligation_context, declaration_with_obligation_item, find_declaration_text,
+    obligation_declaration_text, obligation_declaration_text_from_loaded, sha256_content_hash,
+    synthetic_voluntary_obligation_brief,
 };
 use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 
@@ -1261,9 +1262,10 @@ fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
         TestObligationItemIdentifier::try_new("voluntary:IN-05".to_owned()).unwrap(),
     );
     let declaration = DeclarationHash::new(sha256_content_hash(
-        declaration_with_obligation_item(
+        declaration_with_obligation_context(
             &obligation_declaration_text(std::slice::from_ref(&catalogue), &obligation()).unwrap(),
-            synthetic.item_identifier().as_str(),
+            &synthetic,
+            &synthetic_voluntary_obligation_brief(&edge()).unwrap(),
         )
         .as_bytes(),
     ));
@@ -1298,9 +1300,10 @@ fn fresh_fulfillment_cache_for_catalogue(
 ) -> ObligationFulfillmentCacheDocument {
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let decl = DeclarationHash::new(sha256_content_hash(
-        declaration_with_obligation_item(
+        declaration_with_obligation_context(
             &obligation_declaration_text(std::slice::from_ref(catalogue), obligation).unwrap(),
-            obligation.id().item_identifier().as_str(),
+            obligation.id(),
+            obligation.brief(),
         )
         .as_bytes(),
     ));
