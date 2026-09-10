@@ -1,0 +1,78 @@
+{
+  "entries": [
+    {
+      "claim_hash": "4cefb84a473b7f772325925537674e24353323b23f062e8ee03b5d473d251584",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NullReviewer",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "67fb19a94695889bae892c4c4464a404161e9c8c4f1c49f92e794526d94218e5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "review_v2 の状態照会専用構成を、infrastructure 所有の NullReviewer を composition root が構築して ReviewCycle へ注入する局所的な adapter 修正として整える。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "review_v2 の状態照会専用構成を、infrastructure 所有の NullReviewer を composition root が構築して ReviewCycle へ注入する局所的な adapter 修正として整える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4cefb84a473b7f772325925537674e24353323b23f062e8ee03b5d473d251584",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NullReviewer",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "60192af927bd932f9665481a9b41eec85a911d76251f1cc5c21b262900408484",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "review_v2 の状態照会専用構成では、NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。既存の Reviewer port の method 契約は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4cefb84a473b7f772325925537674e24353323b23f062e8ee03b5d473d251584",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NullReviewer",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6a74ec13bff32c5f72edf5363c4104d5bd0f8480e8eea37e115959987a3e9798",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "review results の state-summary は get_review_states で状態を読み、review check-approved は evaluate_approval を通じて同じ get_review_states を用いる。どちらも Reviewer を実行しない。NullReviewer の review または fast_review が誤って呼ばれた場合は、成功 verdict または provider 実行を生成せず、型付き PreSpawn / Unavailable 診断で fail-closed に失敗する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "どちらも Reviewer を実行しない。NullReviewer の review または fast_review が誤って呼ばれた場合は、成功 verdict または provider 実行を生成せず、型付き PreSpawn / Unavailable 診断で fail-closed に失敗する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}

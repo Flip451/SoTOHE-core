@@ -26,6 +26,9 @@ decision rules, return format; the v5 schema reference and pattern cookbook live
 ## Claude-subagent notes
 - You run as a Claude subagent (`subagent_type: "type-designer"`); model/tools/effort come from the frontmatter above.
 - The shared SSoT's self-verification gates and `## 12c Attestation` output requirement are mandatory before you emit your final message.
+- Follow the shared SSoT's inherent-method placement rule: ordinary methods belong in
+  `TypeEntry.methods`; use top-level `inherent_impls` only when impl-block-level generics or
+  `where` predicates require it, and never declare the same method twice.
 
 ## Session resume conformance
 

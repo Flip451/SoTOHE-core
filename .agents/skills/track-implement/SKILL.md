@@ -1,6 +1,6 @@
 ---
 name: track-implement
-description: Use when Codex is asked to run parallel interactive implementation for the current track — reads the approved impl-plan, marks tasks in_progress, implements them, and verifies with CI.
+description: Use when Codex is asked to run the canonical implementation workflow for the current track.
 ---
 
 # Track-Implement (Codex skill)
@@ -18,40 +18,20 @@ or failure-recovery procedures here.
 
 ### (2) Sandbox constraint
 
-- Requires `--sandbox workspace-write`: the workflow writes Rust source files, updates
-  `impl-plan.json` task states (orchestrator-owned transitions), and runs `cargo make ci` to
-  verify correctness (matching `.harness/workflows/track/implement.md` Step 5).
+- Requires `--sandbox workspace-write`: the implementation workflow writes source and test files
+  to the working tree.
 - Do not run `git add` / `git commit` / `git push` directly. Hand the implementation back to the
-  enclosing `$track-full-cycle` lifecycle, which owns the DFP → orchestrator `done` transition →
-  review → commit sequence defined in the workflow SSoT. Do not hand off straight to
-  `$track-commit`.
+  enclosing `$track-full-cycle` lifecycle; do not hand off straight to `$track-commit`.
 
 ### (3) Sub-workflow and capability invocation
 
-- Implementation work is always delegated to the `implementer` capability through
-  `bin/sotp capability exec implementer --briefing-file <path>`; the dispatcher resolves the
-  provider from `.harness/config/agent-profiles.json` and runs it as a separate process. The
-  root session never implements a task inline and never loads the implementer skill itself;
-  direct editing by the root session is recovery after a failed delegation only, and only for
-  non-ADR files — a change to `knowledge/adr/*.md` always goes through the review workflow
-  SSoT's ADR-scope repair lane (adr-editor / adr-diagnoser), never the root session.
-- Task state transitions are the orchestrator's, never the `implementer` capability's. Their
-  command, sequencing, and timing live in the workflow SSoT — do not restate them here.
-- CI verification uses `cargo make ci` (full gate, matching `.harness/workflows/track/implement.md` Step 5).
+Implementation work is delegated through the Codex capability dispatcher:
+`bin/sotp capability exec implementer --briefing-file <path>`. The dispatcher resolves the
+provider from `.harness/config/agent-profiles.json` and runs the provider subprocess. The
+workflow SSoT owns context intake, task ordering/state, obligation and CI gates, and recovery;
+do not bypass that contract or launch an implementer directly.
 
-### (4) Context intake
-
-- Follow the workflow SSoT's summary-first context intake with the summaries it names:
-  `bin/sotp track resolve`, `bin/sotp track task-counts`, and `bin/sotp track next-task` for
-  progress (Phase 3 artifacts exist by this workflow), `bin/sotp review results` for review
-  necessity, `bin/sotp test-obligation results` when enrolled, and `bin/sotp catalog check` plus
-  `bin/sotp ref-verify results --chain 2 --filter all` for catalogue state.
-- Do not bulk-read `*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a
-  `Related Conventions` list at intake; open an artifact body only for a targeted diff or the
-  blocker it names. Convention paths are listed in each delegated briefing and read by the
-  delegated capability, not by this root session.
-
-### (5) Reporting format
+### (4) Reporting format
 
 - On successful completion, print: `IMPLEMENT_STATUS: completed — <n> tasks implemented, CI passing` (implementation handoff only; the orchestrator owns any task-state transition per the workflow SSoT)
 - On failure or block, print: `IMPLEMENT_STATUS: blocked — task <id>: <reason>`

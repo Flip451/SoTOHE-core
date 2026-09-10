@@ -60,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\": {\"additionalContext\": \"Context compaction triggered. Key context: Check CLAUDE.md for project rules and workflow. Check knowledge/adr/README.md for tech stack decisions. Check track/items/ for current feature specs and plans. Check .claude/rules/ for Rust coding standards. Check knowledge/conventions/README.md for project-specific implementation rules. Run cargo make ci to verify quality before commits.\"}}'"
+            "command": "echo '{\"hookSpecificOutput\": {\"additionalContext\": \"Context compaction triggered. Resume from durable repository state, not remembered session text. Follow .claude/rules/orchestrator.md and the provider-neutral workflow SSoT under .harness/workflows/track/. Resolve the active track with bin/sotp track resolve, task progress with bin/sotp track task-counts and bin/sotp track next-task, and gate state with bin/sotp review results, bin/sotp test-obligation results, bin/sotp catalog check, and bin/sotp ref-verify results. Read only the exact artifact paths in the current workflow or briefing; do not bulk-read track artifacts or conventions. Continue from durable state and use .harness/config/agent-profiles.json for provider routing.\"}}}'"
           }
         ]
       }
@@ -117,6 +117,10 @@
       "Bash(bin/sotp conventions:*)",
       "Bash(bin/sotp review:*)",
       "Bash(bin/sotp signal:*)",
+      "Bash(bin/sotp phase:*)",
+      "Bash(bin/sotp test-obligation:*)",
+      "Bash(bin/sotp catalog:*)",
+      "Bash(bin/sotp ref-verify:*)",
       "Bash(bin/sotp track:*)",
       "Bash(bin/sotp dry:*)",
       "Bash(bin/sotp capability:*)",
@@ -126,6 +130,7 @@
       "Bash(bin/sotp git note-from-file:*)",
       "Bash(bin/sotp pr:*)",
       "Bash(gh pr view:*)",
+      "Bash(gh repo view:*)",
       "Bash(cargo make pr-audit-comment:*)",
       "Bash(cargo make verify-plan-artifact-refs)",
       "Bash(cargo make track-local-review)",

@@ -1,0 +1,902 @@
+{
+  "entries": [
+    {
+      "claim_hash": "7c7511826e64e5d0743616b7cf00d03693461fb4d27915dae51c709f66566309",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "SoTOHE-core の共通 workflow、provider adapter、配布案内、型 catalogue 案内、および PR review 入口が、それぞれの所有権と利用者に見える完了契約へ整合するようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "共通の手順、状態遷移、入力取得、再開条件は `.harness/workflows/` に集約し、adapter には呼び出し面、provider 固有配線、ツール制約、報告形式を残す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7c7511826e64e5d0743616b7cf00d03693461fb4d27915dae51c709f66566309",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "SoTOHE-core の共通 workflow、provider adapter、配布案内、型 catalogue 案内、および PR review 入口が、それぞれの所有権と利用者に見える完了契約へ整合するようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude の配布用 allowlist に phase、test-obligation、catalog、ref-verify の既存コマンド系統を接続する。利用者の設定値を CI で固定する契約にはしない。 type-designer の enrollment 参照は、その成果物を実際に所有する type-design workflow の終端手順を指す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7c7511826e64e5d0743616b7cf00d03693461fb4d27915dae51c709f66566309",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "SoTOHE-core の共通 workflow、provider adapter、配布案内、型 catalogue 案内、および PR review 入口が、それぞれの所有権と利用者に見える完了契約へ整合するようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "レビュー入口から新しい正本へ到達できるようにし、root の常時入力へ本文を追加しない。明示的な指摘なしと、ユーザーが承認した Accepted Deviations は別の完了結果として表示する。後者を `zero findings` と表示しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f607578cd867f423bd50f9107bccc43c6030b6fd446b73de46bdee2c899c8ee8",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "SoTOHE-core が残作業の復旧、reviewer 失敗の安全な診断、複合 anchor の局所的な義務判定を、既存の保護と検証可能性を保って実行できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「Done 後の実在する残作業は正規タスクとして復旧し、再計画後は実装へ戻す」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f607578cd867f423bd50f9107bccc43c6030b6fd446b73de46bdee2c899c8ee8",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "SoTOHE-core が残作業の復旧、reviewer 失敗の安全な診断、複合 anchor の局所的な義務判定を、既存の保護と検証可能性を保って実行できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "reviewer adapter が `ReviewVerdict::ProcessFailed` を情報のない `ReviewerError::ReviewerAbort` に変換する経路で、provider、取得できた終了コード、失敗を区別できる安全な理由を失わず上位 CLI へ伝える。利用者中断、timeout、出力形式不正と区別し、失敗から成功 verdict を生成しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f607578cd867f423bd50f9107bccc43c6030b6fd446b73de46bdee2c899c8ee8",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "SoTOHE-core が残作業の復旧、reviewer 失敗の安全な診断、複合 anchor の局所的な義務判定を、既存の保護と検証可能性を保って実行できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "複合 anchor の別 entry 所有部分を Fail の根拠にしない。一方、対象が所有する中心的な振る舞いが未検証なら既存の Fail 類型を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e09922a075589bc1d051ede5929b7ea15fa59ac5d4ed33053b57676d82ef4181",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "共通 workflow と Codex / Claude provider adapter の責務・呼出し・再開案内を、既存の所有権に整合させる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "共通の手順、状態遷移、入力取得、再開条件は `.harness/workflows/` に集約し、adapter には呼び出し面、provider 固有配線、ツール制約、報告形式を残す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5cf779f6e8f65e172a2184dab0f532bc73bff4adff853ed6fec7cead5bede1ef",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Claude 配布 allowlist と type-designer の成果物案内を、現行のコマンドおよび type catalogue 契約に整合させる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude の配布用 allowlist に phase、test-obligation、catalog、ref-verify の既存コマンド系統を接続する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ba049898be6fec9d8c64709ca668f3fd3f7e06b080f5cede07c6e27f155795bd",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "自動 PR review の共通方法論の正本化、custom focus との分離、完了結果の区別を整える。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ここでいう共通方法論とは、すべての自動 PR reviewer が同じように適用する、正しさ・安全性・テスト・security の確認、PR 全体と commit 間の整合性および dead reference の確認、ならびに finding の報告境界である。これを、実装時に新設する framework 所有の `.harness/prompts/pr-reviewer.md` の正本へ移す。custom prompt には個別の focus と severity を残し、共通方法論への参照を保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4e7ab7fa14960d817d777ee7400b5c9f4ee68b8e547fd22c76a0dbfa7492d746",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "open PR に結び付く track で発見された実在の残作業を正規 task として復旧し、再計画後に通常の実装・検証・review・PR 再審査へ戻す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同じ track の open PR に実在する残作業が発見された場合は、復旧を統括する workflow が PR 状態と現在ブランチの対応を読み取り確認し、既存のタスク追加 API で残作業を記録する。状態は task 群から再導出され、再計画・義務再導出を通常経路で行う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fbb3fb767291294fc47e8d06e5ae61e9106a062dde430750ae4ce07f87a2cf87",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "reviewer subprocess 失敗について、provider、取得できた終了コード、失敗を区別できる安全な分類を、秘匿と有界化を保った診断として上位 CLI へ伝える。利用者中断・timeout・出力形式不正と区別し、失敗から成功 verdict を生成しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "reviewer adapter が `ReviewVerdict::ProcessFailed` を情報のない `ReviewerError::ReviewerAbort` に変換する経路で、provider、取得できた終了コード、失敗を区別できる安全な理由を失わず上位 CLI へ伝える。利用者中断、timeout、出力形式不正と区別し、失敗から成功 verdict を生成しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "67fb19a94695889bae892c4c4464a404161e9c8c4f1c49f92e794526d94218e5",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "review_v2 の状態照会専用構成を、infrastructure 所有の NullReviewer を composition root が構築して ReviewCycle へ注入する局所的な adapter 修正として整える。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "15e0bd4f72459f2cc9de9bd5ef0609a7a45233b6ae232dacca7eadbc8d8ec0aa",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`NullReviewer` は infrastructure 層に置く非実行の secondary adapter とする。composition root はこの adapter を構築して `ReviewCycle` へ注入するだけであり、`Reviewer` port の実装を所有しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e23944bbbb9a7cc9e3003b561037911943bf2d6f0e454f26a928395d18659de9",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "複合 anchor の別 entry 所有部分を Fail の根拠にしない。一方、対象が所有する中心的な振る舞いが未検証なら既存の Fail 類型を適用する。較正には、メモリ上の独立した名前の共存を所有する対象と、保存場所を所有する対象について、それぞれ対象部分が検証済みの合格例と未検証の不合格例を用意する。判定入力の構成を変更する場合も、その有効性を cache 同一性に反映する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8d8ad4ae7cc4f8eb036b050daacfc4224b37b38a1c23f408ef5b68db2531632b",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "PreCompact の再開を新しい永続機構に置き換えること、または Claude agent 一覧を現在の provider 割当ての固定記述にすること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "PreCompact の再開案内は CLI summary と正本文書への参照を使う。Claude agent 一覧は「利用可能な adapter」を説明し、現在の provider 割り当てや特定の担当数を固定しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f146a46fccad2158a536cbfbdc36ef4421ce431ea56d47c7e36545629c73ae60",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "利用者の Claude 設定値を CI で固定すること、既存 top-level inherent implementation 形式を廃止すること、または新しい schema 形式を追加すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "利用者の設定値を CI で固定する契約にはしない。通常の inherent method は `TypeEntry.methods` に置き、schema がサポートする top-level `inherent_impls` の用途と区別する。同じ宣言を両方に要求せず、既存の top-level 形式のサポートは維持する。新たな schema 形式は追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "635a10af7acabbc4a8650d9f39e76dab336892a2218647d000baf774f7f76788",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "ユーザー承認済み逸脱の既存承認要件を緩和すること、または共通 PR review 方法論を root の常時入力へ複製すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「レビュー入口から新しい正本へ到達できるようにし、root の常時入力へ本文を追加しない。」「既存の逸脱承認要件は維持する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4c3c1f9ba657d96e590efac011b5af374ebd7040b9c87695da58cf7836e45e57",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-04",
+          "section": "out_of_scope",
+          "text_label": "merge 済み、archived、または closed PR の修正を既存 track に復旧すること、あるいは task 追加・義務 derive のたびに GitHub 照会を要求すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "merge 済み、archived、または閉じられた PR の修正は新しい corrective track に分離する。…これは workflow の復旧判断であり、タスク追加や derive のたびに GitHub 照会する新たな機構にはしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6ad66b4a346777758cff23a3aa9d437df54a308568b6583592ff8ba8294aa938",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-05",
+          "section": "out_of_scope",
+          "text_label": "stderr 全文や任意の subprocess 出力を上位 error、debug、log に露出すること、または新しい生診断ログ参照を追加すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "任意の subprocess 出力をそのまま error、debug、ログへ追加しない。…新しい診断ログ保存機構や生の秘密を含むログ参照は追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad19245eb8b723b2e5bfb7ca7ddb044b7b2aa8a025f44c64fdc07555def26e57",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-06",
+          "section": "out_of_scope",
+          "text_label": "他 entry の検証済み状態を仮定・探索する新たな横断検査、既存の矛盾・すり替え・中心部未検証の検出を撤去すること、または有限の較正例を未知の複合 anchor を完全に判定する証明として扱うこと。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "他 entry の検証済み状態を仮定したり、存在を探索したりする新たな横断検査は導入しない。既存の矛盾・すり替え・中心部未検証の検出は維持する。有限の較正例が未知の複合 anchor を完全に判定できる証明だとは扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1db3a28c362c5df10d32bb0775aab198480e1d93b674af4bf6ba7515acd15fa4",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "運用文書は provider の現在の割当数や特定の担当者数を固定せず、実際の割当ては既存 profile から判断できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude agent 一覧は「利用可能な adapter」を説明し、現在の provider 割り当てや特定の担当数を固定しない。実際の割り当ては既存の profile を参照する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff38c0aea3909ae8cd696dd7cc2715ff634aaa6d9a377522671f1c2034ef418f",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "既存 schema が支える top-level inherent implementation 形式は維持し、新たな schema 形式を追加しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既存の top-level 形式のサポートは維持する。新たな schema 形式は追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "87d40f2c64e13e2e79eabe9d1e1dbbdba27eae4af1f2c305bd1042d83c3d9476",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "PR review の共通方法論を root の常時入力へ本文として追加しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "レビュー入口から新しい正本へ到達できるようにし、root の常時入力へ本文を追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0bd86f54a96deb308fa56c2a9fa6ad0fc97a0c84ead599718df600b9ad66abd8",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Done / Archived の凍結を撤去せず、完了履歴をダミー task または無意味な状態往復で変更しない。通常の PR 作成前の開発手順に PR 復旧条件を課さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "test-obligation の Done / Archived 凍結を撤去しない。同じ track の open PR に実在する残作業が発見された場合は、復旧を統括する workflow が PR 状態と現在ブランチの対応を読み取り確認し、既存のタスク追加 API で残作業を記録する。状態は task 群から再導出し、再計画・義務再導出を通常経路で行う。完了履歴をダミータスクや無意味な状態往復で書き換えない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e7ddb2a7d2cd8958f2d6ef0214bfe8d48319fc5babf23a00661bba9fd76373d2",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "任意の subprocess 出力をそのまま error、debug、または log へ保存・追加せず、新たな診断ログ保存機構も導入しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "任意の subprocess 出力をそのまま error、debug、ログへ追加しない。秘匿できる根拠がない部分は固定された分類と終了コードへ縮退させる。新しい診断ログ保存機構や生の秘密を含むログ参照は追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "640e2849ac6ceb4a8bd4b4eee4e1bcd7b97f3cfdf57d22fe280e28b09251e1ba",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "モデル名変更だけによる再判定、force、cache 手編集・削除、無意味な hash 変更、有効な参照の削除、責務越境した実装または不適切な waiver を判定回避策にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "モデル名変更による再判定、force フラグ、cache 手編集・削除、無意味な hash 変更、有効な参照の削除、責務越境した実装や不適切な waiver を回避策にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "824df2f53cfd6998045a3f39c4cd2f41a6629574835e0aa95bb1dcc7a107a5ae",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "共通 workflow は手順、状態遷移、入力取得、再開条件の正本として機能し、provider adapter は provider 固有の呼出し面・配線・制約・報告だけを担う。既存の入力確認と裁定境界は維持される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "共通の手順、状態遷移、入力取得、再開条件は `.harness/workflows/` に集約し、adapter には呼び出し面、provider 固有配線、ツール制約、報告形式を残す。既存の手順を移す際は、入力確認や裁定境界そのものを削除しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "838a42d167f0bb147db9107ce348424b051069fac2602a24eb311fd8085352bc",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Codex の汎用 capability 呼出し、Claude の dispatcher 条件付き委譲、phase writer、および rollback の実装経路が、それぞれ定められた provider 選択と担当境界に従って動作する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Codex root からの汎用 capability 呼び出しは `--host` を省略し、設定済み provider の subprocess を使う。Claude の実装 adapter は dispatcher を先に呼び、`delegate-in-host` を返した場合だけ in-host の実装担当を起動する。phase writer は引き続き phase entry が起動する。rollback 診断の `impl` 経路は implementer への委譲を通常経路とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a90c09d430661acf385a52b961d241194b5caeb5c82969d0f31b774142a5b9c6",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "Claude 配布の allowlist は既存の phase、test-obligation、catalog、ref-verify コマンド系統を利用可能にしつつ、利用者の設定値を CI が固定する契約を追加しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Claude の配布用 allowlist に phase、test-obligation、catalog、ref-verify の既存コマンド系統を接続する。利用者の設定値を CI で固定する契約にはしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f5ff9422970f05dc7724389f40c04e45a7a218c5627717f09fb84351c487c52",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "type-designer の案内は成果物を所有する workflow の終端へ到達し、通常の inherent method と既存の top-level inherent implementation 形式を混同せず扱える。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "type-designer の enrollment 参照は、その成果物を実際に所有する type-design workflow の終端手順を指す。通常の inherent method は `TypeEntry.methods` に置き、schema がサポートする top-level `inherent_impls` の用途と区別する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "801c9319ea57ac77d03dc9b5f03e4996e232a6c2cd84a317ad35fa58d9b8ded6",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "すべての自動 PR reviewer に共通する確認方法と finding 報告境界は framework 所有の正本から適用され、custom prompt は個別 focus と severity を保持したままその正本を参照する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "これを、実装時に新設する framework 所有の `.harness/prompts/pr-reviewer.md` の正本へ移す。custom prompt には個別の focus と severity を残し、共通方法論への参照を保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c5bd52765e79d5f9158d2618058af86e715dc5dc8c6f82c85222f123ca2c0d3a",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "PR review の完了表示は明示的な finding なしとユーザー承認済みの逸脱を区別し、後者を zero findings と表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "明示的な指摘なしと、ユーザーが承認した Accepted Deviations は別の完了結果として表示する。後者を `zero findings` と表示しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "038d2dbae4432e9fd77e145ff03e41bc80f2090f25dc31d4a630fd92350f9b43",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同一 track の open PR で実在する残作業が見つかった場合、復旧 workflow は PR と現在 branch の対応を確認して残作業を正規 task として登録し、task 群から状態を再導出して通常の再計画・義務再導出へ進める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同じ track の open PR に実在する残作業が発見された場合は、復旧を統括する workflow が PR 状態と現在ブランチの対応を読み取り確認し、既存のタスク追加 API で残作業を記録する。状態は task 群から再導出し、再計画・義務再導出を通常経路で行う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "49d58931f8eb68cf42ccf70917c30b245f37488144dc2b076622e363c91b7335",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "PR writer の修正後は下流成果物を依存順に再収束し、未完了 task があれば通常の full-cycle を完了してから PR を再審査する。対応する PR 状態を確認できない場合は復旧を仮定せず原因を報告する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "PR の writer 修正後は依存順に下流を再収束させ、その結果に未完了 task があれば通常の full-cycle へ戻る。実装、義務検証、レビュー、commit、履歴の記録を完了してから PR を再審査する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9c2ae65c66ce5cf05f5e3fb521cc5bfaeabe2fb2a9627fc8e2f90025eabf2411",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "reviewer adapter が `ReviewVerdict::ProcessFailed` を情報のない `ReviewerError::ReviewerAbort` に変換する経路で、provider、取得できた終了コード、失敗を区別できる安全な理由を失わず上位 CLI へ伝える。利用者中断、timeout、出力形式不正と区別し、失敗から成功 verdict を生成しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9662a455a91aa8c5676f896c14192aa02edccf8868769967ecc42f5b4f530288",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "自由文の診断を表示する場合は既存の秘匿境界を通し、長さを制限する。秘匿できる根拠がない部分は固定された分類と終了コードへ縮退させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "763f83d77bc6a9b1e4000531f8d87d8115a048c18a66dc65fc30d8ae30a660c6",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "判定対象は既存の obligation item と entry declaration が担う、引用 anchor 内の振る舞いである。複合 anchor の別 entry 所有部分を Fail の根拠にしない。一方、対象が所有する中心的な振る舞いが未検証なら既存の Fail 類型を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "43eb3260f9424b9bd78a1486d7ae9f16750b6fcc1c743e85bf0f33dfcb1bf72a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "較正には、メモリ上の独立した名前の共存を所有する対象と、保存場所を所有する対象について、それぞれ対象部分が検証済みの合格例と未検証の不合格例を用意する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "60192af927bd932f9665481a9b41eec85a911d76251f1cc5c21b262900408484",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "review_v2 の状態照会専用構成では、NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。既存の Reviewer port の method 契約は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "15e0bd4f72459f2cc9de9bd5ef0609a7a45233b6ae232dacca7eadbc8d8ec0aa",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`NullReviewer` は infrastructure 層に置く非実行の secondary adapter とする。composition root はこの adapter を構築して `ReviewCycle` へ注入するだけであり、`Reviewer` port の実装を所有しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6a74ec13bff32c5f72edf5363c4104d5bd0f8480e8eea37e115959987a3e9798",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "review results の state-summary は get_review_states で状態を読み、review check-approved は evaluate_approval を通じて同じ get_review_states を用いる。どちらも Reviewer を実行しない。NullReviewer の review または fast_review が誤って呼ばれた場合は、成功 verdict または provider 実行を生成せず、型付き PreSpawn / Unavailable 診断で fail-closed に失敗する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "15e0bd4f72459f2cc9de9bd5ef0609a7a45233b6ae232dacca7eadbc8d8ec0aa",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`review results` の state-summary 経路は `get_review_states` を用い、`review check-approved` は `evaluate_approval` 経由で同じ `get_review_states` を用いる。いずれも `NullReviewer` の `Reviewer::review` および `fast_review` を呼ばない。両 method が誤って呼ばれた場合は、成功 verdict や provider 実行を生成せず、確立済みの型付き `PreSpawn` / `Unavailable` 診断で失敗する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

@@ -101,10 +101,12 @@ pub trait WaiverCachePort {
     fn save(&self, doc: &WaiverCacheDocument) -> Result<(), DiagnosticMessage>;
 }
 
-/// Semantically verifies an obligation-fulfillment pair (tests vs anchor).
+/// Semantically verifies an obligation-fulfillment pair (tests vs anchor and
+/// the entry-local responsibility inputs carried by the pair).
 pub trait ObligationFulfillmentVerifierPort {
-    /// Verifies whether `tests_source` fulfills `anchor_text` for
-    /// `entry_declaration` at the given model `tier`.
+    /// Verifies whether the pair's bound tests fulfill its cited anchor for
+    /// its entry declaration and entry-local responsibility at the given model
+    /// `tier`.
     ///
     /// # Errors
     ///
@@ -112,9 +114,7 @@ pub trait ObligationFulfillmentVerifierPort {
     /// return a verdict.
     fn verify_pair(
         &self,
-        tests_source: &str,
-        entry_declaration: &str,
-        anchor_text: &str,
+        pair: &crate::tddd::test_obligation::pair::ObligationFulfillmentPair,
         tier: ModelTier,
     ) -> Result<ObligationFulfillmentVerdict, SemanticVerifierError>;
 }

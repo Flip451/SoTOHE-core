@@ -18,7 +18,8 @@ Routing taxonomy (one of):
 - `spec` — ADR decides the question but spec.json did not capture it.
 - `type` — spec correct but <layer>-types.json catalogue has a defect.
 - `impl_plan` — design chain correct but impl-plan task list misses the work.
-- `impl` — design chain consistent; source-side contract violation.
+- `impl` — design chain consistent; source-side contract violation. The orchestrator dispatches
+  `implementer` with a focused source-edit briefing; it does not edit source inline.
 
 Boundaries (hard):
 - Diagnose-only. Do not edit any SoT artifact (ADR / spec.json / <layer>-types.json / impl-plan.json / task-coverage.json / task-contract.json).

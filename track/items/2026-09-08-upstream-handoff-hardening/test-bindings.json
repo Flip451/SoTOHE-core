@@ -1,0 +1,561 @@
+{
+  "track_id": "2026-09-08-upstream-handoff-hardening",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_plan_fulfillment_trait_method_anchors_limits_each_obligation_to_owned_and_shared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_calibration_probes_exercise_all_three_ac08_categories"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_local_responsibility_calibration_has_executable_positive_and_negative_pairs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_known_bad_probe_undetected_category_fails_closed_without_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_changed_fulfillment_obligation_brief_invalidates_cache"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_changed_fulfillment_obligation_brief_invalidates_cache"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewerDiagnostic",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_diagnostic_enforces_nonempty_and_utf8_byte_bound"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewerDiagnosticValidationError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_diagnostic_enforces_nonempty_and_utf8_byte_bound"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewerExecutionProvenance",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_unexpected_retains_provenance_independently_of_diagnostic"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_reviewer_unexpected_provenance_classifies_unavailable_without_text_inference"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_oversized_failure_diagnostic_retains_post_spawn_provenance"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_unavailable_binary_reports_pre_spawn_provenance"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewerProcessDiagnostic",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewerProcessDiagnostic",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "raw_diagnostic_boundary_suppresses_invalid_and_oversized_input_preserving_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "test_diagnostic_redaction_covers_claude_and_grok_credentials"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_oversized_failure_diagnostic_retains_post_spawn_provenance"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_dispatch_process_failed_preserves_exit_and_unavailable_diagnostic"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::review_v2::error::ReviewerError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_lifts_through_review_cycle_error"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_dispatch_process_failed_preserves_exit_and_unavailable_diagnostic"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_review_subprocess_failure_preserves_provider_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_nonzero_exit_is_reviewer_abort_before_envelope_decode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_subprocess_failure_preserves_provider_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_unavailable_binary_reports_pre_spawn_provenance"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_oversized_failure_diagnostic_retains_post_spawn_provenance"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::review_v2::error::ReviewerError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::error::tests",
+          "test_name": "test_reviewer_error_display_preserves_process_identity_and_safe_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "raw_diagnostic_boundary_suppresses_invalid_and_oversized_input_preserving_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::session_log::tests",
+          "test_name": "test_redact_credentials_replaces_non_empty_value_in_captured_output"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::run::tests",
+          "test_name": "test_dispatch_process_failed_preserves_exit_and_unavailable_diagnostic"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::diagnostics::tests",
+          "test_name": "test_diagnostic_redaction_covers_claude_and_grok_credentials"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::session_log::tests",
+          "test_name": "test_redact_credentials_handles_multiple_provider_vars_independently"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "NullReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_review_fails_closed_before_provider_invocation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_fast_review_fails_closed_before_provider_invocation"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NullReviewer",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_query_paths_read_state_without_reviewer_execution"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NullReviewer",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-15"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_review_fails_closed_before_provider_invocation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::null_reviewer::tests",
+          "test_name": "test_null_reviewer_fast_review_fails_closed_before_provider_invocation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::tests",
+          "test_name": "test_query_state_and_approval_paths_do_not_invoke_reviewer"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_query_paths_read_state_without_reviewer_execution"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConfiguredProviderCalibrationOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_enabled_calibration_covers_local_responsibility_and_cache_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConfiguredProviderCalibrationOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NonZeroProductionVerdictCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_nonzero_production_count_rejects_zero_and_preserves_usize_max"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ProductionVerdictCounts",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ProductionVerdictCounts",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_enabled_calibration_covers_local_responsibility_and_cache_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_artifacts_yield_zero_pairs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        }
+      ]
+    }
+  ]
+}

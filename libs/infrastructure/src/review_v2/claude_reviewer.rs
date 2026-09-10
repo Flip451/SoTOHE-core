@@ -18,13 +18,15 @@ use domain::{CommitHash, TrackId};
 use usecase::capability_exec::{CLAUDE_PROVIDER_NAME, ModelName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
 use usecase::review_v2::{
-    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ports::Reviewer,
+    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ReviewerExecutionProvenance,
+    ports::Reviewer,
 };
 use usecase::review_workflow::{
     ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict, parse_review_final_message,
 };
 
 use super::claude_process::{ReviewOutcomeRaw, claude_bin, run_claude_child, spawn_claude};
+use super::diagnostics::{process_failed_from_text, unexpected_from_text};
 use super::session::{ReviewerSession, effort_value};
 
 /// Claude-backed reviewer implementation for the `Reviewer` usecase port.
@@ -184,7 +186,7 @@ impl ClaudeReviewer {
                 resume_id,
                 &prompt,
             )
-            .map_err(ReviewerError::Unexpected)?;
+            .map_err(|error| unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error))?;
             run_claude_child(child, stderr_collector, stdout_collector, self.timeout)
         };
         let attempted = run(resume_id.as_deref());
@@ -237,7 +239,10 @@ fn convert_raw_to_final(raw: ReviewOutcomeRaw) -> Result<(Verdict, LogInfo), Rev
         ReviewPayloadVerdict::FindingsRemain => {
             let findings = convert_findings_to_domain(&payload.findings);
             Verdict::findings_remain(findings).map_err(|e: VerdictError| {
-                ReviewerError::Unexpected(format!("verdict construction: {e}"))
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PostSpawn,
+                    format!("verdict construction: {e}"),
+                )
             })?
         }
     };
@@ -257,7 +262,10 @@ fn convert_raw_to_fast(raw: ReviewOutcomeRaw) -> Result<(FastVerdict, LogInfo), 
         ReviewPayloadVerdict::FindingsRemain => {
             let findings = convert_findings_to_domain(&payload.findings);
             FastVerdict::findings_remain(findings).map_err(|e: VerdictError| {
-                ReviewerError::Unexpected(format!("verdict construction: {e}"))
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PostSpawn,
+                    format!("verdict construction: {e}"),
+                )
             })?
         }
     };
@@ -271,7 +279,13 @@ fn require_successful_payload(
     match raw.verdict {
         ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain => {}
         ReviewVerdict::Timeout => return Err(ReviewerError::Timeout),
-        ReviewVerdict::ProcessFailed => return Err(ReviewerError::ReviewerAbort),
+        ReviewVerdict::ProcessFailed => {
+            return Err(process_failed_from_text(
+                &CLAUDE_PROVIDER_NAME,
+                raw.exit_code,
+                process_diagnostic(raw),
+            ));
+        }
         ReviewVerdict::LastMessageMissing => return Err(ReviewerError::IllegalVerdict),
     }
 
@@ -279,6 +293,13 @@ fn require_successful_payload(
     match parse_review_final_message(Some(json)) {
         ReviewFinalMessageState::Parsed(p) => Ok(p),
         _ => Err(ReviewerError::IllegalVerdict),
+    }
+}
+
+fn process_diagnostic(raw: &ReviewOutcomeRaw) -> Option<&str> {
+    match raw.session_stderr.as_str() {
+        "" | "diagnostic_unavailable" => raw.final_message.as_deref(),
+        diagnostic => Some(diagnostic),
     }
 }
 
@@ -931,7 +952,7 @@ exit 0
 
     #[cfg(unix)]
     #[test]
-    fn test_review_subprocess_failure_returns_reviewer_abort() {
+    fn test_review_subprocess_failure_preserves_provider_and_exit_code() {
         use std::os::unix::fs::PermissionsExt;
 
         let dir = tempfile::tempdir().unwrap();
@@ -948,8 +969,15 @@ exit 0
         let result = reviewer.review(&target);
 
         assert!(
-            matches!(result, Err(usecase::review_v2::ReviewerError::ReviewerAbort)),
-            "non-zero exit with no output must yield ReviewerAbort, got: {result:?}"
+            matches!(
+                result,
+                Err(usecase::review_v2::ReviewerError::ProcessFailed {
+                    ref provider,
+                    exit_code: Some(ref code),
+                    ..
+                }) if provider.as_str() == "claude" && code.as_i32() == 1
+            ),
+            "non-zero exit with no output must retain Claude and exit code, got: {result:?}"
         );
     }
 

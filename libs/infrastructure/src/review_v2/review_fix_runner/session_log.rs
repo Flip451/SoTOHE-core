@@ -3,12 +3,22 @@ use std::io::{Seek, SeekFrom, Write};
 use super::spawn::RuntimeFile;
 use usecase::review_v2::run_review_fix::ReviewFixRunnerError;
 
-/// Names of environment variables that carry authentication credentials and are
-/// intentionally passed through to the nested Codex run via `build_safe_env`.
-/// Any non-empty value for these vars must be redacted before writing to a
-/// persistent log file (`knowledge/conventions/security.md`).
-pub(super) const CREDENTIAL_VARS: &[&str] =
-    &["OPENAI_API_KEY", "CODEX_API_KEY", "OPENAI_ORG_ID", "OPENAI_BASE_URL"];
+/// Names of environment variables that may carry provider authentication
+/// credentials. Any non-empty value for these vars must be redacted before a
+/// subprocess diagnostic is displayed or written to a persistent log
+/// (`knowledge/conventions/security.md`).
+///
+/// The Codex fixer forwards only its allowlisted subset through
+/// `build_safe_env`; reviewer adapters inherit the host provider environment.
+pub(super) const CREDENTIAL_VARS: &[&str] = &[
+    "OPENAI_API_KEY",
+    "CODEX_API_KEY",
+    "OPENAI_ORG_ID",
+    "OPENAI_BASE_URL",
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "XAI_API_KEY",
+];
 
 /// The number of trailing bytes a streaming redactor must retain before
 /// emitting a chunk. A credential can begin this many bytes before a pipe
@@ -33,7 +43,7 @@ pub(super) fn credential_values() -> Vec<(&'static str, String)> {
 /// Replaces every non-empty credential value found in `text` with a
 /// `[REDACTED:<VAR_NAME>]` placeholder.  Empty values are never replaced —
 /// replacing an empty string would corrupt the entire log.
-pub(super) fn redact_credentials(text: &str) -> String {
+pub(crate) fn redact_credentials(text: &str) -> String {
     redact_credential_values(text, credential_values())
 }
 
@@ -165,13 +175,18 @@ mod tests {
     }
 
     #[test]
-    fn test_redact_credentials_handles_multiple_vars_independently() {
+    fn test_redact_credentials_handles_multiple_provider_vars_independently() {
         let key_val = "sk-FAKE-OPENAI-KEY";
         let codex_val = "ck-FAKE-CODEX-KEY";
         let org_val = "org-FAKE-ORG";
         let base_url_val = "https://token@example.invalid/v1";
+        let anthropic_key_val = "sk-ant-FAKE-KEY";
+        let anthropic_token_val = "anthropic-FAKE-TOKEN";
+        let xai_key_val = "xai-FAKE-KEY";
         let captured = format!(
-            "key={key_val} codex={codex_val} org={org_val} base={base_url_val} other=plaintext"
+            "key={key_val} codex={codex_val} org={org_val} base={base_url_val} \
+             anthropic_key={anthropic_key_val} anthropic_token={anthropic_token_val} \
+             xai={xai_key_val} other=plaintext"
         );
 
         let redacted = apply_redaction_with(
@@ -181,6 +196,9 @@ mod tests {
                 ("CODEX_API_KEY", codex_val),
                 ("OPENAI_ORG_ID", org_val),
                 ("OPENAI_BASE_URL", base_url_val),
+                ("ANTHROPIC_API_KEY", anthropic_key_val),
+                ("ANTHROPIC_AUTH_TOKEN", anthropic_token_val),
+                ("XAI_API_KEY", xai_key_val),
             ],
         );
 
@@ -188,11 +206,20 @@ mod tests {
         assert!(!redacted.contains(codex_val), "CODEX_API_KEY value must be redacted");
         assert!(!redacted.contains(org_val), "OPENAI_ORG_ID value must be redacted");
         assert!(!redacted.contains(base_url_val), "OPENAI_BASE_URL value must be redacted");
+        assert!(!redacted.contains(anthropic_key_val), "ANTHROPIC_API_KEY value must be redacted");
+        assert!(
+            !redacted.contains(anthropic_token_val),
+            "ANTHROPIC_AUTH_TOKEN value must be redacted"
+        );
+        assert!(!redacted.contains(xai_key_val), "XAI_API_KEY value must be redacted");
         assert!(redacted.contains("other=plaintext"), "non-credential content must be preserved");
         assert!(redacted.contains("[REDACTED:OPENAI_API_KEY]"));
         assert!(redacted.contains("[REDACTED:CODEX_API_KEY]"));
         assert!(redacted.contains("[REDACTED:OPENAI_ORG_ID]"));
         assert!(redacted.contains("[REDACTED:OPENAI_BASE_URL]"));
+        assert!(redacted.contains("[REDACTED:ANTHROPIC_API_KEY]"));
+        assert!(redacted.contains("[REDACTED:ANTHROPIC_AUTH_TOKEN]"));
+        assert!(redacted.contains("[REDACTED:XAI_API_KEY]"));
     }
 
     #[test]
@@ -217,11 +244,14 @@ mod tests {
     }
 
     #[test]
-    fn test_credential_vars_include_all_auth_safe_vars() {
+    fn test_credential_vars_include_all_provider_auth_vars() {
         assert!(CREDENTIAL_VARS.contains(&"OPENAI_API_KEY"));
         assert!(CREDENTIAL_VARS.contains(&"CODEX_API_KEY"));
         assert!(CREDENTIAL_VARS.contains(&"OPENAI_ORG_ID"));
         assert!(CREDENTIAL_VARS.contains(&"OPENAI_BASE_URL"));
+        assert!(CREDENTIAL_VARS.contains(&"ANTHROPIC_API_KEY"));
+        assert!(CREDENTIAL_VARS.contains(&"ANTHROPIC_AUTH_TOKEN"));
+        assert!(CREDENTIAL_VARS.contains(&"XAI_API_KEY"));
     }
 
     #[test]

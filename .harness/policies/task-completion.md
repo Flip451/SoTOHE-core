@@ -32,9 +32,27 @@
 
 ### PR finding の修正主体
 
-PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作成し、対象 artifact の owner に委譲する。実装変更と implementer の boundary 内の通常の policy / documentation は `implementer`、spec / catalogue / plan の SoT artifacts はそれぞれ `spec-designer` / `type-designer` / `impl-planner` の通常 writer workflow が扱う。writer-owned artifact を implementer の focused dispatch に入れてはならない。`review-fix-lead` は通常の `scope-review` 専用であり、wrapper が typed focused mode をサポートするまでは PR finding の transport として使用しない。writer-owned artifact の修正後は完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させ、生成された plan view を sanctioned views-sync operation で更新してから local review を `zero_findings` まで収束させる。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは implementer-owned non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
+PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作成し、対象 artifact の owner に委譲する。実装変更と implementer の boundary 内の通常の policy / documentation は `implementer`、spec / catalogue / plan の SoT artifacts はそれぞれ `spec-designer` / `type-designer` / `impl-planner` の通常 writer workflow が扱う。writer-owned artifact を implementer の focused dispatch に入れてはならない。`review-fix-lead` は通常の `scope-review` 専用であり、wrapper が typed focused mode をサポートするまでは PR finding の transport として使用しない。writer-owned artifact の修正後は完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させ、生成された plan view を sanctioned views-sync operation で更新する。再収束後に未完了 task が 1 件でも残る場合（新規 residual task だけでなく、修正前から represented だった task を含む）は、shared `full-cycle` の通常 mode を terminal implementation、obligation verification、review、commit、lifecycle tail まで完了させてから PR review を再実行する。未完了 task がない場合だけ local review を `zero_findings` まで収束させ、`commit` workflow を完了して PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは implementer-owned non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後は、まず workflow SSoT の partial-reentry / post-routing descent を spec、types、plan の downstream phases まで完了させてから task summary を再導出し、未完了 task があれば shared `full-cycle` の通常 mode を terminal implementation、obligation verification、review、commit、lifecycle tail まで完了させてから PR review を再実行する。未完了 task がない場合だけ local review と `commit` workflow を完了して PR review を再実行する。
 
-委譲先の完了報告後、writer-owned artifact の修正であれば上記の partial-reentry / post-routing descent を完了させ、生成された plan view を sanctioned views-sync operation で更新したうえで、orchestrator は local review を `zero_findings` まで収束させ、`commit` workflow を完了してから PR review を再実行する。タスク状態の変更や完了報告はこの修正経路を代替せず、状態遷移は引き続き orchestrator が専管する。
+タスク状態の変更や完了報告はこの修正経路を代替せず、状態遷移は引き続き orchestrator が専管する。
+
+### Open-PR residual-work recovery
+
+実在する残作業を Done 後の同一 track に戻す必要がある場合でも、既存 task の完了履歴は
+書き換えない。`pr-review` workflow が、現在の `track/<id>` branch に対応する remote の
+`OPEN` PR を確認した場合に限り、orchestrator は未登録の残作業を
+`bin/sotp track add-task "<description>"` で正規 task として追加できる。これは既存の
+`Done` / `Skipped` を reopen する `bin/sotp track transition` の代替ではなく、dummy task
+や無意味な status toggle も許可しない。Archived track、`MERGED` / `CLOSED` PR、または
+照会できない・branch が一致しない PR は既存 track を変更せず corrective track または
+原因報告へ送る。
+
+追加後は task 群から状態を再導出し、通常の Phase 3 re-plan と義務 `derive` を完了する。
+成功した `track add-task` で登録した residual task は、その後も未完了として存在しなければ
+ならず、消失または完了済みになっていれば recovery failure として停止する。登録 task が
+未完了であることを確認した後は、通常の `full-cycle` を完了してから PR を再審査する。
+通常の PR 作成前の task authoring / plan / derive に PR 照会を要求してはならない。Done /
+Archived の freeze はこの recovery rule でも解除されない。
 
 ### アーキテクチャ変更を含むタスク
 

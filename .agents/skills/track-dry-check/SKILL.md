@@ -1,6 +1,6 @@
 ---
 name: track-dry-check
-description: Use when Codex is asked to run the DRY fix phase (DFP) for the current track — drives sotp dry write → fix DRY violations → sotp dry check-approved loop until the DRY gate passes.
+description: Use when Codex is asked to run the canonical DRY fix workflow for the current track.
 ---
 
 # Track-Dry-Check (Codex skill)
@@ -31,13 +31,9 @@ or failure-recovery procedures here.
   if the wrapper does not support the resolved provider, report the failure and stop (fail-closed).
 - DRY gate verification uses `bin/sotp dry check-approved --track-id <id>`.
 
-### (4) Gate waiting
+The workflow SSoT owns the DRY loop, gate waiting, and failure recovery.
 
-- The DRY fix wrapper is a long-running gate: run it as one blocking call and read its terminal
-  status once. Do not poll its output or re-run status probes; if the host backgrounds the call,
-  read the result once after the single completion notification.
-
-### (5) Reporting format
+### (4) Reporting format
 
 - On successful completion, print: `DRY_CHECK_STATUS: completed — DRY gate APPROVED`
 - On failure or block, print: `DRY_CHECK_STATUS: blocked — <n> unresolved pairs: <reason>`

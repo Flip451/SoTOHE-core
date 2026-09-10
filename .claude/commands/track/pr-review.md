@@ -24,14 +24,14 @@ User invokes this command as `/track:pr-review`. `$ARGUMENTS` is unused (reserve
   `review-fix-lead` remains the normal scope-review lane until its wrapper supports a typed
   focused mode.
 
-- **Convergence and commit**: after the delegated capability reports completion, use the
-  workflow SSoT's partial-reentry / post-routing descent for any writer-owned correction, then
-  run `/track:review` to convergence and `/track:commit` before re-running this command. The Claude
-  root may edit directly only as recovery after a failed delegation for implementer-owned
-  non-ADR findings. A
+- **Convergence and commit**: follow the workflow SSoT after delegated completion. Its
+  provider-specific invocation mappings are `/track:full-cycle` (normal mode), `/track:review`,
+  and `/track:commit`; do not duplicate task-state conditions or ordering here. The Claude root
+  may edit directly only as recovery after a failed delegation for implementer-owned non-ADR
+  findings. A
   finding requiring an edit to `knowledge/adr/*.md` must go through the review workflow SSoT's
-  `ADR-scope repair lane` and is never edited by the Claude root or `review-fix-lead`; apply the
-  same local-convergence and commit sequence afterward.
+  `ADR-scope repair lane` and is never edited by the Claude root or `review-fix-lead`; after that
+  lane completes, continue according to the workflow SSoT.
 
 - **PR command wrappers**: use these from the orchestrator host in sequence:
 
@@ -56,6 +56,8 @@ error and direct the user to use `/track:review` instead.
 After execution, summarize:
 
 1. PR number and URL.
-2. Terminal state: machine PASS (explicit zero-findings signal), or user-approved Accepted Deviations with the user's approval citation.
+2. Terminal state: either `machine PASS — zero findings` (explicit zero-findings signal) or
+   `user-approved Accepted Deviations — not zero findings` with the user's approval citation.
+   Never report the second state as zero findings; a reviewer approval is not user approval.
 3. Per-round trace: review state (APPROVED / CHANGES_REQUESTED / COMMENTED), surfaced comments (review body + inline with `path:line`), actionability assessment, and fix commit hashes.
-4. Recommended next command (`/track:merge` once 👍 is reached and the user is ready).
+4. Recommended next command (`/track:merge` once either terminal result is reached and the user is ready).

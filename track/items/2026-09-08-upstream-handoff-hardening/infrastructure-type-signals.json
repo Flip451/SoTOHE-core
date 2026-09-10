@@ -1,0 +1,28 @@
+{
+  "baseline_hash": "772c14374216ec636500a99400582c15b89c857108b7e131ac53f12dd204c77f",
+  "declaration_hash": "d8b040509a55c7ac9a933e0e25d7cd4e18c1345a51e076017ee9a1deffc4d445",
+  "generated_at": "2026-09-10T09:20:22Z",
+  "head_commit": "7164fa6aa3ef2482a218956fa00beb8b72451ca4",
+  "implementation_fingerprint": "13fc9d02af8009b39b179d12043bf4c1a6ad631855d3157908ea07923f751af7",
+  "resolution_fingerprint": "c5a3de55a363ba8f40e74204eba594ed0df2fbc60993892dc8bc79052486c994",
+  "rustdoc_execution_identity": {
+    "crate_name": "infrastructure",
+    "expected_json_path": "target/.sotp-rustdoc/80ef124330a4d85e56773cb51d55f0af9cd1e5454c35163a47f1290391a2c9f2/doc/infrastructure.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/80ef124330a4d85e56773cb51d55f0af9cd1e5454c35163a47f1290391a2c9f2"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_items": [
+        "usecase::review_v2::ports::Reviewer"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "NullReviewer"
+    }
+  ]
+}

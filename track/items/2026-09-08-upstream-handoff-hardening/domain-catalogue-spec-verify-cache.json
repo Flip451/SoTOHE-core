@@ -1,0 +1,102 @@
+{
+  "entries": [
+    {
+      "claim_hash": "18aa32f05cc7d36d9babecb185abcf376725c337536244c9e69a24e799ab19da",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "763f83d77bc6a9b1e4000531f8d87d8115a048c18a66dc65fc30d8ae30a660c6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18aa32f05cc7d36d9babecb185abcf376725c337536244c9e69a24e799ab19da",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e770082b7d928fd007c0bb814ef292381ba2c22397e88a1bd19f80e5a846d93",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ObligationFulfillmentVerifierPort",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "763f83d77bc6a9b1e4000531f8d87d8115a048c18a66dc65fc30d8ae30a660c6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e770082b7d928fd007c0bb814ef292381ba2c22397e88a1bd19f80e5a846d93",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ObligationFulfillmentVerifierPort",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 1
+}

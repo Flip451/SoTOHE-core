@@ -1,7 +1,7 @@
 //! Process and runtime-artifact helpers for the Codex reviewer adapter.
 
 use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::thread;
@@ -10,16 +10,19 @@ use std::time::{Duration, Instant};
 #[cfg(unix)]
 use std::os::unix::fs::OpenOptionsExt;
 
-use usecase::review_v2::ReviewerError;
+use usecase::review_v2::{ReviewerError, ReviewerExecutionProvenance};
 use usecase::review_workflow::{
     ReviewFinalMessageState, ReviewVerdict, classify_review_verdict, normalize_final_message,
     parse_review_final_message, render_review_payload,
 };
 
 use crate::codex_common::{
-    POLL_INTERVAL, REVIEW_RUNTIME_DIR, configure_codex_command, runtime_path, tee_stderr_to_file,
+    MAX_CODEX_SESSION_LOG_BYTES, POLL_INTERVAL, REVIEW_RUNTIME_DIR, configure_codex_command,
+    runtime_path,
 };
 use crate::track::symlink_guard::reject_symlinks_up_to_root;
+
+use super::diagnostics::{safe_log_text, unexpected_from_text};
 
 /// Raw outcome from the Codex subprocess — parsed but not yet converted to domain types.
 pub(super) struct ReviewOutcomeRaw {
@@ -27,6 +30,7 @@ pub(super) struct ReviewOutcomeRaw {
     pub(super) final_message: Option<String>,
     pub(super) session_log_path: PathBuf,
     pub(super) session_id: Option<String>,
+    pub(super) exit_code: Option<i32>,
 }
 
 pub(super) fn prepare_output_last_message_path(explicit: Option<&Path>) -> Result<PathBuf, String> {
@@ -72,14 +76,18 @@ pub(super) fn run_codex_child(
     let start = Instant::now();
     let mut timed_out = false;
     let mut exit_success = false;
+    let mut exit_code = None;
 
     loop {
-        match child
-            .try_wait()
-            .map_err(|e| ReviewerError::Unexpected(format!("failed to poll reviewer child: {e}")))?
-        {
+        match child.try_wait().map_err(|e| {
+            unexpected_from_text(
+                ReviewerExecutionProvenance::PostSpawn,
+                format!("failed to poll reviewer child: {e}"),
+            )
+        })? {
             Some(status) => {
                 exit_success = status.success();
+                exit_code = status.code();
                 break;
             }
             None => {
@@ -89,7 +97,10 @@ pub(super) fn run_codex_child(
                     // try_wait() returning None and this kill() call.
                     let _ = terminate_reviewer_child(&mut child);
                     child.wait().map_err(|e| {
-                        ReviewerError::Unexpected(format!("failed to reap reviewer child: {e}"))
+                        unexpected_from_text(
+                            ReviewerExecutionProvenance::PostSpawn,
+                            format!("failed to reap reviewer child: {e}"),
+                        )
                     })?;
                     break;
                 }
@@ -114,11 +125,18 @@ pub(super) fn run_codex_child(
     ) {
         Ok(content) => normalize_final_message(&content),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        // Invalid UTF-8 and an over-limit final message are verdict-input
+        // failures. Let the normal verdict classifier preserve the exit code
+        // and route missing input to IllegalVerdict or ProcessFailed.
+        Err(e) if e.kind() == std::io::ErrorKind::InvalidData => None,
         Err(e) => {
-            return Err(ReviewerError::Unexpected(format!(
-                "failed to read output-last-message {}: {e}",
-                output_last_message.display()
-            )));
+            return Err(unexpected_from_text(
+                ReviewerExecutionProvenance::PostSpawn,
+                format!(
+                    "failed to read output-last-message {}: {e}",
+                    output_last_message.display()
+                ),
+            ));
         }
     };
 
@@ -131,9 +149,11 @@ pub(super) fn run_codex_child(
     // source, breaking the fail-closed contract.
 
     let final_message = match &final_message_state {
-        ReviewFinalMessageState::Parsed(payload) => Some(
-            render_review_payload(payload).map_err(|e| ReviewerError::Unexpected(e.to_string()))?,
-        ),
+        ReviewFinalMessageState::Parsed(payload) => {
+            Some(render_review_payload(payload).map_err(|e| {
+                unexpected_from_text(ReviewerExecutionProvenance::PostSpawn, e.to_string())
+            })?)
+        }
         _ => raw_content,
     };
 
@@ -144,6 +164,7 @@ pub(super) fn run_codex_child(
         final_message,
         session_log_path: session_log_path.to_path_buf(),
         session_id,
+        exit_code,
     })
 }
 
@@ -380,7 +401,7 @@ pub(super) fn spawn_codex_reviewer(
     let stderr = child
         .stderr
         .take()
-        .map(|pipe| thread::spawn(move || tee_stderr_to_file(pipe, log)))
+        .map(|pipe| thread::spawn(move || tee_reviewer_stderr_to_file(pipe, log)))
         .unwrap_or_else(|| thread::spawn(|| {}));
     let stdout = child
         .stdout
@@ -388,6 +409,59 @@ pub(super) fn spawn_codex_reviewer(
         .map(|pipe| thread::spawn(move || collect_codex_session_id(pipe)))
         .unwrap_or_else(|| thread::spawn(|| None));
     Ok((child, stderr, stdout))
+}
+
+/// Drains reviewer stderr through the existing credential-redaction boundary.
+///
+/// The session log remains the existing bounded artifact, but it must never
+/// become a raw subprocess-output sink. Invalid UTF-8 or a redacted value that
+/// still exceeds the log bound is represented by the fixed unavailable marker.
+fn tee_reviewer_stderr_to_file(mut pipe: impl Read, mut log: impl Write) {
+    let maximum_bytes = MAX_CODEX_SESSION_LOG_BYTES as usize;
+    let mut captured = Vec::with_capacity(maximum_bytes);
+    let mut truncated = false;
+    let mut read_failed = false;
+    let mut chunk = [0_u8; 8 * 1024];
+
+    loop {
+        let read = match pipe.read(&mut chunk) {
+            Ok(0) => break,
+            Err(_) => {
+                read_failed = true;
+                break;
+            }
+            Ok(read) => read,
+        };
+        let Some(bytes) = chunk.get(..read) else {
+            truncated = true;
+            break;
+        };
+        let remaining = maximum_bytes.saturating_sub(captured.len());
+        let retained = remaining.min(bytes.len());
+        if let Some(bytes) = bytes.get(..retained) {
+            captured.extend_from_slice(bytes);
+        }
+        truncated |= retained < bytes.len();
+    }
+
+    let (rendered, diagnostic) = render_reviewer_stderr(&captured, truncated || read_failed);
+    let _ = log.write_all(rendered.as_bytes());
+    let _ = log.flush();
+    let _ = std::io::stderr().write_all(diagnostic.as_bytes());
+}
+
+fn render_reviewer_stderr(captured: &[u8], unavailable: bool) -> (String, String) {
+    let rendered = if unavailable {
+        None
+    } else {
+        std::str::from_utf8(captured)
+            .ok()
+            .map(crate::review_v2::review_fix_runner::redact_credentials)
+            .filter(|text| text.len() <= MAX_CODEX_SESSION_LOG_BYTES as usize)
+    }
+    .unwrap_or_else(|| "diagnostic_unavailable".to_owned());
+    let diagnostic = safe_log_text(&rendered);
+    (rendered, diagnostic)
 }
 
 /// Maximum bytes retained for a single Codex JSON event while looking up `thread_id`.
@@ -469,6 +543,21 @@ pub(super) fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> 
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_render_reviewer_stderr_exact_4096_bytes_is_echoed_and_4097_is_unavailable() {
+        let accepted = "x".repeat(4096);
+        let (accepted_log, accepted_diagnostic) =
+            render_reviewer_stderr(accepted.as_bytes(), false);
+        assert_eq!(accepted_log.len(), 4096);
+        assert_eq!(accepted_diagnostic, accepted);
+
+        let rejected = "x".repeat(4097);
+        let (rejected_log, rejected_diagnostic) =
+            render_reviewer_stderr(rejected.as_bytes(), false);
+        assert_eq!(rejected_log.len(), 4097);
+        assert_eq!(rejected_diagnostic, "diagnostic_unavailable");
+    }
 
     #[cfg(unix)]
     #[test]

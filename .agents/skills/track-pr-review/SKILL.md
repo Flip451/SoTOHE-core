@@ -45,21 +45,16 @@ or failure-recovery procedures here.
     (`spec.json` and its view), `bin/sotp phase enter type-design` (`<layer>-types.json` and
     its views), or `bin/sotp phase enter impl-plan` (`impl-plan.json`, `task-coverage.json`,
     `task-contract.json`, `batch-plan.json`).
-  - Do not route a focused PR finding through `cargo make track-local-review-fix`: that
-    wrapper always injects the scope-wide reviewer loop and is not a delegated-PR-finding
-    transport.
-  - local convergence and commit use `$track-review` and `$track-commit`.
+- Do not route a focused PR finding through `cargo make track-local-review-fix`: that
+  wrapper always injects the scope-wide reviewer loop and is not a delegated-PR-finding
+  transport.
+- local convergence and commit use `$track-review` and `$track-commit`.
 
-### (5) Gate waiting
+### (5) Reporting format
 
-- `bin/sotp pr review-cycle` owns the trigger → poll → parse sequence internally: run it as one
-  blocking call and read its result once. Do not add a manual polling loop or periodic PR-status
-  probes around it; if the host backgrounds the call, read the result once after the single
-  completion notification, then apply the workflow SSoT's stale-review handling.
-
-### (6) Reporting format
-
-- On successful completion (only when the PR review reaches explicit zero findings or the user
-  approves an Accepted Deviations exception per `.harness/workflows/track/pr-review.md`),
-  print: `PR_REVIEW_STATUS: completed — PR <url> zero findings`
+- On an explicit zero-findings terminal signal per the workflow SSoT, print:
+  `PR_REVIEW_STATUS: completed — PR <url> machine PASS — zero findings`
+- On an Accepted Deviations exception explicitly approved by the user per the workflow SSoT,
+  print: `PR_REVIEW_STATUS: completed — PR <url> user-approved Accepted Deviations — not zero findings`
+  Include the user's approval citation; reviewer approval alone is not user approval.
 - On failure or block, print: `PR_REVIEW_STATUS: blocked — <reason>`

@@ -23,18 +23,19 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use domain::TrackId;
-use domain::review_v2::{FastVerdict, LogInfo, ReviewTarget, Verdict};
 use usecase::fixpoint_resolve::{
     FixpointResolveError, RefVerifyGateStatePort, RefVerifyGateStatus, ReviewGateStatePort,
     ReviewGateStatus,
 };
-use usecase::review_v2::{ReviewCycle, ReviewerError, ports::Reviewer};
+use usecase::review_v2::ReviewCycle;
 
 use crate::git_cli::SystemGitRepo;
 use crate::ref_verify::{
     RefVerifyCacheAdapter, RefVerifyPairSourceAdapter, RefVerifyScopeResolver,
 };
-use crate::review_v2::{FsCommitHashStore, FsReviewStore, GitDiffGetter, SystemReviewHasher};
+use crate::review_v2::{
+    FsCommitHashStore, FsReviewStore, GitDiffGetter, NullReviewer, SystemReviewHasher,
+};
 use domain::track_phase::ReviewScopeSet;
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -209,22 +210,6 @@ fn resolve_gate_path_context(items_dir: &Path) -> Result<GatePathContext, GateSt
     Ok(GatePathContext { canonical_root, canonical_items_dir })
 }
 
-// ── NullReviewer ──────────────────────────────────────────────────────────────
-
-/// Null reviewer — never called; exists only to satisfy the `ReviewCycle` type
-/// parameter for the status/check-approved path.
-struct NullReviewer;
-
-impl Reviewer for NullReviewer {
-    fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
-        Err(ReviewerError::Unexpected("NullReviewer: review() must not be called".to_owned()))
-    }
-
-    fn fast_review(&self, _target: &ReviewTarget) -> Result<(FastVerdict, LogInfo), ReviewerError> {
-        Err(ReviewerError::Unexpected("NullReviewer: fast_review() must not be called".to_owned()))
-    }
-}
-
 // ── FsReviewGateStateAdapter ──────────────────────────────────────────────────
 
 /// Filesystem adapter implementing [`ReviewGateStatePort`].
@@ -318,7 +303,8 @@ impl ReviewGateStatePort for FsReviewGateStateAdapter {
         })
         .map_err(|e| gate_err(e.to_string()))?;
 
-        // Build ReviewCycle with NullReviewer (we only call evaluate_approval).
+        // Build ReviewCycle with NullReviewer; evaluate_approval reads state via
+        // get_review_states and does not execute a reviewer provider.
         let cycle =
             ReviewCycle::new(base, scope_config, NullReviewer, GitDiffGetter, SystemReviewHasher);
 

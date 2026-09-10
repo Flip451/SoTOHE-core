@@ -10,23 +10,26 @@ User invokes this command as `/track:implement`. Use `$ARGUMENTS` as optional sc
 
 ## Claude Code invocation constraints
 
-- **Context intake**: follow the implement workflow SSoT's `Summary-first context intake`.
-  Before selecting or dispatching tasks, use its CLI summaries as the primary context and treat
-  the selected task briefing as primary for task details. Do not bulk-read `*-types.json`,
-  review or binding JSON, full sub-workflow texts, or a `Related Conventions` list. Open only a
-  targeted diff or the artifact body named by a blocker; the dispatcher supplies resolved
-  convention paths with the implementer briefing for the delegated capability.
-- **Parallel implementation**: use Agent Teams (multiple subagents with `run_in_background: true`) for independent tasks. Serialize `cargo add` / `cargo update` / `Cargo.lock`-changing steps through a single worker.
-- **Task state transitions**: the calling orchestrator, never the `implementer` capability, performs them; do NOT edit `plan.md` directly (read-only view).
-- **Test validation per worker**: `cargo make test`; reserve full-suite commands for single workers to avoid `target/` build lock contention.
-- **CI gate before reporting**: `cargo make ci`
-- **Completion timing**: owned by the workflow SSoT (`.harness/workflows/track/implement.md` Step 7 and `full-cycle.md` Step 1d / Step 3) — this adapter does not restate the transition ordering.
+- Shared context intake, task ordering and state, phase/rollback routing, obligation/CI gates,
+  and recovery behavior are defined by `.harness/workflows/track/implement.md`; this adapter
+  does not restate them.
+- **Implementation dispatch**: for each selected task, prepare the workflow SSoT's briefing and
+  invoke the configured capability through:
+  `bin/sotp capability exec implementer --host claude --briefing-file <path>`. The dispatcher
+  resolves the provider and model from `.harness/config/agent-profiles.json`. If it returns
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`, invoke the returned Claude subagent with its
+  briefing path and discipline body; otherwise let the dispatcher complete the provider
+  subprocess. Do not bypass this resolution with a direct Agent or hand-assembled provider
+  command.
+- **Parallel implementation**: independent tasks may use Agent Teams only after each task has
+  passed the capability-dispatch step above. The workflow SSoT owns dependency ordering and
+  serialization boundaries.
 
 ## Report format
 
 After execution, summarize:
 
 1. Implemented scope.
-2. Implementation handoff: implemented task IDs and their verification results (tasks are handed off `in_progress`; the orchestrator owns transitions per the workflow SSoT).
+2. Implementation handoff: implemented task IDs and their verification results.
 3. Remaining tasks.
-4. Recommended next command: `/track:full-cycle` (it owns the DFP → transition → review → commit ordering defined in the workflow SSoT). Standalone `/track:review` or `/track:commit` straight after implementation is not sanctioned.
+4. Recommended next command: `/track:full-cycle`.

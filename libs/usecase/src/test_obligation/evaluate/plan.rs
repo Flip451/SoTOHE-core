@@ -25,7 +25,9 @@ use domain::tddd::test_obligation::binding::{
 };
 use domain::tddd::test_obligation::errors::ObligationEvaluateError;
 use domain::tddd::test_obligation::hashes::{AnchorTextHash, DeclarationHash, WaivedReasonHash};
-use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId, WaivedReason};
+use domain::tddd::test_obligation::ids::{
+    TestObligationBrief, TestObligationEdgeId, TestObligationId, WaivedReason,
+};
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::pair::{
     AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
@@ -47,8 +49,9 @@ use super::verify::{
 use super::{EvaluateTestObligationsInteractor, Tally};
 use crate::test_obligation::bound_tests::ResolvedBoundTests;
 use crate::test_obligation::{
-    LoadedCatalogueDocument, find_declaration_text_from_loaded,
-    obligation_declaration_text_from_loaded,
+    LoadedCatalogueDocument, declaration_with_obligation_context,
+    find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
+    synthetic_voluntary_obligation_brief,
 };
 
 /// A single plan step — either an outcome we already know, or an LLM task the
@@ -88,6 +91,7 @@ pub(super) enum ImmediateOutcome {
 pub(super) struct FulfillmentLlmTask {
     pub(super) edge_id: TestObligationEdgeId,
     pub(super) obligation_id: TestObligationId,
+    pub(super) obligation_brief: TestObligationBrief,
     pub(super) key: ObligationFulfillmentCacheKey,
     pub(super) resolved_bound_tests: ResolvedBoundTests,
     pub(super) tests_source: String,
@@ -218,6 +222,7 @@ impl EvaluateTestObligationsInteractor {
             self.emit_fulfillment_action(
                 edge_id,
                 obligation.id().clone(),
+                obligation.brief(),
                 &declaration,
                 &anchor_text,
                 tests,
@@ -264,6 +269,7 @@ impl EvaluateTestObligationsInteractor {
                 self.emit_fulfillment_action(
                     edge_id.clone(),
                     obligation.id().clone(),
+                    obligation.brief(),
                     &declaration,
                     &anchor_text,
                     tests,
@@ -280,9 +286,14 @@ impl EvaluateTestObligationsInteractor {
             )));
             return Ok(());
         };
+        let obligation_id = synthetic_obligation_id(edge_id);
+        let obligation_brief = synthetic_voluntary_obligation_brief(edge_id).map_err(|error| {
+            super::invalid_input_error(&format!("voluntary_obligation_brief: {error}"))
+        })?;
         self.emit_fulfillment_action(
             edge_id.clone(),
-            synthetic_obligation_id(edge_id),
+            obligation_id,
+            &obligation_brief,
             &declaration,
             &anchor_text,
             tests,
@@ -405,6 +416,7 @@ impl EvaluateTestObligationsInteractor {
         &self,
         edge_id: TestObligationEdgeId,
         obligation_id: TestObligationId,
+        obligation_brief: &TestObligationBrief,
         declaration: &str,
         anchor_text: &str,
         tests: &[TestLocation],
@@ -418,10 +430,8 @@ impl EvaluateTestObligationsInteractor {
             .resolve_source(locations)
             .map_err(ObligationEvaluateError::TestSourceScan)?;
         let bound_hash = resolved_bound_tests.set_hash().clone();
-        let declaration = crate::test_obligation::declaration_with_obligation_item(
-            declaration,
-            obligation_id.item_identifier().as_str(),
-        );
+        let declaration =
+            declaration_with_obligation_context(declaration, &obligation_id, obligation_brief);
         let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
         let anchor_hash = AnchorTextHash::new(self.hasher.sha256(anchor_text.as_bytes()));
         let key = ObligationFulfillmentCacheKey::new(bound_hash, declaration_hash, anchor_hash);
@@ -451,6 +461,7 @@ impl EvaluateTestObligationsInteractor {
         plan.push(PlannedAction::Fulfillment(FulfillmentLlmTask {
             edge_id,
             obligation_id,
+            obligation_brief: obligation_brief.clone(),
             key,
             resolved_bound_tests,
             tests_source,
@@ -636,7 +647,13 @@ fn build_fulfillment_pair_input(
         .map_err(|_| invalid_input_error("entry_declaration"))?;
     let anchor_text = AnchorText::try_new(task.anchor_text.clone())
         .map_err(|_| invalid_input_error("anchor_text"))?;
-    Ok(ObligationFulfillmentPair::new(tests_source, entry_declaration, anchor_text))
+    Ok(ObligationFulfillmentPair::new(
+        tests_source,
+        entry_declaration,
+        anchor_text,
+        task.obligation_id.clone(),
+        task.obligation_brief.clone(),
+    ))
 }
 
 fn build_waiver_pair_input(task: &WaiverLlmTask) -> Result<WaiverPair, ObligationEvaluateError> {

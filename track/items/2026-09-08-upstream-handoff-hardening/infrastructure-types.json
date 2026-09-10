@@ -1,0 +1,45 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "NullReviewer",
+      "trait_ref": "usecase::review_v2::ports::Reviewer"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "NullReviewer": {
+      "action": "add",
+      "docs": "Infrastructure Reviewer implementation used when composition only queries review state.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::null_reviewer",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,15 +1,13 @@
 //! Provider subprocess execution, bounded logging, and process-tree cleanup.
 
-use std::ffi::OsString;
 use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Write};
 use std::path::Path;
 use std::process::{Child, Command, ExitStatus, Stdio};
-use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::AtomicU64;
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
 use std::thread;
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant};
 
 use usecase::capability_exec::{CapabilityExecError, ProviderName};
 
@@ -21,7 +19,6 @@ const BOUNDED_COMMAND_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const BOUNDED_COMMAND_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const CODEX_VERSION_PROBE_TIMEOUT: Duration = Duration::from_secs(5);
 const CODEX_VERSION_PROBE_MAX_OUTPUT_BYTES: usize = 64 * 1024;
-const LOG_TRUNCATION_NOTICE: &[u8] = b"\n[provider stderr truncated]\n";
 static PROVIDER_LOG_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Bounded output collected from a short-lived subprocess.
@@ -246,194 +243,22 @@ fn terminate_bounded_command(child: &mut Child, process_id: u32) -> Result<(), s
     child.wait().map(|_| ())
 }
 
-pub(crate) trait ProviderProcessRunner: Send + Sync {
-    #[allow(clippy::too_many_arguments)]
-    fn run(
-        &self,
-        binary: &str,
-        path_prefix: Option<&Path>,
-        args: &[OsString],
-        repo_root: &Path,
-        runtime_dir: &Path,
-        provider: &ProviderName,
-        timeout: Option<Duration>,
-        output_last_message: Option<&Path>,
-    ) -> Result<ProviderProcessOutput, CapabilityExecError>;
-}
+#[path = "process/reviewer_lifecycle.rs"]
+mod reviewer_lifecycle;
 
-/// Observable, bounded result of a provider subprocess.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct ProviderProcessOutput {
-    pub(crate) exit_code: u8,
-    pub(crate) session_id: Option<String>,
-    /// The bounded provider result retained until the adapter adopts this attempt.
-    pub(crate) final_message: Option<Vec<u8>>,
-}
+pub(crate) use reviewer_lifecycle::{
+    ProviderProcessFailure, ProviderProcessOutput, ProviderProcessRunner, ReviewerProcessOutput,
+    system_process_runner,
+};
 
-pub(crate) struct SystemProviderProcessRunner;
+#[cfg(test)]
+pub(crate) use reviewer_lifecycle::{
+    run_provider_process_with_timeout, run_provider_process_with_timeout_inner,
+};
 
-impl ProviderProcessRunner for SystemProviderProcessRunner {
-    fn run(
-        &self,
-        binary: &str,
-        path_prefix: Option<&Path>,
-        args: &[OsString],
-        repo_root: &Path,
-        runtime_dir: &Path,
-        provider: &ProviderName,
-        timeout: Option<Duration>,
-        output_last_message: Option<&Path>,
-    ) -> Result<ProviderProcessOutput, CapabilityExecError> {
-        run_provider_process_with_timeout(
-            binary,
-            path_prefix,
-            args,
-            repo_root,
-            runtime_dir,
-            provider,
-            timeout,
-            output_last_message,
-        )
-    }
-}
-
-pub(crate) fn system_process_runner() -> Arc<dyn ProviderProcessRunner> {
-    Arc::new(SystemProviderProcessRunner)
-}
-
-#[allow(clippy::too_many_arguments)]
-pub(crate) fn run_provider_process_with_timeout(
-    binary: &str,
-    path_prefix: Option<&Path>,
-    args: &[OsString],
-    repo_root: &Path,
-    runtime_dir: &Path,
-    provider: &ProviderName,
-    timeout: Option<Duration>,
-    output_last_message: Option<&Path>,
-) -> Result<ProviderProcessOutput, CapabilityExecError> {
-    run_provider_process_with_timeout_inner(
-        binary,
-        path_prefix,
-        args,
-        repo_root,
-        runtime_dir,
-        provider,
-        timeout,
-        output_last_message,
-    )
-}
-
-#[allow(clippy::too_many_arguments)]
-fn run_provider_process_with_timeout_inner(
-    binary: &str,
-    path_prefix: Option<&Path>,
-    args: &[OsString],
-    repo_root: &Path,
-    runtime_dir: &Path,
-    provider: &ProviderName,
-    timeout: Option<Duration>,
-    output_last_message: Option<&Path>,
-) -> Result<ProviderProcessOutput, CapabilityExecError> {
-    let runtime_dir = prepare_runtime_dir(repo_root, runtime_dir, provider)?;
-    let output_last_message = output_last_message
-        .map(|path| prepare_output_last_message(path, &runtime_dir, provider))
-        .transpose()?;
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|error| {
-            dispatch_error(provider, format!("cannot create session log timestamp: {error}"))
-        })?
-        .as_nanos();
-    let log_name = OsString::from(format!(
-        "capability-exec-{}-{}-{timestamp}-{}.log",
-        provider.as_str(),
-        std::process::id(),
-        PROVIDER_LOG_SEQUENCE.fetch_add(1, Ordering::Relaxed),
-    ));
-    let log_path = runtime_dir.path.join(&log_name);
-    let mut log_file = open_runtime_file(
-        &runtime_dir.directory,
-        &log_name,
-        rustix::fs::OFlags::WRONLY
-            | rustix::fs::OFlags::CREATE
-            | rustix::fs::OFlags::EXCL
-            | rustix::fs::OFlags::NOFOLLOW
-            | rustix::fs::OFlags::CLOEXEC,
-        provider,
-        &log_path,
-        "create session log",
-    )?;
-    if provider.as_str() == "codex" {
-        let real_path = std::path::Path::new(binary)
-            .canonicalize()
-            .map(|path| path.display().to_string())
-            .unwrap_or_else(|_| binary.to_owned());
-        let mut version_command = Command::new(binary);
-        version_command.arg("--version");
-        apply_path_prefix(&mut version_command, path_prefix, provider)?;
-        let version = run_command_with_bounded_output(
-            &mut version_command,
-            CODEX_VERSION_PROBE_MAX_OUTPUT_BYTES,
-            CODEX_VERSION_PROBE_TIMEOUT,
-            "Codex version probe",
-        )
-        .map(|output| {
-            let mut text = String::from_utf8_lossy(&output.stdout).into_owned();
-            text.push_str(&String::from_utf8_lossy(&output.stderr));
-            text
-        })
-        .unwrap_or_else(|error| format!("probe failed: {error}"));
-        writeln!(
-            log_file,
-            "resolved_real_path: {real_path}\ncodex_version: {}",
-            version.trim_end()
-        )
-        .map_err(|error| {
-            dispatch_error(
-                provider,
-                format!("cannot write session log {}: {error}", log_path.display()),
-            )
-        })?;
-    }
-
-    let mut command = Command::new(binary);
-    command
-        .args(args)
-        .current_dir(repo_root)
-        .stdin(Stdio::null())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
-    apply_path_prefix(&mut command, path_prefix, provider)?;
-    configure_process_group(&mut command);
-    let mut child = command
-        .spawn()
-        .map_err(|error| dispatch_error(provider, format!("cannot start {binary}: {error}")))?;
-    let process_id = child.id();
-    let stderr = child.stderr.take().ok_or_else(|| {
-        dispatch_error(provider, format!("cannot capture stderr for {binary} provider subprocess"))
-    })?;
-    let stdout = child.stdout.take().ok_or_else(|| {
-        dispatch_error(provider, format!("cannot capture stdout for {binary} provider subprocess"))
-    })?;
-    let log_writer = spawn_bounded_log_writer(stderr, log_file);
-    let session_collector = spawn_provider_session_collector(stdout, provider.clone());
-    let status = wait_for_provider_process(&mut child, provider, binary, timeout)?;
-    wait_for_bounded_log_writer(log_writer, process_id, provider, binary, &log_path)?;
-    let collected = receive_provider_output(session_collector, process_id, provider, binary)?;
-    // The provider may mutate its writable runtime directory while it runs. Re-open every
-    // component relative to a pinned repository handle before opening provider-controlled
-    // output, so a replaced parent cannot redirect the leaf read outside the repository runtime.
-    let runtime_dir = prepare_runtime_dir(repo_root, &runtime_dir.path, provider)?;
-    let final_message = match output_last_message {
-        Some(output) => read_output_last_message_at(&runtime_dir, &output, provider)?,
-        None => collected.final_message,
-    };
-    Ok(ProviderProcessOutput {
-        exit_code: status.code().and_then(|code| u8::try_from(code).ok()).unwrap_or(1),
-        session_id: collected.session_id,
-        final_message,
-    })
+enum ProviderProcessWaitFailure {
+    Timeout(CapabilityExecError),
+    Failed(CapabilityExecError),
 }
 
 fn apply_path_prefix(
@@ -551,48 +376,44 @@ pub(crate) fn spawn_bounded_log_writer(
     thread::spawn(move || {
         let result = (|| {
             let mut buffer = [0_u8; 8192];
-            let mut written = 0_usize;
-            let mut truncated = false;
+            let maximum_capture = MAX_CAPABILITY_EXEC_LOG_BYTES.saturating_add(1);
+            let mut captured = Vec::with_capacity(maximum_capture);
+            let mut exceeded_limit = false;
+            let mut invalid_read = false;
             loop {
-                let read = stderr.read(&mut buffer)?;
-                if read == 0 {
-                    break;
-                }
-                if written < MAX_CAPABILITY_EXEC_LOG_BYTES {
-                    let remaining = MAX_CAPABILITY_EXEC_LOG_BYTES - written;
-                    if read <= remaining {
-                        let captured = buffer.get(..read).ok_or_else(|| {
-                            Error::new(
-                                ErrorKind::InvalidData,
-                                "stderr reader returned an invalid byte count",
-                            )
-                        })?;
-                        log_file.write_all(captured)?;
-                        written += read;
-                    } else {
-                        let content_budget = remaining.saturating_sub(LOG_TRUNCATION_NOTICE.len());
-                        if content_budget > 0 {
-                            let captured = buffer.get(..content_budget).ok_or_else(|| {
-                                Error::new(
-                                    ErrorKind::InvalidData,
-                                    "stderr reader returned an invalid byte count",
-                                )
-                            })?;
-                            log_file.write_all(captured)?;
-                        }
-                        if remaining >= LOG_TRUNCATION_NOTICE.len() {
-                            log_file.write_all(LOG_TRUNCATION_NOTICE)?;
-                        }
-                        written = MAX_CAPABILITY_EXEC_LOG_BYTES;
-                        truncated = true;
+                let read = match stderr.read(&mut buffer) {
+                    Ok(0) => break,
+                    Ok(read) => read,
+                    Err(_) => {
+                        invalid_read = true;
+                        break;
                     }
-                } else {
-                    truncated = true;
+                };
+                let Some(bytes) = buffer.get(..read) else {
+                    invalid_read = true;
+                    break;
+                };
+                let remaining = maximum_capture.saturating_sub(captured.len());
+                let retained = remaining.min(bytes.len());
+                if let Some(bytes) = bytes.get(..retained) {
+                    captured.extend_from_slice(bytes);
                 }
+                exceeded_limit |= retained < bytes.len();
             }
-            if truncated {
-                log_file.flush()?;
-            }
+
+            let rendered =
+                if invalid_read || exceeded_limit || captured.len() > MAX_CAPABILITY_EXEC_LOG_BYTES
+                {
+                    "diagnostic_unavailable".to_owned()
+                } else {
+                    std::str::from_utf8(&captured)
+                        .ok()
+                        .map(crate::review_v2::review_fix_runner::redact_credentials)
+                        .filter(|text| text.len() <= MAX_CAPABILITY_EXEC_LOG_BYTES)
+                        .unwrap_or_else(|| "diagnostic_unavailable".to_owned())
+                };
+            log_file.write_all(rendered.as_bytes())?;
+            log_file.flush()?;
             Ok(())
         })();
         let _ = sender.send(result);
@@ -605,7 +426,7 @@ fn wait_for_provider_process(
     provider: &ProviderName,
     binary: &str,
     timeout: Option<Duration>,
-) -> Result<ExitStatus, CapabilityExecError> {
+) -> Result<ExitStatus, ProviderProcessWaitFailure> {
     let started = Instant::now();
     loop {
         match child.try_wait() {
@@ -614,14 +435,19 @@ fn wait_for_provider_process(
                 if let Some(limit) = timeout
                     && started.elapsed() >= limit
                 {
-                    terminate_provider_process(child, provider, binary)?;
-                    return Err(dispatch_error(
+                    let termination_detail = terminate_provider_process(child, provider, binary)
+                        .err()
+                        .map(|termination_error| {
+                            format!("; provider termination also failed: {termination_error}")
+                        })
+                        .unwrap_or_default();
+                    return Err(ProviderProcessWaitFailure::Timeout(dispatch_error(
                         provider,
                         format!(
-                            "{binary} provider process timed out after {} seconds",
+                            "{binary} provider process timed out after {} seconds{termination_detail}",
                             limit.as_secs()
                         ),
-                    ));
+                    )));
                 }
                 thread::sleep(PROVIDER_PROCESS_POLL_INTERVAL);
             }
@@ -633,7 +459,10 @@ fn wait_for_provider_process(
                         format!("; provider termination also failed: {termination_error}")
                     })
                     .unwrap_or_default();
-                return Err(dispatch_error(provider, format!("{poll_detail}{termination_detail}")));
+                return Err(ProviderProcessWaitFailure::Failed(dispatch_error(
+                    provider,
+                    format!("{poll_detail}{termination_detail}"),
+                )));
             }
         }
     }
@@ -646,9 +475,12 @@ pub(crate) use termination::{configure_process_group, terminate_bounded_process_
 use termination::{terminate_provider_process, terminate_provider_process_group};
 
 #[cfg(test)]
+#[allow(clippy::expect_used)]
 mod tests {
     use std::ffi::OsString;
+    use std::fs::File;
     use std::io::{Cursor, Error};
+    use std::time::Duration;
 
     use super::output_collector::{
         MAX_PROVIDER_FINAL_MESSAGE_BYTES, MAX_PROVIDER_SESSION_EVENT_BYTES,
@@ -656,8 +488,9 @@ mod tests {
         read_output_last_message,
     };
     use super::{
-        RuntimeOutputLastMessage, collect_bounded_pipe, prepare_runtime_dir,
-        read_output_last_message_at, run_provider_process_with_timeout_inner,
+        MAX_CAPABILITY_EXEC_LOG_BYTES, ProviderProcessFailure, RuntimeOutputLastMessage,
+        collect_bounded_pipe, prepare_runtime_dir, read_output_last_message_at,
+        run_provider_process_with_timeout_inner, spawn_bounded_log_writer, system_process_runner,
     };
     use usecase::capability_exec::ProviderName;
 
@@ -667,6 +500,122 @@ mod tests {
 
         assert_eq!(collected.bytes, b"abc");
         assert!(collected.exceeded_limit);
+        Ok(())
+    }
+
+    #[test]
+    fn test_bounded_log_writer_redacts_credentials_before_persisting()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let path = directory.path().join("provider.log");
+        let secret = "xai-streaming-redaction-secret";
+
+        temp_env::with_vars([("XAI_API_KEY", Some(secret))], || {
+            let file = File::create(&path)?;
+            let stderr = Cursor::new(format!("before {secret} after").into_bytes());
+            spawn_bounded_log_writer(stderr, file)
+                .recv_timeout(Duration::from_secs(1))
+                .map_err(|_| "bounded log writer did not complete")??;
+
+            let log = std::fs::read_to_string(&path)?;
+            assert!(!log.contains(secret));
+            assert!(log.contains("[REDACTED:XAI_API_KEY]"));
+            Ok::<(), Box<dyn std::error::Error>>(())
+        })?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_bounded_log_writer_over_limit_fails_closed_to_unavailable_marker()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let path = directory.path().join("provider.log");
+        let file = File::create(&path)?;
+        let stderr = Cursor::new(vec![b'x'; MAX_CAPABILITY_EXEC_LOG_BYTES + 1]);
+
+        spawn_bounded_log_writer(stderr, file)
+            .recv_timeout(Duration::from_secs(1))
+            .map_err(|_| "bounded log writer did not complete")??;
+
+        assert_eq!(std::fs::read_to_string(path)?, "diagnostic_unavailable");
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_system_reviewer_process_invalid_binary_is_pre_spawn_failure()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let binary = directory.path().join("missing-provider").display().to_string();
+        let runtime_dir = directory.path().join("runtime");
+
+        let failure = system_process_runner()
+            .run_reviewer_with_lifecycle(
+                &binary,
+                None,
+                &[],
+                directory.path(),
+                &runtime_dir,
+                &provider,
+                None,
+                None,
+            )
+            .expect_err("invalid binary must fail before spawn");
+
+        assert!(matches!(failure, ProviderProcessFailure::PreSpawn(_)));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_system_reviewer_process_signal_exit_preserves_unavailable_status()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let runtime_dir = directory.path().join("runtime");
+        let args = [OsString::from("-c"), OsString::from("kill -TERM $$")];
+
+        let output = system_process_runner()
+            .run_reviewer_with_lifecycle(
+                "sh",
+                None,
+                &args,
+                directory.path(),
+                &runtime_dir,
+                &provider,
+                None,
+                None,
+            )
+            .expect("signal-terminated reviewer process should return an output");
+
+        assert_eq!(output.exit_code, None);
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_system_reviewer_process_timeout_is_typed_post_spawn_failure()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let runtime_dir = directory.path().join("runtime");
+        let args = [OsString::from("-c"), OsString::from("sleep 60")];
+
+        let failure = system_process_runner()
+            .run_reviewer_with_lifecycle(
+                "sh",
+                None,
+                &args,
+                directory.path(),
+                &runtime_dir,
+                &provider,
+                Some(Duration::from_millis(100)),
+                None,
+            )
+            .expect_err("timed-out child must be classified at the process boundary");
+
+        assert!(matches!(failure, ProviderProcessFailure::Timeout(_)));
         Ok(())
     }
 

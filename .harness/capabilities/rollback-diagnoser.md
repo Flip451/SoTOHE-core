@@ -95,7 +95,10 @@ Pick exactly one of the following five classes for `routing_target`:
 
 The `impl` class is **not** "out_of_scope" / "do nothing". It is the explicit affirmative
 diagnosis that no design-side rollback is required and the implementation is the only target.
-The calling orchestrator translates this to a source-edit task (no writer subagent).
+The calling orchestrator dispatches the `implementer` capability with a focused source-edit
+briefing (including the architecture constraints required by
+`.harness/policies/implementation-delegation.md`). The parent orchestrator must not take over
+the source edit inline as the normal route.
 
 ### Routing procedure (LLM-semantic, sketch)
 
@@ -151,7 +154,7 @@ If the briefing asks for:
 - type catalogue editing → stop and advise to invoke `type-designer`
 - impl-plan editing → stop and advise to invoke `impl-planner`
 - Source code editing → stop and return `routing_target: "impl"` so the orchestrator dispatches
-  a source-edit task
+  the `implementer` capability with a focused source-edit briefing
 
 This capability **never** edits any artifact, runs `bin/sotp track transition`, or invokes any
 writer subagent — it is diagnose-only and has no task-state transition authority.
@@ -184,7 +187,8 @@ writer subagent — it is diagnose-only and has no task-state transition authori
 ### Return value
 
 The structured object described under **Output contract**. The orchestrator reads this output
-verbatim and dispatches the corresponding writer (or applies a source edit for `impl`).
+verbatim and dispatches the corresponding writer (or dispatches `implementer` with a focused
+source-edit briefing for `impl`).
 
 ## Session continuity and resume
 

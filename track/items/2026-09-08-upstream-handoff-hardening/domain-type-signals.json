@@ -1,0 +1,32 @@
+{
+  "baseline_hash": "fabebbab1b87ef2ba550f421df03f448766927cae82486b98e2213d9b992b5b5",
+  "declaration_hash": "90ef81602614ff770fd630c889b86077281a47bcbc6824e6d148e982fbe13403",
+  "generated_at": "2026-09-10T09:19:36Z",
+  "head_commit": "7164fa6aa3ef2482a218956fa00beb8b72451ca4",
+  "implementation_fingerprint": "13fc9d02af8009b39b179d12043bf4c1a6ad631855d3157908ea07923f751af7",
+  "resolution_fingerprint": "c5a3de55a363ba8f40e74204eba594ed0df2fbc60993892dc8bc79052486c994",
+  "rustdoc_execution_identity": {
+    "crate_name": "domain",
+    "expected_json_path": "target/.sotp-rustdoc/c74f020b7ff22d38dc26c50f352e3b3fe0dd62b5ed38186a4ce5477458e725c2/doc/domain.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/c74f020b7ff22d38dc26c50f352e3b3fe0dd62b5ed38186a4ce5477458e725c2"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "ObligationFulfillmentVerifierPort"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a contract test covering 'trait_method:verify_pair' of ObligationFulfillmentVerifierPort",
+      "declaration_hash": "8fa85c4d4f1374a7378ed0a8e9083b8e90b48cff089d6b2f566107bbc4f5a633",
+      "id": {
+        "entry_key": "ObligationFulfillmentVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-11",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "ObligationFulfillmentVerifierPort",
+        "file_path": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::ports::Reviewer' of NullReviewer",
+      "declaration_hash": "730a39b157a5e226e86c7faf611b132fa9ae43e118fa26d18b79ad75b0861e8e",
+      "id": {
+        "entry_key": "NullReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-14",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "NullReviewer",
+        "file_path": "track/items/2026-09-08-upstream-handoff-hardening/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    }
+  ],
+  "track_id": "2026-09-08-upstream-handoff-hardening"
+}

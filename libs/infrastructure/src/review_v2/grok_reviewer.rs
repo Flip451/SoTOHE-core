@@ -18,7 +18,8 @@ use domain::{CommitHash, TrackId};
 use usecase::capability_exec::{GROK_PROVIDER_NAME, ModelName, ProviderName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
 use usecase::review_v2::{
-    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ports::Reviewer,
+    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ReviewerExecutionProvenance,
+    ports::Reviewer,
 };
 use usecase::review_workflow::{
     ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
@@ -26,10 +27,15 @@ use usecase::review_workflow::{
 };
 
 use crate::capability_exec::grok::build_grok_args;
-use crate::capability_exec::process::{ProviderProcessOutput, ProviderProcessRunner};
+use crate::capability_exec::process::{
+    ProviderProcessFailure, ProviderProcessRunner, ReviewerProcessOutput,
+};
 use crate::codex_common::REVIEW_RUNTIME_DIR;
 use crate::grok_common::{GrokOutputEnvelope, GrokSandbox};
 
+use super::diagnostics::{
+    process_failed_from_bytes, process_failed_from_text, unexpected_from_text,
+};
 use super::session::ReviewerSession;
 
 /// Grok-backed reviewer implementation for the `Reviewer` usecase port.
@@ -146,9 +152,9 @@ impl GrokReviewer {
     fn run_process(
         &self,
         args: &[std::ffi::OsString],
-    ) -> Result<ProviderProcessOutput, ReviewerError> {
+    ) -> Result<ReviewerProcessOutput, ReviewerError> {
         self.process_runner
-            .run(
+            .run_reviewer_with_lifecycle(
                 "grok",
                 None,
                 args,
@@ -158,12 +164,13 @@ impl GrokReviewer {
                 Some(self.timeout),
                 None,
             )
-            .map_err(|error| {
-                let detail = error.to_string();
-                if detail.contains("timed out") {
-                    ReviewerError::Timeout
-                } else {
-                    ReviewerError::Unexpected(detail)
+            .map_err(|failure| match failure {
+                ProviderProcessFailure::Timeout(_) => ReviewerError::Timeout,
+                ProviderProcessFailure::PreSpawn(error) => {
+                    unexpected_from_text(ReviewerExecutionProvenance::PreSpawn, error.to_string())
+                }
+                ProviderProcessFailure::PostSpawn(error) => {
+                    unexpected_from_text(ReviewerExecutionProvenance::PostSpawn, error.to_string())
                 }
             })
     }
@@ -182,25 +189,32 @@ impl GrokReviewer {
             &prompt,
         );
         let output = self.run_process(&args)?;
-        if output.exit_code != 0 {
-            return Err(ReviewerError::ReviewerAbort);
+        if output.exit_code != Some(0) {
+            return Err(process_failed_from_bytes(
+                &self.provider,
+                output.exit_code,
+                output.final_message.as_deref(),
+            ));
         }
         let result = extract_review_result(&output)?;
         let normalized = normalize_final_message(&result);
         let final_message_state = parse_review_final_message(normalized.as_deref());
         let final_message = match &final_message_state {
-            ReviewFinalMessageState::Parsed(payload) => Some(
-                render_review_payload(payload)
-                    .map_err(|error| ReviewerError::Unexpected(error.to_string()))?,
-            ),
+            ReviewFinalMessageState::Parsed(payload) => {
+                Some(render_review_payload(payload).map_err(|error| {
+                    unexpected_from_text(ReviewerExecutionProvenance::PostSpawn, error.to_string())
+                })?)
+            }
             _ => normalized,
         };
-        let verdict = classify_review_verdict(false, output.exit_code == 0, &final_message_state);
+        let verdict =
+            classify_review_verdict(false, output.exit_code == Some(0), &final_message_state);
         Ok(ReviewOutcomeRaw {
             verdict,
             final_message,
             session_id: output.session_id,
             log_info: self.runtime_dir.display().to_string(),
+            exit_code: output.exit_code,
         })
     }
 
@@ -248,15 +262,16 @@ struct ReviewOutcomeRaw {
     final_message: Option<String>,
     session_id: Option<String>,
     log_info: String,
+    exit_code: Option<i32>,
 }
 
-fn extract_review_result(output: &ProviderProcessOutput) -> Result<String, ReviewerError> {
+fn extract_review_result(output: &ReviewerProcessOutput) -> Result<String, ReviewerError> {
     let message = output.final_message.as_deref().ok_or(ReviewerError::IllegalVerdict)?;
     let envelope = serde_json::from_slice::<GrokOutputEnvelope>(message)
         .map_err(|_| ReviewerError::IllegalVerdict)?;
-    let structured_output = envelope
-        .into_structured_output()
-        .map_err(|error| ReviewerError::Unexpected(error.to_string()))?;
+    let structured_output = envelope.into_structured_output().map_err(|error| {
+        unexpected_from_text(ReviewerExecutionProvenance::PostSpawn, error.to_string())
+    })?;
     structured_output
         .get("result")
         .and_then(serde_json::Value::as_str)
@@ -271,7 +286,10 @@ fn convert_raw_to_final(raw: ReviewOutcomeRaw) -> Result<(Verdict, LogInfo), Rev
         ReviewPayloadVerdict::FindingsRemain => {
             let findings = convert_findings_to_domain(&payload.findings);
             Verdict::findings_remain(findings).map_err(|error: VerdictError| {
-                ReviewerError::Unexpected(format!("verdict construction: {error}"))
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PostSpawn,
+                    format!("verdict construction: {error}"),
+                )
             })?
         }
     };
@@ -285,7 +303,10 @@ fn convert_raw_to_fast(raw: ReviewOutcomeRaw) -> Result<(FastVerdict, LogInfo), 
         ReviewPayloadVerdict::FindingsRemain => {
             let findings = convert_findings_to_domain(&payload.findings);
             FastVerdict::findings_remain(findings).map_err(|error: VerdictError| {
-                ReviewerError::Unexpected(format!("verdict construction: {error}"))
+                unexpected_from_text(
+                    ReviewerExecutionProvenance::PostSpawn,
+                    format!("verdict construction: {error}"),
+                )
             })?
         }
     };
@@ -298,7 +319,13 @@ fn require_successful_payload(
     match raw.verdict {
         ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain => {}
         ReviewVerdict::Timeout => return Err(ReviewerError::Timeout),
-        ReviewVerdict::ProcessFailed => return Err(ReviewerError::ReviewerAbort),
+        ReviewVerdict::ProcessFailed => {
+            return Err(process_failed_from_text(
+                &GROK_PROVIDER_NAME,
+                raw.exit_code,
+                raw.final_message.as_deref(),
+            ));
+        }
         ReviewVerdict::LastMessageMissing => return Err(ReviewerError::IllegalVerdict),
     }
 
@@ -337,7 +364,7 @@ mod tests {
 
     use super::*;
     use crate::capability_exec::grok::GROK_STRUCTURED_OUTPUT_SCHEMA;
-    use crate::capability_exec::process::ProviderProcessRunner;
+    use crate::capability_exec::process::{ProviderProcessOutput, ProviderProcessRunner};
     use usecase::capability_exec::{CapabilityExecError, CapabilityFailureDetail};
     use usecase::provider_session::{
         ProviderSessionCacheEntry, ProviderSessionCacheError, ProviderSessionCacheKey,
@@ -350,6 +377,7 @@ mod tests {
     struct RecordingProcessRunner {
         invocations: Mutex<Vec<RecordedInvocation>>,
         responses: Mutex<Vec<Result<ProviderProcessOutput, CapabilityExecError>>>,
+        lifecycle_failures: Mutex<Vec<ProviderProcessFailure>>,
     }
 
     impl ProviderProcessRunner for RecordingProcessRunner {
@@ -374,6 +402,35 @@ mod tests {
                 .expect("process response lock")
                 .pop()
                 .unwrap_or_else(|| Ok(successful_process_output()))
+        }
+
+        fn run_with_lifecycle(
+            &self,
+            binary: &str,
+            path_prefix: Option<&Path>,
+            args: &[OsString],
+            repo_root: &Path,
+            runtime_dir: &Path,
+            provider: &ProviderName,
+            timeout: Option<Duration>,
+            output_last_message: Option<&Path>,
+        ) -> Result<ProviderProcessOutput, ProviderProcessFailure> {
+            if let Some(failure) =
+                self.lifecycle_failures.lock().expect("process lifecycle failure lock").pop()
+            {
+                return Err(failure);
+            }
+            self.run(
+                binary,
+                path_prefix,
+                args,
+                repo_root,
+                runtime_dir,
+                provider,
+                timeout,
+                output_last_message,
+            )
+            .map_err(ProviderProcessFailure::PostSpawn)
         }
     }
 
@@ -793,13 +850,48 @@ mod tests {
     }
 
     #[test]
+    fn test_grok_reviewer_oversized_failure_diagnostic_retains_post_spawn_provenance()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let runner = Arc::new(RecordingProcessRunner {
+            responses: Mutex::new(vec![Ok(ProviderProcessOutput {
+                exit_code: 0,
+                session_id: None,
+                final_message: Some(
+                    serde_json::json!({
+                        "failure_reason": "x".repeat(4096),
+                    })
+                    .to_string()
+                    .into_bytes(),
+                ),
+            })]),
+            ..Default::default()
+        });
+        let reviewer = reviewer(runner, Arc::new(MemorySessionCache::with_entry(None)));
+
+        let error = reviewer
+            .review(&ReviewTarget::new(vec![]))
+            .expect_err("an oversized provider failure must fail closed");
+
+        assert!(matches!(
+            error,
+            ReviewerError::Unexpected {
+                provenance: ReviewerExecutionProvenance::PostSpawn,
+                diagnostic: usecase::review_v2::ReviewerProcessDiagnostic::Unavailable,
+            }
+        ));
+        Ok(())
+    }
+
+    #[test]
     fn test_grok_reviewer_subprocess_timeout_is_reviewer_timeout()
     -> Result<(), Box<dyn std::error::Error>> {
         let runner = Arc::new(RecordingProcessRunner {
-            responses: Mutex::new(vec![Err(CapabilityExecError::DispatchFailed {
-                provider: GROK_PROVIDER_NAME.clone(),
-                detail: CapabilityFailureDetail::new("provider process timed out"),
-            })]),
+            lifecycle_failures: Mutex::new(vec![ProviderProcessFailure::Timeout(
+                CapabilityExecError::DispatchFailed {
+                    provider: GROK_PROVIDER_NAME.clone(),
+                    detail: CapabilityFailureDetail::new("provider process timed out"),
+                },
+            )]),
             ..Default::default()
         });
         let reviewer = reviewer(runner, Arc::new(MemorySessionCache::with_entry(None)));
@@ -850,7 +942,14 @@ mod tests {
             .review(&ReviewTarget::new(vec![]))
             .expect_err("nonzero Grok exit must abort before envelope decode");
 
-        assert!(matches!(error, ReviewerError::ReviewerAbort));
+        assert!(matches!(
+            error,
+            ReviewerError::ProcessFailed {
+                provider,
+                exit_code: Some(code),
+                ..
+            } if provider.as_str() == "grok" && code.as_i32() == 9
+        ));
         Ok(())
     }
 

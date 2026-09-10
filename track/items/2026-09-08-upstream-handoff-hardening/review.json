@@ -1,0 +1,1201 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-08T16:17:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45d3a9626b18b3bd01f3a6928cc2145f69233b97ade545f853d6513343f185ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T16:37:43Z",
+          "findings": [
+            {
+              "category": "broken narrative reference",
+              "file": "knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md",
+              "line": 53,
+              "message": "D3 は共通方法論の正本を framework-owned の `.harness/prompts/pr-reviewer.md` に委譲していますが、この ADR の自己完結方針および現在の SoTOHE-core の review 文書配置と整合しません。SoTOHE-core 内でどの既存 authority が方法論を所有するのかを明示しない限り、D3 の所有境界が未解決です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:801f2487e07f7053189c3765de5339d456283e65c8c1c40f90a3eb8a3fa66a4d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T16:44:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c75ed478754ca54416b2bede477f909eb2dc4160b20c915f954dd86bc4d6787",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T16:55:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c75ed478754ca54416b2bede477f909eb2dc4160b20c915f954dd86bc4d6787",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T09:24:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e905e7d29e5eac10354359b0e283cb7d65bf5a68fe14c5f08a900a863ca1a3fc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T09:30:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e905e7d29e5eac10354359b0e283cb7d65bf5a68fe14c5f08a900a863ca1a3fc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T09:45:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f748d747d9526f1446dcf16edb9ea6f9f9a07a40c3f8fb886cbfb2b6f68174da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T09:50:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f748d747d9526f1446dcf16edb9ea6f9f9a07a40c3f8fb886cbfb2b6f68174da",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T07:05:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e5cb73b16344be7d2ecde7976842d18da79f789f642b0dcc5240b47434611e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T07:08:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e5cb73b16344be7d2ecde7976842d18da79f789f642b0dcc5240b47434611e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-09-09T04:34:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76e574ddfacfd78b9c7710e733c05c46c1d79736ff890ddf9f6ac981eb28f17d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:50:55Z",
+          "findings": [
+            {
+              "category": "application-logic leak",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 556,
+              "message": "`ReviewerProcessDiagnostic::Unavailable` is always classified as pre-subprocess, but adapters can produce it after a child has run—for example, an oversized `Grok provider failed:` detail is converted by `unexpected_from_text` into `Unexpected(Unavailable)`. `dispatch_review_cycle` then returns `Err` instead of `SubprocessFailed`, suppressing subprocess telemetry and losing execution provenance. Carry an explicit typed pre/post-spawn classification from the adapter/usecase; the composition layer must not infer lifecycle state from diagnostic text or availability.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:76e574ddfacfd78b9c7710e733c05c46c1d79736ff890ddf9f6ac981eb28f17d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T07:12:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4a26b08705cdc6bc2a66cbf9816e3752465950ad3411701f9e22f5a20bd24e4d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T07:21:44Z",
+          "findings": [
+            {
+              "category": "adapter defined here",
+              "file": "apps/cli-composition/src/review_v2/null_reviewer.rs",
+              "line": 14,
+              "message": "`NullReviewer` remains a production secondary adapter in the composition crate, and this diff extends its `Reviewer` implementation with execution-provenance behavior. The cli_composition policy explicitly forbids defining domain/usecase port implementations here; this adapter is wired into the status/check-approved `ReviewCycle` through `review_v2::shared`. Move the no-op reviewer implementation to `libs/infrastructure` and leave composition responsible only for constructing and injecting it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4a26b08705cdc6bc2a66cbf9816e3752465950ad3411701f9e22f5a20bd24e4d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T12:14:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a0bc8e984da42b76034b276ee01a0bc91303c45cb8710524404be8220d9c2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T12:26:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a0bc8e984da42b76034b276ee01a0bc91303c45cb8710524404be8220d9c2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-09T04:34:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:087f72ec7561b8f0a35084bc50f14b1ee0f16a363df0903fc7f6a3e85d52ebc8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:42:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:087f72ec7561b8f0a35084bc50f14b1ee0f16a363df0903fc7f6a3e85d52ebc8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:00:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d925074dcdd1265c6f630a298ee8debe82a1166eece164e6dae0003eb6a95a6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:06:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d925074dcdd1265c6f630a298ee8debe82a1166eece164e6dae0003eb6a95a6",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-09-09T04:34:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:299597be33c0994cacb20e8c666d100367e89cb89f73fbe34a26c5866c4b32b1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:41:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:299597be33c0994cacb20e8c666d100367e89cb89f73fbe34a26c5866c4b32b1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-09-09T04:32:52Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/capabilities/rollback-diagnoser.md",
+              "line": 190,
+              "message": "The capability's return-value contract still says the orchestrator “applies a source edit for `impl`,” contradicting the updated `impl` routing contract at lines 96–101 and the diagnose workflow. This can cause the parent to edit inline instead of dispatching `implementer`, bypassing the required architecture-constraint briefing and delegation boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:962c0915f18aafc0e68913e26c5a66fe8cfd536b81ed3737726d903fddbfa84d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T04:35:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:deaab880f19d75fe572486cff5e340bd9dcefaa3020c1506756354e20719f718",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:50:59Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 384,
+              "message": "通常の inherent method を `TypeEntry.methods` に置くという新規規則と、Step 6 で `--inherent-method \"fn new(...)\"` を一般的な inherent method 用として案内している line 154 が矛盾しています。このフラグは実装上常に top-level `inherent_impls` を生成するため、生成手順に従うとこの規則および AC-04 に違反します。Step 6 でも通常メソッドには `--method` を使い、`--inherent-method` は impl-level generics／where predicates が必要な例外だけに使うと明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:deaab880f19d75fe572486cff5e340bd9dcefaa3020c1506756354e20719f718",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T04:58:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e84688ada430287879a69c2ab32d30b6aa2b655a7e64fb8253f55eb80409d41e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T02:59:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89bf1ea1e88eb58a3f2cc1d2e338c1ccd55ed44dbec62f6660b229779c4efb58",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:12:30Z",
+          "findings": [
+            {
+              "category": "workflow consistency",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 289,
+              "message": "The new unfinished-task branch is not propagated consistently. Step 3 and residual-recovery step 6 require unfinished tasks to run normal full-cycle through commit/lifecycle tail and then proceed to PR re-review, reserving standalone local review/commit for the no-unfinished-task branch. This recovery summary still directs writer corrections straight to local review/commit; `.claude/commands/track/pr-review.md:27`, `.harness/policies/review-protocol.md:78`, and `.harness/policies/task-completion.md:35`/`:37` contain the same stale or redundant sequence. Following those surfaces can skip unfinished work or attempt another commit after full-cycle has already closed the lifecycle. Align every surface with the mutually exclusive Step 3 split.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 137,
+              "message": "The provider-agnostic workflow now invokes `/track:full-cycle`, which is Claude-specific command syntax; the Codex surface uses `$track-full-cycle`. The same leakage occurs again at line 215. Refer to the `full-cycle` workflow in normal mode here and leave concrete invocation syntax to each provider adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:89bf1ea1e88eb58a3f2cc1d2e338c1ccd55ed44dbec62f6660b229779c4efb58",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:29:34Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".harness/policies/review-protocol.md",
+              "line": 78,
+              "message": "The ADR-repair tail still bypasses the new task-summary/full-cycle split. After the guardian lane can regenerate downstream plan tasks, this sentence unconditionally sends execution to local review and commit, whereas the workflow SSoT requires unfinished tasks to complete normal full-cycle first. The same stale instruction remains at `.harness/policies/task-completion.md:35` and `.claude/commands/track/pr-review.md:35`. Route ADR-lane completion through the same mutually exclusive task-summary paths as every other writer-owned correction.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow consistency",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 222,
+              "message": "A successful `track add-task` creates a genuine residual task in `todo`, so after re-planning the residual branch must still have unfinished work. The no-unfinished fallback permits a dropped or incorrectly settled residual task to proceed through only local review/commit and reach PR re-review without implementation. Make normal full-cycle mandatory after successful residual-task registration, and fail closed if the registered task disappears or is no longer unfinished; align the policy summaries with that invariant.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:684c42af31cc1cae8891cd06273d06711a16609726473e6f5f52d6dce5f2675a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:37:32Z",
+          "findings": [
+            {
+              "category": "command wiring",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "The `machine PASS` condition depends on the absence of an `Accepted Deviations` section in the PR body, but the documented `review-cycle` result only supplies the latest review body/inline comments or a zero-findings signal. No step fetches the current PR body, so a bot zero signal can still be labeled `machine PASS — zero findings` when the PR body contains deviations. Fetch the body through a supported read-only field before labeling the terminal result (or include a typed deviation indicator in `review-cycle`) and fail closed if it cannot be inspected.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow consistency",
+              "file": ".harness/policies/review-protocol.md",
+              "line": 78,
+              "message": "The policy paths jump directly from completion of the ADR guardian lane to task-summary evaluation. That guardian lane only reconverges ADR review; it does not perform the required partial re-entry through spec, types, and plan. The same omission appears in `.harness/policies/task-completion.md:35` and `.claude/commands/track/pr-review.md:35`, while the workflow SSoT correctly requires downstream reconvergence first. Route ADR completion through that descent before checking tasks or choosing full-cycle versus local review/commit.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 27,
+              "message": "This provider adapter now duplicates Step 3's unfinished-task gate, both state-dependent branches, lifecycle-tail waiting, and the ADR recovery branch. That contradicts its declared boundary that provider-independent workflow logic lives in the workflow SSoT and recreates the drift the adapter split is intended to prevent. Keep only Claude-specific invocation mappings (`full-cycle` to `/track:full-cycle`, review/commit to their commands) and defer the conditions and ordering to the SSoT.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01f28bc3b92275258e666eb0db50b127d5a2736d48ada74ff1fca49e620389bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:43:39Z",
+          "findings": [
+            {
+              "category": "review gate correctness",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 106,
+              "message": "The presence of any `Accepted Deviations` section selects this branch before the current review comments are surfaced or assessed. A stale or partial section can therefore let user approval terminate the workflow while the same review round contains new actionable findings that are not listed as deviations. Always assess the complete current round first, require every remaining finding to correspond to an explicit deviation entry, and continue the fix loop for any unlisted finding before offering the deviation terminal state.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:48696c7e73b041ed069019b5d5508f54af6f3e820ebfc09dcd174c4dc7cf90ae",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:47:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf06a9f89931fe5c3147f786e736455e834fbc1beb89bac753d6abc036591c4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T07:06:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45b7cc3af065779281b182e9bf6e5b1da2f1d42ce55ba1eb0c30568be0b896ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T07:10:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45b7cc3af065779281b182e9bf6e5b1da2f1d42ce55ba1eb0c30568be0b896ad",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T09:07:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:31a069917b2355e5f044ac6c4af7567814f60b51e93c8fb47cd85940c4601ac9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T09:16:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:31a069917b2355e5f044ac6c4af7567814f60b51e93c8fb47cd85940c4601ac9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-08T20:27:31Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 107,
+              "message": "T006 changes `ReviewerError` variants/payloads, but existing infrastructure constructors still use `ReviewerError::Unexpected(String)` and related old variants. T006 cannot leave the workspace compiling until T007 updates those callers. Make the API change and required call-site migration one independently passing task boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 148,
+              "message": "T004 is unnecessarily placed in B2. T001–T003 have non-overlapping harness-policy targets and total 275 production lines; adding T004 totals 385, below the 500-line ceiling, with no dependency or ownership conflict. Move T004 into B1 (or document a concrete conflict).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5e670ecc7d3df9ff5a061727d088a5bf23baeb64841b92d049462147ebe4f6d8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:33:13Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 107,
+              "message": "T006 now includes existing callers under `libs/infrastructure/src/review_v2/`, while T007 also owns `claude_reviewer.rs` in that directory. Their concrete write targets overlap within B1; narrow T006’s migration boundary or separate the ownership before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 148,
+              "message": "T004 is unnecessarily placed in B2. T001–T003 have non-overlapping harness-policy targets and total 275 production lines; adding T004 totals 385, below the 500-line ceiling, with no dependency conflict. Move T004 into B1 or document a concrete ownership conflict.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:662b8260c91ba3f197bb7c8f55f4e9ad3255d6b95d20c0d5cd09ef9909819b25",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:37:18Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 147,
+              "message": "T004 is unnecessarily placed in B2. T001–T003 are dependency-ready, have non-overlapping harness-policy targets, and total 275 production lines; adding T004 totals 385, below the 500-line ceiling. Move T004 into B1 or document a concrete ownership conflict.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:be64e7b2062876ed3bd256cf0a6f9e1c9edc654d7c48ae86a257b0224a7e4cf7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:47:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f2c2580673702483507c6bdbf5805739a1226c7eae8502ccf48f8cd30e754fa8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T21:04:23Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 70,
+              "message": "`plan.summary` claims H/IN/AC coverage but does not trace either spec goal. Goal traceability is intentionally absent from `task-coverage.json`, so the summary must explicitly map GO-01 to T001–T004 and GO-02 to T005–T010 (or equivalent task sets).",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 83,
+              "message": "T002 bundles independently verifiable units: Claude dispatcher behavior (AC-02), the distribution allowlist (AC-03), and PreCompact/adapter-list alignment (AC-01/CN-01). Split these into separately executable tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 95,
+              "message": "T004 bundles two independent behaviors: framework PR-review prompt/reference wiring (AC-05/CN-03) and completion-result labeling (AC-06). Split them into separate tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 101,
+              "message": "T005's target, “PR-review workflow and related review/recovery policy,” does not identify specific files or symbols. The executor must invent which workflow and policy artifacts form the boundary; name the exact targets while retaining the operation and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 131,
+              "message": "T009's target, “Fulfillment-verifier prompt/input and cache-identity modules plus structural regression fixtures,” does not identify files or symbols. Multiple verifier, evaluation, cache, and fixture modules match this wording, so the implementation boundary must be made explicit.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/task-contract.json",
+              "line": 10,
+              "message": "T006 omits the `usecase::review_v2::error::ReviewCycleError` reference entry even though it owns convergence of `review_v2/error.rs` and must preserve the existing `From<ReviewerError>` conversion. Attribute that catalogue entry to T006; the current coverage check reports it as `OrphanEntry`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f2c2580673702483507c6bdbf5805739a1226c7eae8502ccf48f8cd30e754fa8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T21:23:40Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/task-coverage.json",
+              "line": 31,
+              "message": "OUT-01 remains mapped only to T001/T002, but the split moved both constrained surfaces—`.claude/settings.json` `hooks.PreCompact` and `.claude/agents/README.md`—to T012. Map OUT-01 to T012 so the prohibition on new persistence and fixed provider-assignment descriptions follows the task that owns those surfaces.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/task-coverage.json",
+              "line": 39,
+              "message": "OUT-03 is mapped only to T004, while T013 now owns the approved-deviation completion path. AC-06 distinguishes the displayed results but does not itself preserve the existing explicit-user-approval requirement; map OUT-03 to T013 as well.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 124,
+              "message": "T005 claims AC-08 but no task targets `.harness/policies/review-protocol.md`. That policy currently sends writer-owned corrections from downstream planning convergence directly to local review/commit, without the required full-cycle branch when replanning creates unfinished tasks. Add the policy update to T005 or another AC-08 task.",
+              "severity": "P1"
+            },
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/impl-plan.json",
+              "line": 145,
+              "message": "T008 owns the catalogue change to `ObligationFulfillmentVerifierPort::verify_pair`, but its task stops at the domain port/pair and usecase constructors. Existing implementations and calls in `libs/infrastructure/src/test_obligation/{fulfillment_verifier,fulfillment_escalation_driver}.rs` and `apps/cli-composition/src/test_obligation.rs` retain the old signature; T009 depends on T008 and now names only usecase files despite carrying infrastructure estimates. Consequently T008 cannot close as an independently compiling task. Put the port change and all implementor/caller migrations in one task, or reattribute and reorder the tasks so every boundary compiles, including the missing CLI-composition scope.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/batch-plan.json",
+              "line": 193,
+              "message": "B2 groups ready tasks T013 and T005 even though both explicitly write `.harness/workflows/track/pr-review.md` and T005 targets Step 3, where T013's completion-result distinction also belongs. With no dependency between them, their write ownership overlaps; serialize them through a declared dependency or place them in non-overlapping batches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:581454d00dc15df45721b1c2e2a275d02924bb632e5e7df0a2d0b49b7f6d2da7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T21:29:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9473b4c65d2132d34590bf45d0d8599035760e81be2ddd184f80c9c88e9511d0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T02:55:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f488ad89c6eefdc7805f4d8ff59a79285b1e134288aa3e1f896ff8f0f93feef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T03:03:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f488ad89c6eefdc7805f4d8ff59a79285b1e134288aa3e1f896ff8f0f93feef",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:30:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5f6e230e402dbb613db7d93ed8498de0b652990cbcc544622681c1837ad71bb0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:32:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5f6e230e402dbb613db7d93ed8498de0b652990cbcc544622681c1837ad71bb0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T05:30:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e36d69a583b05ea0b01c0624a7e73a4e272f401c55256de3f1a2a46f77769ca",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T05:33:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e36d69a583b05ea0b01c0624a7e73a4e272f401c55256de3f1a2a46f77769ca",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T10:38:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7b489df8227e2e04dd0930d43570b23ffa471045339715e95fbdb5ee09e91d2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T10:44:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7b489df8227e2e04dd0930d43570b23ffa471045339715e95fbdb5ee09e91d2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T01:35:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3cf463def624c13661cf0116f2abe544b74b2efbb0d431b2cf9413573cdd07b8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T01:41:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3cf463def624c13661cf0116f2abe544b74b2efbb0d431b2cf9413573cdd07b8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T02:57:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3aa3c5c0ddc1d1332e36a0526e9e03704ce8614814ec116413f73cdad59138",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:00:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3aa3c5c0ddc1d1332e36a0526e9e03704ce8614814ec116413f73cdad59138",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T04:12:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa0d28fc6e839b269bb228e5a741834453bb8be2366c991eb78c1aa2612a2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T04:17:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa0d28fc6e839b269bb228e5a741834453bb8be2366c991eb78c1aa2612a2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-09T04:36:05Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/review_v2/diagnostics.rs",
+              "line": 21,
+              "message": "The new reviewer diagnostics path calls `redact_credentials`, but that redactor only covers `OPENAI_API_KEY`, `CODEX_API_KEY`, `OPENAI_ORG_ID`, and `OPENAI_BASE_URL`. Claude's `ANTHROPIC_API_KEY` (and provider-specific Grok credentials) can therefore be emitted verbatim when a provider includes them in stderr or failure output, violating the fail-closed no-secret-leakage contract. Use a redaction authority that covers every credential available to the respective provider, with a regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7587075eb6508a2ec576ee5e8e2b9e3cd687f47190a37db9bce5914f94291324",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T04:50:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b6407af3426859c0782ddc7fd844d0ac000e0fd6e3e7e9844e4260fac1b0d0a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T07:11:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:10c7fb8d16ff6736b26e990732ef4fb643a2e0c7a6e60acdada003a9acfc359d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T07:34:48Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/capability_exec/process/reviewer_lifecycle.rs",
+              "line": 145,
+              "message": "The real Grok reviewer reaches this lifecycle path, but `spawn_bounded_log_writer` writes stderr bytes directly to the persistent `capability-exec-grok-*.log` before any credential redaction. The diagnostic helpers sanitize only the final-message/error channel, so a provider echo of `XAI_API_KEY` is still stored verbatim. Use a reviewer-aware redacting bounded writer and fail closed on invalid or over-limit text.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/review_v2/codex_process.rs",
+              "line": 448,
+              "message": "`maximum_bytes` is the 4 MiB session-log limit, and the same accepted value is echoed to the parent stderr. Consequently valid, redacted diagnostics between 4097 bytes and 4 MiB are displayed instead of degrading to `diagnostic_unavailable`, violating AC-10's 4096-byte boundary. Apply the validated 4 KiB limit separately before the stderr write.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/capability_exec/process/reviewer_lifecycle.rs",
+              "line": 164,
+              "message": "`ExitStatus::code()` returns `None` for signal termination and may produce values outside `u8`, but both cases are collapsed to `1`. `GrokReviewer` then reports this as `Some(1)`, fabricating an acquired exit code instead of preserving it or reporting it unavailable. Preserve `Option<i32>` or `Option<ProgramExitCode>` across the lifecycle boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/review_v2/grok_reviewer.rs",
+              "line": 177,
+              "message": "Timeout classification is reconstructed from opaque error display text using `contains(\"timed out\")`. A post-spawn filesystem/log error with that wording is misclassified as the reviewer process exceeding its limit, while a wording change can turn a real timeout into `Unexpected`. Carry a typed timeout condition from the process boundary.",
+              "severity": "P2"
+            },
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/review_v2/grok_reviewer.rs",
+              "line": 435,
+              "message": "The production `SystemProviderProcessRunner` lifecycle classification has no executable boundary test. The scoped Grok test runner hardcodes every injected failure as `PostSpawn`, so a regression that labels actual spawn/setup failures `PostSpawn` leaves the current tests green. Add a real invalid-binary pre-spawn test against the system lifecycle path, plus a post-spawn case if practical.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:10c7fb8d16ff6736b26e990732ef4fb643a2e0c7a6e60acdada003a9acfc359d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T08:03:16Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 696,
+              "message": "Once the configured deadline is crossed, `Timeout` is returned only if process termination and reaping succeed. If the child exits between `try_wait()` and the kill attempt, or OS cleanup otherwise fails, `?` converts the already-observed timeout into `Failed`, which Grok reports as `Unexpected(PostSpawn)` instead of `ReviewerError::Timeout`. Preserve the typed timeout while attaching any cleanup failure detail so AC-09 remains truthful across the process-exit race.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:9a75e5eacd987c6af1c8c669f401972d24af69d572e83ef401e931c7b558eeae",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T08:11:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4eee721083962d5d1aee3beda8002ec58801570318e2457d224278fce7993aed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T12:13:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08bca50fd31a4c8aa11f3b0d475c730e36fd9ab3c97eadd8c4918b3cbfa44697",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T12:21:23Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/review_v2/check_zero_findings.rs",
+              "line": 74,
+              "message": "`ReviewCheckZeroFindingsStateAdapter` still constructs its query-only `ReviewCycle` with the private `StateReaderReviewer` instead of the newly designated infrastructure `NullReviewer`. `ResultsStateAdapter` delegates review-results state-summary reads through this adapter, so that real query path never constructs or uses the AC-14 adapter; the current no-invocation tests pass even if `NullReviewer` is disconnected. Use the shared `NullReviewer` here and remove the duplicate `Reviewer` implementation.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:08bca50fd31a4c8aa11f3b0d475c730e36fd9ab3c97eadd8c4918b3cbfa44697",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T12:29:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f5846f6653d1e9ae786077276899fb2376241e93f6cb3336a7997fdd7573e7a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-08T16:36:35Z",
+          "findings": [
+            {
+              "category": "documentation correctness",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/research/handoff-triage.md",
+              "line": 13,
+              "message": "H07 is recorded as fixed, but the claimed framework-owned `.harness/prompts/pr-reviewer.md` does not exist, and the current custom prompt still contains the full review methodology rather than only focus/severity plus a reference. The triage note therefore misstates the branch's actual state.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c675a0800cb796c29fdd25c148a11390a4b4fc143865e81256e6f7bd2d539d8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T16:50:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a589617620a78a3a03d3048946fdab71b755545b566291bb65b3f0ff7927a826",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T17:00:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a589617620a78a3a03d3048946fdab71b755545b566291bb65b3f0ff7927a826",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T20:26:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4c850c6a0398cbdd3abdc3a1503acbdcb5481bea56bba5b87cb1d7d8ba0d58e4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T20:31:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4c850c6a0398cbdd3abdc3a1503acbdcb5481bea56bba5b87cb1d7d8ba0d58e4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:31:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ed43143e1ca32fc36b44cae87163b0ea72fdb41802f11616d031f5e40177a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:49:39Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/test-bindings.json",
+              "line": 174,
+              "message": "The AC-09 binding only references tests that construct `ReviewerError::ProcessFailed` directly or use a fake reviewer that already returns it. None exercises conversion of a real reviewer subprocess failure, so an adapter could regress to `UserAbort` while this obligation remains green. Bind the existing Claude/Grok adapter failure tests and add the analogous Codex case.",
+              "severity": "P2"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/test-bindings.json",
+              "line": 196,
+              "message": "The AC-10 evidence separates a pure redaction-helper test from a diagnostic-boundary test whose successful input is already redacted. Removing `redact_credentials` from the production diagnostic path would therefore leave every bound test green and permit credential leakage. Bind the current end-to-end diagnostic redaction test (and the all-provider credential test) so the wiring itself is verified.",
+              "severity": "P2"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/test-bindings.json",
+              "line": 96,
+              "message": "The sole AC-10 test bound to both diagnostic value types accepts 4095 bytes and rejects 4097, but never verifies that the specified inclusive 4096-byte limit is accepted. A `>= 4096` off-by-one regression would pass these bindings. Add an exact-4096 success assertion and keep it bound to both edges.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:d7ed43143e1ca32fc36b44cae87163b0ea72fdb41802f11616d031f5e40177a7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T07:09:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:769b4cfd538d16fef0d5cca11b83740c4eedfde6d68d2cad7ea559bf4ec3d9f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T07:20:49Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/test-bindings.json",
+              "line": 140,
+              "message": "The AC-09 provenance binding never observes a pre-spawn failure produced by a real runner or adapter. Its first two tests construct `PreSpawn`/`PostSpawn` manually, while the infrastructure test injects a completed `ProviderProcessOutput` through `RecordingProcessRunner` and covers only post-spawn parsing. A regression that labels actual spawn/setup failures `PostSpawn` would therefore leave all bound evidence green. Add and bind a real pre-spawn failure test, preferably alongside direct lifecycle-boundary pre/post cases.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:769b4cfd538d16fef0d5cca11b83740c4eedfde6d68d2cad7ea559bf4ec3d9f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-09T12:11:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:947871e7fd3f8fe49e97d5cddddfab4351fb2f9ccb958cd1e65b271ff60081cc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T12:17:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:947871e7fd3f8fe49e97d5cddddfab4351fb2f9ccb958cd1e65b271ff60081cc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T02:58:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77c61bb579662e55e5db5215df1f26e5875aaeb40263809c0e1f9f43dc754637",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:05:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77c61bb579662e55e5db5215df1f26e5875aaeb40263809c0e1f9f43dc754637",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-08T17:18:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:313c39aa0af263e0b8742a982539111328294f6db9a65499764ce71e513b28db",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T17:28:33Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+              "line": 101,
+              "message": "AC-10 は自由文診断を「長さを制限」とするだけで、上限値、単位（bytes / characters）、超過時の切り詰めまたは固定分類への縮退動作を定義していません。環境前提宣言の Resource Limits は `gate-output` の子プロセス捕捉専用で reviewer 診断を対象にしていないため、下流フェーズが境界を発明する必要があり、有界出力を決定論的に検証できません。これは未宣言の前提への依存です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:313c39aa0af263e0b8742a982539111328294f6db9a65499764ce71e513b28db",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T17:34:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4422963b12f38e71e99075b73c9c808f61b667c20822d9b420212b623ca66de0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T09:01:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40a9fca03813f34ce9ab77f6a34eade4baba3800dcadaf362a6ff9579935dce5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T09:09:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40a9fca03813f34ce9ab77f6a34eade4baba3800dcadaf362a6ff9579935dce5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T09:59:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7fdd51b85ae6aedfa0750e5f4235c0ea8c7dbeb70e1125505f5db95046eccbd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T10:03:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7fdd51b85ae6aedfa0750e5f4235c0ea8c7dbeb70e1125505f5db95046eccbd",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-08T18:40:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50e41e54ccbd654a59ab78bdfcbde8f09d1dbafae98c44cb0ef75de4dd8320d3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T18:53:52Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+              "line": 29,
+              "message": "`ObligationFulfillmentVerifierPort::verify_pair` invokes an external semantic-verifier provider but remains synchronous, while entry `ObligationFulfillmentVerifierPort` does not acknowledge the intentional blocking boundary or the existing `SpawnBlocking` isolation. Record that choice in the type contract or expose an asynchronous port before callers are fixed to this shape.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 8,
+              "message": "The `action: delete` declaration for `ReviewCycleError: From<ReviewerError>` is not required by AC-09/AC-10. The existing conversion preserves the structured `ReviewerError` inside `ReviewCycleError::Reviewer` without losing provider, exit-code, or diagnostic data, and remains the appropriate boundary conversion. Keep it unchanged instead of introducing an unrelated public API deletion.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/domain-types.json",
+              "line": 31,
+              "message": "The `docs` fields for entries `ObligationFulfillmentVerifierPort` and `domain::tddd::test_obligation::pair::ObligationFulfillmentPair` reproduce AC-11/AC-12’s entry-local responsibility behavior in prose. Replace the behavioral restatement with concise type identification and rely on `spec_refs`, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 88,
+              "message": "The `docs` fields for entries `ReviewerDiagnostic`, `ReviewerProcessDiagnostic`, and `usecase::review_v2::error::ReviewerError` restate AC-09/AC-10’s redaction limit, unavailable fallback, preserved diagnostics, and error distinctions. Reduce them to concise type-purpose labels and rely on their `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:50e41e54ccbd654a59ab78bdfcbde8f09d1dbafae98c44cb0ef75de4dd8320d3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-08T20:03:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc31df31a42cc23f12a622f6a2830b733f9a8583f5c7df5c19f0d16b12c5fc73",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-08T20:08:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc31df31a42cc23f12a622f6a2830b733f9a8583f5c7df5c19f0d16b12c5fc73",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T02:22:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81349d15700791f558ee2a9dbdc068cf97ef389a75f84d85ea3f181c409b0fd8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T02:30:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81349d15700791f558ee2a9dbdc068cf97ef389a75f84d85ea3f181c409b0fd8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T05:17:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8845ee4e9fd42bdcb203ff7f824236f1c068619d1f048bba4dde4e183a964817",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T05:22:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8845ee4e9fd42bdcb203ff7f824236f1c068619d1f048bba4dde4e183a964817",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T10:19:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c68a9a3cd96a4d3261c01adb7412488a5e4c9b8a586c6027a3fd6465deb8e5d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T10:25:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c68a9a3cd96a4d3261c01adb7412488a5e4c9b8a586c6027a3fd6465deb8e5d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T00:17:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06d307d0a055eefee0062c162cbaf31c8e49ad8730b7102dfd549e50c67fa650",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T00:26:10Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 578,
+              "message": "`usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome::new` accepts verdict counts and `ConfiguredProviderCalibrationOutcome` independently and infallibly returns `Self`. It therefore permits contradictory states such as a positive production count with `SkippedNoProductionPairs`, or zero counts with `SkippedByConfiguration`. Encode or validate this relationship so the B2 reporting state cannot lie.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsupported semantic placement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 215,
+              "message": "`ConfiguredProviderCalibrationOutcome` is an operation-specific application output discriminant, but is classified as `ValueObject`. Its docs and IN-06/AC-12 record do not establish stable meaning across application operations or independence from workflow/reporting concerns—the required semantic grounds for an application-layer ValueObject. Classify this boundary result as a `Dto`, or provide reviewable grounds that actually support ValueObject placement.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 182,
+              "message": "The `ConfiguredProviderCalibrationOutcome` docs reproduce the upstream behavior and rationale: both skip reasons, actual execution rate, and exclusion of inferred/legacy states. `.harness/policies/no-upstream-restatement.md` requires catalogue docs to identify the type and reference IN-06/AC-12 rather than restating that contract.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:06d307d0a055eefee0062c162cbaf31c8e49ad8730b7102dfd549e50c67fa650",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T00:52:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b6f6b6b8fb388a228365b099f39d48b237becede9b4b0a0d4ee35d66e46f0c89",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T00:58:35Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 251,
+              "message": "`ProductionVerdictCounts` exposes `additional_pass_count`, `additional_fail_count`, and `additional_pending_count` as unrestricted `usize` fields on public enum variants. A caller can therefore construct, for example, `Passing { additional_pass_count: usize::MAX, ... }`; after accounting for the guaranteed leading passing verdict, `pass_count()` would need to return `usize::MAX + 1`, forcing overflow, panic, or lossy saturation. Represent the leading totals with a nonzero bounded type such as `NonZeroUsize`, or use private validated storage, so every publicly constructible tally has exact `usize` getters.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b6f6b6b8fb388a228365b099f39d48b237becede9b4b0a0d4ee35d66e46f0c89",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T01:20:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:945fa5a443b3f93f15662bbaced37bda2e3bfbfbdb0b67e9dc0007f7fac543e5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T01:26:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:945fa5a443b3f93f15662bbaced37bda2e3bfbfbdb0b67e9dc0007f7fac543e5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-09-09T04:35:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:281d9a41256e04e09825dbaf74878c197c5591ee12d200c987e31ec3b8a2b033",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T04:50:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:281d9a41256e04e09825dbaf74878c197c5591ee12d200c987e31ec3b8a2b033",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T07:12:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e710e793457fa89ee0ed8602ec07f25b105d416bb22578b74a262c64a7613a6d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T07:22:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e710e793457fa89ee0ed8602ec07f25b105d416bb22578b74a262c64a7613a6d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T12:14:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4c093a356ad92c6720c706ef79cce6912edb7580aa6032b4051b8c95625870f3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-09T12:21:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4c093a356ad92c6720c706ef79cce6912edb7580aa6032b4051b8c95625870f3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:01:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fb74621976ecc12e862887533cd25a94a1a7395966c771c3817714b5242f6fc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:10:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fb74621976ecc12e862887533cd25a94a1a7395966c771c3817714b5242f6fc",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

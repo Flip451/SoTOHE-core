@@ -12,6 +12,7 @@ pub(crate) use prompt::build_prompt_with_context;
 use crate::codex_common::resolve_codex_runtime;
 use env::{build_codex_fixer_invocation, build_safe_env, create_safe_home, resolve_codex_home};
 use sentinel::{parse_sentinel, sentinel_to_exit_code};
+pub(crate) use session_log::redact_credentials;
 use session_log::{CREDENTIAL_VARS, SessionLogCleanup};
 use smoke_test::{is_forbidden_sandbox_value, parse_major_minor, parse_semver_from_text};
 use spawn::spawn_and_collect_codex;

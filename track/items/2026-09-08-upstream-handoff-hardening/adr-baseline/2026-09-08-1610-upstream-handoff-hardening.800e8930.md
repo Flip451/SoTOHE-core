@@ -1,0 +1,125 @@
+---
+adr_id: 2026-09-08-1610-upstream-handoff-hardening
+decisions:
+  - id: D1
+    user_decision_ref: "chat:2026-09-09:upstream-handoff:指摘を選別してADRからPRを作成し、ADRは指摘内容から自律的に作成するとの委任"
+    status: proposed
+  - id: D2
+    user_decision_ref: "chat:2026-09-09:upstream-handoff:指摘を選別してADRからPRを作成し、ADRは指摘内容から自律的に作成するとの委任"
+    status: proposed
+  - id: D3
+    user_decision_ref: "chat:2026-09-09:upstream-handoff:指摘を選別してADRからPRを作成し、ADRは指摘内容から自律的に作成するとの委任"
+    status: proposed
+  - id: D4
+    user_decision_ref: "chat:2026-09-09:upstream-handoff:指摘を選別してADRからPRを作成し、ADRは指摘内容から自律的に作成するとの委任"
+    status: proposed
+  - id: D5
+    user_decision_ref: "chat:2026-09-09:upstream-handoff:指摘を選別してADRからPRを作成し、ADRは指摘内容から自律的に作成するとの委任"
+    status: proposed
+  - id: D6
+    user_decision_ref: "chat:2026-09-09:upstream-handoff:指摘を選別してADRからPRを作成し、ADRは指摘内容から自律的に作成するとの委任"
+    status: proposed
+---
+# 共通ハーネスで観測された責務・復旧・検証契約を整える
+
+## Context
+
+SoTOHE-core の現行の workflow、provider adapter、配布設定、型 catalogue、PR レビュー入口、および検証器を照合したところ、文書と機構の間に次の不一致が観測された。共通 workflow と adapter に同じ手順や host ごとの委譲条件が重複し、adapter の説明が実際の provider 選択と一致していない。Claude 向けの配布 allowlist には既存のコマンド系統が欠け、type-designer の案内は成果物を所有しない終端を指している。型 catalogue では inherent method の置き場と、別用途の top-level 宣言が混同されている。
+
+PR レビューでは、共通方法論と個別 focus の所有場所が分かれず、ユーザー承認済みの逸脱が「指摘なし」と同じ表示になる。Done / Archived の保護を保ったまま open PR 上で見つかった実在作業を正規 task として復旧する経路と、再計画後に実装へ戻る経路も一貫していない。reviewer subprocess の失敗は `ProcessFailed` などの診断情報を失った抽象的な中断へ縮退し得るため、安全に伝えられる provider・終了コード・分類まで失われる。
+
+現行では、自動 PR reviewer に共通する review guideline は `.harness/custom/review-prompts/pr-review.md` に置かれている。同ファイルは、正しさ・安全性・テスト・security の確認、PR 全体と commit 間の整合性および dead reference の確認、報告する severity と報告しない事項を一体で定めている。D3 はこの現行配置を前提に、共通部分の所有先を変更する判断であり、`.harness/prompts/pr-reviewer.md` が既に存在するという主張ではない。
+
+複合 anchor の局所判定でも責務越境が観測された。独立した名前の共存と独立 lookup を所有するメモリ上の mapping を評価する際に、保存場所を所有する別の persistence adapter の検証まで要求して Fail とすることがある。判定契約は entry 局所である一方、較正は既知の不合格例を中心としており、局所責務を満たす合格例を確認できない。また、同じ判定入力と prompt fingerprint に結び付く Fail は、モデル設定だけを変えても再利用される。
+
+以下の判断は、ユーザーの「指摘内容から自律的に ADR を作成する」という委任に基づく。個々の選択肢についてヒアリングで回答を得たという記録ではない。
+
+## Decision
+
+### D1: 共通手順の正本と provider adapter の境界を既存の所有権に揃える
+
+共通の手順、状態遷移、入力取得、再開条件は `.harness/workflows/` に集約し、adapter には呼び出し面、provider 固有配線、ツール制約、報告形式を残す。既存の手順を移す際は、入力確認や裁定境界そのものを削除しない。
+
+Codex root からの汎用 capability 呼び出しは `--host` を省略し、設定済み provider の subprocess を使う。Claude の実装 adapter は dispatcher を先に呼び、`delegate-in-host` を返した場合だけ in-host の実装担当を起動する。phase writer は引き続き phase entry が起動する。rollback 診断の `impl` 経路は implementer への委譲を通常経路とする。
+
+PreCompact の再開案内は CLI summary と正本文書への参照を使う。Claude agent 一覧は「利用可能な adapter」を説明し、現在の provider 割り当てや特定の担当数を固定しない。実際の割り当ては既存の profile を参照する。
+
+### D2: 配布既定値と型宣言の案内を現行契約に整合させる
+
+Claude の配布用 allowlist に phase、test-obligation、catalog、ref-verify の既存コマンド系統を接続する。利用者の設定値を CI で固定する契約にはしない。
+
+type-designer の enrollment 参照は、その成果物を実際に所有する type-design workflow の終端手順を指す。通常の inherent method は `TypeEntry.methods` に置き、schema がサポートする top-level `inherent_impls` の用途と区別する。同じ宣言を両方に要求せず、既存の top-level 形式のサポートは維持する。新たな schema 形式は追加しない。
+
+### D3: PR レビューの共通方法論と完了表示を分離する
+
+ここでいう共通方法論とは、すべての自動 PR reviewer が同じように適用する、正しさ・安全性・テスト・security の確認、PR 全体と commit 間の整合性および dead reference の確認、ならびに finding の報告境界である。これを、実装時に新設する framework 所有の `.harness/prompts/pr-reviewer.md` の正本へ移す。custom prompt には個別の focus と severity を残し、共通方法論への参照を保持する。レビュー入口から新しい正本へ到達できるようにし、root の常時入力へ本文を追加しない。
+
+明示的な指摘なしと、ユーザーが承認した Accepted Deviations は別の完了結果として表示する。後者を `zero findings` と表示しない。既存の逸脱承認要件は維持する。
+
+### D4: Done 後の実在する残作業は正規タスクとして復旧し、再計画後は実装へ戻す
+
+test-obligation の Done / Archived 凍結を撤去しない。同じ track の open PR に実在する残作業が発見された場合は、復旧を統括する workflow が PR 状態と現在ブランチの対応を読み取り確認し、既存のタスク追加 API で残作業を記録する。状態は task 群から再導出し、再計画・義務再導出を通常経路で行う。完了履歴をダミータスクや無意味な状態往復で書き換えない。
+
+merge 済み、archived、または閉じられた PR の修正は新しい corrective track に分離する。PR 状態を確認できない場合は既存 track を再開したと仮定せず、原因を報告する。これは workflow の復旧判断であり、タスク追加や derive のたびに GitHub 照会する新たな機構にはしない。通常の PR 作成前の開発手順にはこの PR 復旧条件を課さない。
+
+PR の writer 修正後は依存順に下流を再収束させ、その結果に未完了 task があれば通常の full-cycle へ戻る。実装、義務検証、レビュー、commit、履歴の記録を完了してから PR を再審査する。未完了作業がなければ通常の修正レビューと commit へ進む。この分岐を workflow と関連 policy で一致させる。
+
+### D5: reviewer の失敗は安全な診断を保ったまま上位へ伝える
+
+reviewer adapter が `ReviewVerdict::ProcessFailed` を情報のない `ReviewerError::ReviewerAbort` に変換する経路で、provider、取得できた終了コード、失敗を区別できる安全な理由を失わず上位 CLI へ伝える。利用者中断、timeout、出力形式不正と区別し、失敗から成功 verdict を生成しない。
+
+自由文の診断を表示する場合は既存の秘匿境界を通し、長さを制限する。任意の subprocess 出力をそのまま error、debug、ログへ追加しない。秘匿できる根拠がない部分は固定された分類と終了コードへ縮退させる。新しい診断ログ保存機構や生の秘密を含むログ参照は追加しない。
+
+### D6: 複合 anchor の局所判定を正例・負例で較正する
+
+判定対象は既存の obligation item と entry declaration が担う、引用 anchor 内の振る舞いである。anchor 全文は渡したまま、対象 method / entry の識別と責務を入力から確認できるようにする。複合 anchor の別 entry 所有部分を Fail の根拠にしない。一方、対象が所有する中心的な振る舞いが未検証なら既存の Fail 類型を適用する。他 entry の検証済み状態を仮定したり、存在を探索したりする新たな横断検査は導入しない。
+
+較正には、メモリ上の独立した名前の共存を所有する対象と、保存場所を所有する対象について、それぞれ対象部分が検証済みの合格例と未検証の不合格例を用意する。既存の矛盾・すり替え・中心部未検証の検出は維持する。正例を常に Fail にする判定器も健全と扱わない。既存の較正を無効にする設定は維持し、有効時の追加判定コストを明示する。
+
+prompt の実質的な変更は通常の fingerprint 更新で既存判定を失効させる。判定入力の構成を変更する場合も、その有効性を cache 同一性に反映する。モデル名変更による再判定、force フラグ、cache 手編集・削除、無意味な hash 変更、有効な参照の削除、責務越境した実装や不適切な waiver を回避策にしない。
+
+構造的な回帰試験と、実際の設定 provider を使う較正結果を別々に報告する。有限の較正例が未知の複合 anchor を完全に判定できる証明だとは扱わない。
+
+## Rejected Alternatives
+
+### A: 個別環境の作業ツリーを一括移植する
+
+個別環境固有の source、bindings、catalogue、cache、provider 同期や既存の未コミット変更が混在するため採用しない。共通の正規ソースに必要な変更を個別に反映する。
+
+### B: Done 凍結を解除する、または PR 状態を全書き込み API の前提にする
+
+前者は完了記録の保護を弱め、後者はローカル操作へネットワーク依存を広げる。実在する残作業の正規登録と、PR 復旧 workflow の判断に限定する。
+
+### C: Fail の一例を無条件に Pass へ訂正する
+
+原因は prompt の曖昧さ、入力の不足、モデルの誤判断のいずれかに確定していない。判定契約と較正で境界を検証し、正規の再評価で結果を得る。
+
+### D: stderr の全文を上位 error に含める
+
+認証情報などを露出するため採用しない。安全な分類・終了コードと秘匿・有界化された情報に限定する。
+
+## Consequences
+
+- 良: provider 選択と実行担当の責務が一致し、修復作業が通常の計画・実装・検証へ戻る。
+- 良: 複合 anchor の過剰要求と、局所責務の検証不足を別々に検出できる。
+- 負: 較正有効時は追加の provider 呼び出しが発生し、応答時間と費用が増える。
+- 負: PR 復旧時はリモート状態を取得できなければその経路を進められない。一般 API の保護は従来の branch / lifecycle guard に依存する。
+- 中立: type-signals rustdoc 評価器の snapshot reuse/export は既存どおり Unix に限定し、gate-log persistence の既存 platform 条件も変更しない。この ADR はハーネス全体を Unix-only とせず、その他の Windows 対応範囲を変更しない。
+- 中立: 出荷元の選択は既存 template boundary と export 機構に委ね、配布成果物だけの編集や内容を固定する文字列テストは増やさない。
+- 中立: 別の利用環境での再評価は別担当の操作であり、この変更の完了だけでその環境の Fail 解消を宣言しない。
+
+## Reassess When
+
+- 明示した局所責務と較正例でも、責務越境した判定が継続して観測されるとき。
+- 実在する修正 task を表現できない正当な Done 後修復が見つかったとき。
+- PR 状態確認を workflow で行う保護が実運用で不十分だと確認されたとき。
+- provider の診断形式が変わり、既存の秘匿境界では安全な理由を抽出できなくなったとき。
+
+## Related
+
+- [Claude/Codex 運用文書の正本化](2026-06-30-0425-harness-workflow-ssot-adapters.md) — D1 は既存の所有権を維持する。
+- [省略 host の subprocess dispatch](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) — D1 はこの呼び出し契約を adapter に整合させる。
+- [テスト義務ゲート](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) — D6 は局所判定と fingerprint の決定を維持し、合格例の較正を補う。
+- [method 単位の anchor 所有権](2026-08-13-1720-test-obligation-method-anchor-ownership.md) — D6 は所有 anchor 内での対象責務の判定を明確にする。
+- [現在ブランチに紐付く書き込み保護](2026-05-26-0518-active-track-write-guard.md) — D4 は既存の branch 保護を変更せず、PR 復旧の運用条件を補う。
+- [秘匿の fail-closed 契約](2026-08-20-1053-sensitive-redaction-fail-closed.md) — D5 の診断表示に適用する。

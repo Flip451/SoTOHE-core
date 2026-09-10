@@ -21,7 +21,7 @@ Rules:
   fail closed when it is absent. Declare every tddd.enabled layer, with an empty array for a layer
   that needs no feature.
 - Capture baselines before editing catalogues.
-- Choose layer, role, kind, action, fields, params, returns, methods, and impls from the conventions and spec.
+- Choose layer, role, kind, action, fields, params, returns, methods, and impls from the conventions and spec. Ordinary inherent methods belong in `TypeEntry.methods`; reserve top-level `inherent_impls` for impl-block-level generics or `where` predicates, and never declare a method in both locations.
 - Do not update source code in this role.
 - Run type-signals, catalogue-spec-signals, view sync, and freshness checks before returning.
 - On a resumed session (orchestrator opt-in continuation), follow the "Session resume" section

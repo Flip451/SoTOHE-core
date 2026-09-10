@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-09-08-upstream-handoff-hardening",
+  "entries": {
+    "T001": [],
+    "T002": [],
+    "T003": [],
+    "T004": [],
+    "T005": [],
+    "T006": [
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewerDiagnostic"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewerDiagnosticValidationError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewerExecutionProvenance"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewerProcessDiagnostic"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::review_v2::error::ReviewerError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::review_v2::error::ReviewCycleError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "NullReviewer"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "Reviewer"
+      }
+    ],
+    "T007": [],
+    "T008": [
+      {
+        "layer": "domain",
+        "entry_key": "ObligationFulfillmentVerifierPort"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+      }
+    ],
+    "T009": [],
+    "T010": [
+      {
+        "layer": "usecase",
+        "entry_key": "ConfiguredProviderCalibrationOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "NonZeroProductionVerdictCount"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ProductionVerdictCounts"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome"
+      }
+    ],
+    "T011": [],
+    "T012": [],
+    "T013": []
+  }
+}

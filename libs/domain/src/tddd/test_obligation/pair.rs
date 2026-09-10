@@ -1,9 +1,10 @@
 //! Named claim/evidence payload value objects for semantic obligation
 //! evaluation (IN-09).
 //!
-//! Each pair bundles the three text components a semantic verifier reasons over
-//! into a named value object, replacing an anonymous `(String, String, String)`
-//! triple so the components can no longer be positionally swapped:
+//! Each pair bundles the claim, evidence, and entry-local responsibility inputs
+//! a semantic verifier reasons over into a named value object, replacing an
+//! anonymous `(String, String, String)` triple so the components can no longer
+//! be positionally swapped:
 //!
 //! - [`ObligationFulfillmentPair`]: bound test source vs. the catalogue entry
 //!   declaration and the anchor text (the fulfillment lane).
@@ -15,7 +16,7 @@
 //! never be constructed with an empty claim or evidence side.
 
 use crate::ValidationError;
-use crate::tddd::test_obligation::ids::WaivedReason;
+use crate::tddd::test_obligation::ids::{TestObligationBrief, TestObligationId, WaivedReason};
 
 /// Validated non-empty bound-test source text (the fulfillment claim side).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -104,17 +105,22 @@ pub struct ObligationFulfillmentPair {
     tests_source: TestsSource,
     entry_declaration: EntryDeclaration,
     anchor_text: AnchorText,
+    obligation_id: TestObligationId,
+    obligation_brief: TestObligationBrief,
 }
 
 impl ObligationFulfillmentPair {
-    /// Builds an [`ObligationFulfillmentPair`] from its three validated components.
+    /// Builds an [`ObligationFulfillmentPair`] from its validated claim,
+    /// evidence, and entry-local responsibility components.
     #[must_use]
     pub fn new(
         tests_source: TestsSource,
         entry_declaration: EntryDeclaration,
         anchor_text: AnchorText,
+        obligation_id: TestObligationId,
+        obligation_brief: TestObligationBrief,
     ) -> Self {
-        Self { tests_source, entry_declaration, anchor_text }
+        Self { tests_source, entry_declaration, anchor_text, obligation_id, obligation_brief }
     }
 
     /// Borrows the concatenated bound test source (the claim side).
@@ -133,6 +139,18 @@ impl ObligationFulfillmentPair {
     #[must_use]
     pub fn anchor_text(&self) -> &AnchorText {
         &self.anchor_text
+    }
+
+    /// Borrows the stable identity of the obligation being judged.
+    #[must_use]
+    pub fn obligation_id(&self) -> &TestObligationId {
+        &self.obligation_id
+    }
+
+    /// Borrows the responsibility brief for the obligation being judged.
+    #[must_use]
+    pub fn obligation_brief(&self) -> &TestObligationBrief {
+        &self.obligation_brief
     }
 }
 
@@ -178,6 +196,21 @@ impl WaiverPair {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::tddd::catalogue_v2::CatalogueEntryKey;
+    use crate::tddd::test_obligation::ids::TestObligationItemIdentifier;
+    use crate::tddd::test_obligation::vocab::TestObligationKind;
+
+    fn obligation_id() -> TestObligationId {
+        TestObligationId::new(
+            CatalogueEntryKey::try_new("Entry".to_owned()).unwrap(),
+            TestObligationKind::Contract,
+            TestObligationItemIdentifier::try_new("trait_method:verify".to_owned()).unwrap(),
+        )
+    }
+
+    fn obligation_brief() -> TestObligationBrief {
+        TestObligationBrief::try_new("verify the entry-local contract".to_owned()).unwrap()
+    }
 
     #[test]
     fn newtypes_reject_blank_input() {
@@ -199,10 +232,14 @@ mod tests {
             TestsSource::try_new("tests".to_owned()).unwrap(),
             EntryDeclaration::try_new("decl".to_owned()).unwrap(),
             AnchorText::try_new("anchor".to_owned()).unwrap(),
+            obligation_id(),
+            obligation_brief(),
         );
         assert_eq!(pair.tests_source().as_str(), "tests");
         assert_eq!(pair.entry_declaration().as_str(), "decl");
         assert_eq!(pair.anchor_text().as_str(), "anchor");
+        assert_eq!(pair.obligation_id(), &obligation_id());
+        assert_eq!(pair.obligation_brief(), &obligation_brief());
     }
 
     #[test]
@@ -224,6 +261,8 @@ mod tests {
                 TestsSource::try_new(tests.to_owned()).unwrap(),
                 EntryDeclaration::try_new("d".to_owned()).unwrap(),
                 AnchorText::try_new("a".to_owned()).unwrap(),
+                obligation_id(),
+                obligation_brief(),
             )
         };
         assert_eq!(build("t"), build("t"));

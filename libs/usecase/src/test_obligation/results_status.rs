@@ -29,9 +29,9 @@ use super::status_lanes::{
     tally_findings, target_for_direct_edge, target_for_obligation, targets_for_scope,
 };
 use super::{
-    LoadedCatalogueDocument, declaration_with_obligation_item, diag,
-    find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
-    sha256_content_hash,
+    LoadedCatalogueDocument, declaration_with_obligation_context, declaration_with_obligation_item,
+    diag, find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
+    sha256_content_hash, synthetic_voluntary_obligation_brief,
 };
 
 /// Computes the informational missing / stale / verdict-absent totals without
@@ -184,10 +184,11 @@ fn collect_obligation_findings(
                 &edge,
                 obligation.id(),
                 tests,
-                declaration_with_obligation_item(
+                declaration_with_obligation_context(
                     &obligation_declaration_text_from_loaded(catalogues, obligation)
                         .unwrap_or_default(),
-                    obligation.id().item_identifier().as_str(),
+                    obligation.id(),
+                    obligation.brief(),
                 ),
                 &target,
                 spec_texts,
@@ -201,10 +202,11 @@ fn collect_obligation_findings(
                 &edge,
                 obligation.id(),
                 tests,
-                declaration_with_obligation_item(
+                declaration_with_obligation_context(
                     &obligation_declaration_text_from_loaded(catalogues, obligation)
                         .unwrap_or_default(),
-                    obligation.id().item_identifier().as_str(),
+                    obligation.id(),
+                    obligation.brief(),
                 ),
                 &target,
                 spec_texts,
@@ -239,6 +241,9 @@ fn collect_direct_edge_findings(
     let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
         .unwrap_or_default();
     let synthetic_id = synthetic_voluntary_obligation_id(edge);
+    let synthetic_brief = synthetic_voluntary_obligation_brief(edge).map_err(|error| {
+        malformed(&format!("invalid voluntary obligation brief for {edge:?}: {error}"))
+    })?;
     if let Some(reason) = waived_reason(bindings, edge) {
         inspect_waiver(
             edge,
@@ -256,7 +261,7 @@ fn collect_direct_edge_findings(
             edge,
             &synthetic_id,
             tests,
-            declaration_with_obligation_item(&declaration, synthetic_id.item_identifier().as_str()),
+            declaration_with_obligation_context(&declaration, &synthetic_id, &synthetic_brief),
             &target,
             spec_texts,
             fulfillment,

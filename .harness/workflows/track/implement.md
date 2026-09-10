@@ -164,6 +164,10 @@ backfills the commit hash only after the batch commit. If work remains blocked, 
 - **Blocked task**: keep the task in `in_progress`. Report the blocker and the remaining work.
   The `review` + `commit` cycle may proceed for other tasks once the orchestrator has completed
   their pre-review `done` transition after CI and the DRY fix phase.
+- **Implementation delegation failure**: do not bypass the configured capability dispatcher during
+  normal execution. After a failed delegation, the orchestrator may use the existing non-ADR
+  recovery edit path; changes to `knowledge/adr/*.md` always return to the review workflow's
+  ADR-scope repair lane.
 - **Cargo.lock contention** (parallel workers): serialize the lockfile-changing step through
   one worker, then resume parallel work.
 

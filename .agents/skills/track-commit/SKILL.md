@@ -24,19 +24,10 @@ or failure-recovery procedures here.
 - Commit creation uses `cargo make track-commit-message` exclusively.
 - Do not run `git add` / `git commit` / `git push` directly.
 
-### (3) Sub-workflow and capability invocation
+The workflow SSoT owns commit inputs, preconditions, gate waiting, failure recovery, and note
+timing; this adapter only supplies the Codex command and tool constraints above.
 
-- No capabilities are delegated; commit is a standalone terminal workflow step.
-
-### (4) Gate waiting
-
-- `cargo make track-commit-message` is a long-running gate: run it as one blocking call and read
-  its exit status once. Do not poll its log, re-run status probes, or add periodic re-checks; if
-  the host backgrounds the call, read the result once after the single completion notification.
-- Do not launch `bin/sotp test-obligation evaluate` around the commit: the commit gate runs
-  `check`, and `evaluate` is only a synchronous step inside repair work on the orchestrator host.
-
-### (5) Reporting format
+### (3) Reporting format
 
 - On successful completion, print: `COMMIT_STATUS: completed — <short-hash> <subject>`
 - On failure or block, print: `COMMIT_STATUS: blocked — <reason>`

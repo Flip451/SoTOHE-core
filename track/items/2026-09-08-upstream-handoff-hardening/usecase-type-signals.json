@@ -1,0 +1,138 @@
+{
+  "baseline_hash": "34e477b6c3e1bf8fd53bbff20cb73d4bc70c3aaba791080fe4b5bf4dbeb92496",
+  "declaration_hash": "b9ae641441a84832aca74f39761dacd5726c306ad872f518ebbef71e29a52cfe",
+  "generated_at": "2026-09-10T09:20:07Z",
+  "head_commit": "7164fa6aa3ef2482a218956fa00beb8b72451ca4",
+  "implementation_fingerprint": "13fc9d02af8009b39b179d12043bf4c1a6ad631855d3157908ea07923f751af7",
+  "resolution_fingerprint": "c5a3de55a363ba8f40e74204eba594ed0df2fbc60993892dc8bc79052486c994",
+  "rustdoc_execution_identity": {
+    "crate_name": "usecase",
+    "expected_json_path": "target/.sotp-rustdoc/f855b69b5c9e87ebfe506c211426b5d3c50fd843a7f90d2fa08b3355ddb5fcea/doc/usecase.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/f855b69b5c9e87ebfe506c211426b5d3c50fd843a7f90d2fa08b3355ddb5fcea"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ReviewerDiagnostic"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ReviewerDiagnosticValidationError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::review_v2::error::ReviewerError"
+    },
+    {
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ReviewerExecutionProvenance"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ReviewerProcessDiagnostic"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ConfiguredProviderCalibrationOutcome"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "NonZeroProductionVerdictCount"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ProductionVerdictCounts"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "Reviewer"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::review_v2::error::ReviewCycleError"
+    }
+  ]
+}

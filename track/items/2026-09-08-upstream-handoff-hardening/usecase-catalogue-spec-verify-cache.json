@@ -1,0 +1,390 @@
+{
+  "entries": [
+    {
+      "claim_hash": "477d780266b779ec0e25555e8e3bf687c68367674bbae022177fc24978993da2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ConfiguredProviderCalibrationOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e23944bbbb9a7cc9e3003b561037911943bf2d6f0e454f26a928395d18659de9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "477d780266b779ec0e25555e8e3bf687c68367674bbae022177fc24978993da2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ConfiguredProviderCalibrationOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実際の設定 provider による結果を別々に報告する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a50ccea56ffbfb8138a3a835c4b735cbdb25872fdcde1db6c2e596dc05bfcfee",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NonZeroProductionVerdictCount",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a4f699347e5c5fd2b449b38731fa313e265160067b1ce0ccacff2c47fe703416",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProductionVerdictCounts",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e23944bbbb9a7cc9e3003b561037911943bf2d6f0e454f26a928395d18659de9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a4f699347e5c5fd2b449b38731fa313e265160067b1ce0ccacff2c47fe703416",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProductionVerdictCounts",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9e9895752a6a9f39c5946b01ed27448e8b325103cf6e29f42bd3f802830867ce",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewerDiagnostic",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9662a455a91aa8c5676f896c14192aa02edccf8868769967ecc42f5b4f530288",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3887cb64197f409e23b008037e68e9da9435a945cf9faee947c3d48cee43c35d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewerDiagnosticValidationError",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9662a455a91aa8c5676f896c14192aa02edccf8868769967ecc42f5b4f530288",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "77010c3f79c9edfa323e42459339541b7a107b195f373f1a5ac207440fa510db",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewerExecutionProvenance",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c2ae65c66ce5cf05f5e3fb521cc5bfaeabe2fb2a9627fc8e2f90025eabf2411",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ec08214913f1ea4afb61bbf4b64b07a4290d45c36959a9d4a4aa200bdc31aa8d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewerProcessDiagnostic",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c2ae65c66ce5cf05f5e3fb521cc5bfaeabe2fb2a9627fc8e2f90025eabf2411",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ec08214913f1ea4afb61bbf4b64b07a4290d45c36959a9d4a4aa200bdc31aa8d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewerProcessDiagnostic",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9662a455a91aa8c5676f896c14192aa02edccf8868769967ecc42f5b4f530288",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "565787292498b19d6e494a3ebbfc8c13b5984bd4674976ff4264a341450c318c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::review_v2::error::ReviewCycleError",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c2ae65c66ce5cf05f5e3fb521cc5bfaeabe2fb2a9627fc8e2f90025eabf2411",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4bf3978e8eed86cf1ad0e94beca6dd8bbe066407b6fdf120e90bd3959dc5556b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::review_v2::error::ReviewerError",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c2ae65c66ce5cf05f5e3fb521cc5bfaeabe2fb2a9627fc8e2f90025eabf2411",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4bf3978e8eed86cf1ad0e94beca6dd8bbe066407b6fdf120e90bd3959dc5556b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::review_v2::error::ReviewerError",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9662a455a91aa8c5676f896c14192aa02edccf8868769967ecc42f5b4f530288",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e6d2615c89852a247e5780366d116a0c579eac8f9ca6f1b034d86fa1452403de",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e23944bbbb9a7cc9e3003b561037911943bf2d6f0e454f26a928395d18659de9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e6d2615c89852a247e5780366d116a0c579eac8f9ca6f1b034d86fa1452403de",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7635fd344a02a4179933ac03e9afce9d83349826a9d0504472757fbd14efb490",
+      "claim_origin": {
+        "data": {
+          "entry_key": "Reviewer",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "60192af927bd932f9665481a9b41eec85a911d76251f1cc5c21b262900408484",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "review_v2 の状態照会専用構成では、NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。既存の Reviewer port の method 契約は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の Reviewer port の method 契約は変更しない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

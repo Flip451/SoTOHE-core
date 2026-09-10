@@ -1,0 +1,914 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::convert::From<ReviewerError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewerError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewerError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewerError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReviewerDiagnosticValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewerDiagnosticValidationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewerDiagnosticValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewerDiagnosticValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewerDiagnosticValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ReviewerDiagnosticValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReviewerDiagnostic",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewerDiagnostic",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewerDiagnostic",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewerDiagnostic",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewerProcessDiagnostic",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewerProcessDiagnostic",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewerProcessDiagnostic",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewerProcessDiagnostic",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewerExecutionProvenance",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewerExecutionProvenance",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewerExecutionProvenance",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "Reviewer": {
+      "action": "reference",
+      "docs": "Baseline reviewer secondary port carried unchanged for NullReviewer implementation-edge visibility.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::types::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::types::Verdict, domain::review_v2::types::LogInfo), ReviewerError>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::types::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::types::FastVerdict, domain::review_v2::types::LogInfo), ReviewerError>"
+        }
+      ],
+      "module_path": "review_v2::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-14",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "ConfiguredProviderCalibrationOutcome": {
+      "action": "add",
+      "docs": "Configured-provider calibration result reported at the application boundary for IN-06 / AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SkippedByConfiguration",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Executed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "known_bad_detection_rate",
+                  "ty": "domain::tddd::test_obligation::verdict::DetectionRatePercent"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "NonZeroProductionVerdictCount": {
+      "action": "add",
+      "docs": "Application-boundary nonzero production-verdict category count for AC-12 with private validated storage.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Option<Self>",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "get",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "ProductionVerdictCounts": {
+      "action": "add",
+      "docs": "Non-empty production-verdict tally for IN-06 / AC-12 with exact per-category counts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pass_count",
+                  "ty": "NonZeroProductionVerdictCount"
+                },
+                {
+                  "name": "fail_count",
+                  "ty": "usize"
+                },
+                {
+                  "name": "pending_count",
+                  "ty": "usize"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Failing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "fail_count",
+                  "ty": "NonZeroProductionVerdictCount"
+                },
+                {
+                  "name": "pending_count",
+                  "ty": "usize"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pending_count",
+                  "ty": "NonZeroProductionVerdictCount"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "pass_count",
+              "ty": "usize"
+            },
+            {
+              "name": "fail_count",
+              "ty": "usize"
+            },
+            {
+              "name": "pending_count",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Option<Self>",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pass_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fail_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pending_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "ReviewerDiagnostic": {
+      "action": "add",
+      "docs": "Validated reviewer diagnostic text value.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ReviewerDiagnosticValidationError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-10",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "spec_refs": [
+            {
+              "anchor": "AC-10",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "review_v2::error",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "ReviewerDiagnosticValidationError": {
+      "action": "add",
+      "docs": "Validation failures for bounded redacted reviewer diagnostic text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Empty",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TooLong",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "ReviewerExecutionProvenance": {
+      "action": "add",
+      "docs": "Application-boundary finite value for reviewer subprocess execution provenance.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PreSpawn",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PostSpawn",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "ReviewerProcessDiagnostic": {
+      "action": "add",
+      "docs": "Reviewer subprocess diagnostic availability state.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Available",
+            "payload": {
+              "fields": [
+                "ReviewerDiagnostic"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Unavailable",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "usecase::review_v2::error::ReviewCycleError": {
+      "action": "reference",
+      "docs": "Review-cycle orchestration error type.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UnknownScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::types::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FileChangedDuringReview",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Diff",
+            "payload": {
+              "fields": [
+                "DiffGetError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PostReviewDiff",
+            "payload": {
+              "fields": [
+                "DiffGetError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Hash",
+            "payload": {
+              "fields": [
+                "ReviewHasherError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PostReviewHash",
+            "payload": {
+              "fields": [
+                "ReviewHasherError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Reviewer",
+            "payload": {
+              "fields": [
+                "ReviewerError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Reader",
+            "payload": {
+              "fields": [
+                "domain::review_v2::error::ReviewReaderError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "usecase::review_v2::error::ReviewerError": {
+      "action": "modify",
+      "docs": "Reviewer-port failure taxonomy.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UserAbort",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ProcessFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "Option<ProgramExitCode>"
+                },
+                {
+                  "name": "diagnostic",
+                  "ty": "ReviewerProcessDiagnostic"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Timeout",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "IllegalVerdict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unexpected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provenance",
+                  "ty": "ReviewerExecutionProvenance"
+                },
+                {
+                  "name": "diagnostic",
+                  "ty": "ReviewerProcessDiagnostic"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome": {
+      "action": "modify",
+      "docs": "Application outcome for production-verdict and configured-provider calibration reporting; see IN-06 / AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoProductionPairs",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ProductionPairs",
+            "payload": {
+              "fields": [
+                {
+                  "name": "verdicts",
+                  "ty": "ProductionVerdictCounts"
+                },
+                {
+                  "name": "configured_provider_calibration",
+                  "ty": "ConfiguredProviderCalibrationOutcome"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_no_production_pairs",
+          "params": [],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_production_pairs",
+          "params": [
+            {
+              "name": "verdicts",
+              "ty": "ProductionVerdictCounts"
+            },
+            {
+              "name": "configured_provider_calibration",
+              "ty": "ConfiguredProviderCalibrationOutcome"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pass_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fail_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pending_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "configured_provider_calibration",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ConfiguredProviderCalibrationOutcome>",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    }
+  }
+}

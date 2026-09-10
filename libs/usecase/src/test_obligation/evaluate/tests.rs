@@ -64,10 +64,15 @@ use domain::{
 
 use domain::SpecDocumentLoaderPort;
 
+use super::calibration::{
+    CalibrationExecution, LocalResponsibilityExpectation, calibration_probe_count,
+    local_responsibility_probe_shapes,
+};
 use super::plan::PlannedAction;
 use super::{
-    EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
-    EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
+    ConfiguredProviderCalibrationOutcome, EvaluateTestObligationsApplicationService,
+    EvaluateTestObligationsCommand, EvaluateTestObligationsInteractor,
+    NonZeroProductionVerdictCount, ProductionVerdictCounts, TestObligationEvaluateConfig,
 };
 use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::test_obligation::LoadedCatalogueDocument;
@@ -133,6 +138,9 @@ struct ScriptedFulfillment {
     /// Records the `tests_source` seen for every calibration probe so
     /// tests can assert per-category shape distribution (AC-08).
     calibration_probe_sources: Mutex<Vec<String>>,
+    /// Records the actual local-responsibility verdict for each locality
+    /// probe so the integration-shaped tests cover both calibration branches.
+    local_responsibility_probe_results: Mutex<Vec<(String, bool)>>,
     tiers: Mutex<Vec<ModelTier>>,
     declarations: Mutex<Vec<String>>,
 }
@@ -152,6 +160,24 @@ impl
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
         Box::pin(async move {
             let source = pair.tests_source().as_str();
+            if source.contains("local_responsibility_probe_memory_positive")
+                || source.contains("local_responsibility_probe_persistence_positive")
+            {
+                self.local_responsibility_probe_results
+                    .lock()
+                    .unwrap()
+                    .push((source.to_owned(), true));
+                return Ok(fulfilled());
+            }
+            if source.contains("local_responsibility_probe_memory_negative")
+                || source.contains("local_responsibility_probe_persistence_negative")
+            {
+                self.local_responsibility_probe_results
+                    .lock()
+                    .unwrap()
+                    .push((source.to_owned(), false));
+                return Ok(fulfillment_fail());
+            }
             if source.contains("known_bad_calibration_probe") {
                 *self.calibration_calls.lock().unwrap() += 1;
                 self.calibration_probe_sources.lock().unwrap().push(source.to_owned());
@@ -329,7 +355,11 @@ impl
         _initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
         let source = pair.tests_source().as_str();
-        let verdict = if source.contains("_contradiction_") {
+        let verdict = if source.contains("local_responsibility_probe_memory_negative")
+            || source.contains("local_responsibility_probe_persistence_negative")
+        {
+            fulfillment_fail()
+        } else if source.contains("_contradiction_") {
             fulfillment_fail_for_category(FulfillmentFailCategory::Contradiction)
         } else if source.contains("_substitution_") {
             fulfillment_fail_for_category(FulfillmentFailCategory::Substitution)
@@ -338,7 +368,9 @@ impl
         } else {
             fulfilled()
         };
-        let tracker = if source.contains("calibration_probe") {
+        let tracker = if source.contains("calibration_probe")
+            || source.contains("local_responsibility_probe")
+        {
             self.tracker.clone()
         } else {
             self.real_tracker.clone().unwrap_or_else(|| self.tracker.clone())
@@ -495,6 +527,10 @@ fn edge() -> TestObligationEdgeId {
 }
 
 fn obligation() -> TestObligation {
+    obligation_with_brief("cover positivity")
+}
+
+fn obligation_with_brief(brief: &str) -> TestObligation {
     let entry_key = CatalogueEntryKey::try_new("Money".to_owned()).unwrap();
     TestObligation::new(
         TestObligationId::new(
@@ -508,7 +544,7 @@ fn obligation() -> TestObligation {
             entry_key,
         ),
         TargetEntryRoleKind::DataRole(DataRole::value_object()),
-        TestObligationBrief::try_new("cover positivity".to_owned()).unwrap(),
+        TestObligationBrief::try_new(brief.to_owned()).unwrap(),
         DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
         vec![anchor()],
     )
@@ -1103,6 +1139,7 @@ fn harness_with_read_models_and_config_impl(
         calibration_central_unverified: Mutex::new(None),
         calibration_calls: Mutex::new(0),
         calibration_probe_sources: Mutex::new(Vec::new()),
+        local_responsibility_probe_results: Mutex::new(Vec::new()),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
     });
@@ -1244,9 +1281,10 @@ fn cached_fulfillment_doc_with_fingerprint(
     let declaration =
         crate::test_obligation::obligation_declaration_text(&[money_catalogue()], &obligation)
             .unwrap();
-    let declaration = crate::test_obligation::declaration_with_obligation_item(
+    let declaration = crate::test_obligation::declaration_with_obligation_context(
         &declaration,
-        obligation.id().item_identifier().as_str(),
+        obligation.id(),
+        obligation.brief(),
     );
     let key = ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes())),
@@ -1310,6 +1348,77 @@ fn test_config_exposes_validated_calibration_bounds() {
     assert_eq!(config.injection_rate(), 10);
     assert_eq!(config.detection_threshold().get(), 90);
     assert_eq!(config.parallelism(), 4);
+}
+
+#[test]
+fn test_calibration_execution_distinguishes_empty_disabled_and_provider_runs() {
+    assert_eq!(
+        CalibrationExecution::for_inputs(0, 10),
+        CalibrationExecution::SkippedNoProductionPairs
+    );
+    assert_eq!(
+        CalibrationExecution::for_inputs(1, 0),
+        CalibrationExecution::SkippedByConfiguration
+    );
+    assert_eq!(
+        CalibrationExecution::for_inputs(1, 10),
+        CalibrationExecution::Provider { probe_count: 3 }
+    );
+    assert_eq!(calibration_probe_count(0, 10), 0);
+    assert_eq!(calibration_probe_count(1, 0), 0);
+    assert_eq!(calibration_probe_count(1, 10), 3);
+}
+
+#[test]
+fn test_nonzero_production_count_rejects_zero_and_preserves_usize_max() {
+    assert!(NonZeroProductionVerdictCount::try_new(0).is_none());
+    let maximum = NonZeroProductionVerdictCount::try_new(usize::MAX).unwrap();
+    assert_eq!(maximum.get(), usize::MAX);
+}
+
+#[test]
+fn test_production_verdict_counts_preserve_exact_category_combinations() {
+    let cases = [
+        (1, 0, 0),
+        (0, 2, 0),
+        (0, 0, 3),
+        (1, 2, 3),
+        (0, 2, 3),
+        (1, 0, 3),
+        (1, 2, 0),
+        (usize::MAX, usize::MAX, usize::MAX),
+    ];
+
+    for (pass_count, fail_count, pending_count) in cases {
+        let counts = ProductionVerdictCounts::try_new(pass_count, fail_count, pending_count)
+            .expect("at least one category is non-zero");
+        assert_eq!(counts.pass_count(), pass_count);
+        assert_eq!(counts.fail_count(), fail_count);
+        assert_eq!(counts.pending_count(), pending_count);
+    }
+    assert!(ProductionVerdictCounts::try_new(0, 0, 0).is_none());
+}
+
+#[test]
+fn test_evaluation_outcome_exposes_typed_variants_and_count_accessors() {
+    let no_pairs = super::EvaluateTestObligationsOutcome::new_no_production_pairs();
+    assert_eq!(no_pairs.pass_count(), 0);
+    assert_eq!(no_pairs.fail_count(), 0);
+    assert_eq!(no_pairs.pending_count(), 0);
+    assert_eq!(no_pairs.configured_provider_calibration(), None);
+
+    let calibration = ConfiguredProviderCalibrationOutcome::Executed {
+        known_bad_detection_rate:
+            domain::tddd::test_obligation::verdict::DetectionRatePercent::try_new(97).unwrap(),
+    };
+    let production = super::EvaluateTestObligationsOutcome::new_production_pairs(
+        ProductionVerdictCounts::try_new(2, 3, 4).unwrap(),
+        calibration.clone(),
+    );
+    assert_eq!(production.pass_count(), 2);
+    assert_eq!(production.fail_count(), 3);
+    assert_eq!(production.pending_count(), 4);
+    assert_eq!(production.configured_provider_calibration(), Some(&calibration));
 }
 
 fn assert_evaluator_fan_out_bound(config: TestObligationEvaluateConfig, expected_bound: usize) {
@@ -1398,6 +1507,7 @@ fn test_new_accepts_and_wires_declared_dependencies() {
         calibration_central_unverified: Mutex::new(None),
         calibration_calls: Mutex::new(0),
         calibration_probe_sources: Mutex::new(Vec::new()),
+        local_responsibility_probe_results: Mutex::new(Vec::new()),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
     });
@@ -1462,6 +1572,7 @@ fn test_voluntary_binding_with_derived_owners_returns_consistency_error() {
         calibration_central_unverified: Mutex::new(None),
         calibration_calls: Mutex::new(0),
         calibration_probe_sources: Mutex::new(Vec::new()),
+        local_responsibility_probe_results: Mutex::new(Vec::new()),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
     });
@@ -1599,55 +1710,6 @@ fn test_waiver_does_not_hide_invalid_voluntary_binding() {
     );
 }
 
-/// Valid voluntary bindings always target catalogue-only edges and consume one
-/// calibration pair; waivers continue to scale with derived ownership.
-#[test]
-fn test_production_pair_count_counts_valid_voluntary_binding_once() {
-    let obligations =
-        ObligationsDocument::new(track(), vec![obligation(), trait_impl_obligation()]);
-    let bindings = TestBindingsDocument::new(
-        track(),
-        vec![TestBindingRecord::VoluntaryBinding {
-            edge_id: edge(),
-            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
-        }],
-    );
-    assert_eq!(super::production_pair_count(&obligations, &bindings), 1);
-
-    let waiver = TestBindingsDocument::new(
-        track(),
-        vec![TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() }],
-    );
-    assert_eq!(super::production_pair_count(&obligations, &waiver), 2);
-
-    let unowned_edge = TestObligationEdgeId::new(
-        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
-        TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-06".to_owned()).unwrap(),
-    );
-    let unowned = TestBindingsDocument::new(
-        track(),
-        vec![TestBindingRecord::VoluntaryBinding {
-            edge_id: unowned_edge.clone(),
-            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
-        }],
-    );
-    assert_eq!(
-        super::production_pair_count(&obligations, &unowned),
-        1,
-        "catalogue-only voluntary edges keep the minimum budget of one"
-    );
-
-    let unowned_waiver = TestBindingsDocument::new(
-        track(),
-        vec![TestBindingRecord::Waiver { edge_id: unowned_edge, reason: waiver_reason() }],
-    );
-    assert_eq!(
-        super::production_pair_count(&obligations, &unowned_waiver),
-        1,
-        "catalogue-only waiver edges keep the minimum budget of one"
-    );
-}
-
 #[test]
 fn test_fulfilled_on_fast_counts_pass_without_escalation() {
     // AC-06: a fast pass is authoritative; no escalation to final.
@@ -1661,11 +1723,113 @@ fn test_fulfilled_on_fast_counts_pass_without_escalation() {
     let outcome = run(h.interactor.execute(&command())).unwrap();
     assert_eq!(outcome.pass_count(), 1);
     assert_eq!(outcome.fail_count(), 0);
-    assert_eq!(outcome.known_bad_detection_rate().value(), 100);
+    assert!(matches!(
+        outcome.configured_provider_calibration(),
+        Some(ConfiguredProviderCalibrationOutcome::Executed { known_bad_detection_rate })
+            if known_bad_detection_rate.value() == 100
+    ));
     assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 3);
     assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
     // The verdict is frozen in the fulfillment cache.
     assert_eq!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().len(), 1);
+}
+
+#[test]
+fn test_enabled_calibration_covers_local_responsibility_and_cache_identity() {
+    let h = harness(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert!(matches!(
+        &outcome,
+        super::EvaluateTestObligationsOutcome::ProductionPairs {
+            configured_provider_calibration: ConfiguredProviderCalibrationOutcome::Executed { .. },
+            ..
+        }
+    ));
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(
+        *h.fulfillment_driver.calibration_calls.lock().unwrap(),
+        3,
+        "enabled calibration must run the known-bad probes"
+    );
+
+    // The configured-provider locality calibration must exercise both the
+    // target-owned positive and negative branches, independently of the
+    // known-bad category probes.
+    let local_results =
+        h.fulfillment_driver.local_responsibility_probe_results.lock().unwrap().clone();
+    assert_eq!(local_results.len(), 4);
+    assert_eq!(local_results.iter().filter(|(_, passed)| *passed).count(), 2);
+    assert_eq!(local_results.iter().filter(|(_, passed)| !*passed).count(), 2);
+    assert!(local_results.iter().any(|(source, passed)| {
+        source.contains("local_responsibility_probe_memory_positive") && *passed
+    }));
+    assert!(local_results.iter().any(|(source, passed)| {
+        source.contains("local_responsibility_probe_memory_negative") && !*passed
+    }));
+    assert!(local_results.iter().any(|(source, passed)| {
+        source.contains("local_responsibility_probe_persistence_positive") && *passed
+    }));
+    assert!(local_results.iter().any(|(source, passed)| {
+        source.contains("local_responsibility_probe_persistence_negative") && !*passed
+    }));
+
+    // The verdict is frozen against the evaluated edge, obligation, bound
+    // test location, and all three cache-key components—not merely as an
+    // arbitrary one-entry cache document.
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.entries().len(), 1);
+    let entry = &saved.entries()[0];
+    assert_eq!(entry.edge_id(), &edge());
+    assert_eq!(entry.obligation_id(), obligation().id());
+    let expected_cache = cached_fulfillment_doc(fulfilled());
+    assert_eq!(entry.key(), expected_cache.entries()[0].key());
+    assert_eq!(entry.bound_tests().unwrap().as_slice(), &[location()]);
+    assert_eq!(entry.verifier_fingerprint(), Some(&fulfillment_verifier_fingerprint()));
+}
+
+#[test]
+fn test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported() {
+    let h = harness_with_read_models_and_config(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+        Arc::new(StubScanner),
+        None,
+        None,
+        spec_doc(),
+        money_catalogue(),
+        config_with_rate(0),
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(outcome.fail_count(), 0);
+    assert_eq!(outcome.pending_count(), 0);
+    assert_eq!(
+        outcome.configured_provider_calibration(),
+        Some(&ConfiguredProviderCalibrationOutcome::SkippedByConfiguration)
+    );
+    assert_eq!(
+        *h.fulfillment_driver.calibration_calls.lock().unwrap(),
+        0,
+        "injection_rate=0 must not dispatch known-bad calibration probes"
+    );
+    assert_eq!(
+        h.fulfillment_driver.tiers.lock().unwrap().as_slice(),
+        &[ModelTier::Fast],
+        "positive production pairs still use the real fulfillment path"
+    );
 }
 
 #[test]
@@ -1793,6 +1957,35 @@ fn test_calibration_probes_exercise_all_three_ac08_categories() {
         probes.iter().any(|s| s.contains("known_bad_calibration_probe_central_unverified_")),
         "central-unverified probe missing: {probes:?}"
     );
+}
+
+#[test]
+fn test_local_responsibility_calibration_has_executable_positive_and_negative_pairs() {
+    let probes = local_responsibility_probe_shapes();
+
+    assert_eq!(probes.len(), 4);
+    assert_eq!(
+        probes
+            .iter()
+            .filter(|probe| probe.expectation == LocalResponsibilityExpectation::Fulfilled)
+            .count(),
+        2
+    );
+    assert_eq!(
+        probes
+            .iter()
+            .filter(|probe| probe.expectation == LocalResponsibilityExpectation::Rejected)
+            .count(),
+        2
+    );
+    for probe in probes {
+        assert!(probe.tests_source.starts_with("#[test]"));
+        assert!(
+            probe.tests_source.contains("assert_eq!") || probe.tests_source.contains("assert!(")
+        );
+        assert!(!probe.tests_source.contains("mock"));
+        assert!(!probe.tests_source.contains("stub"));
+    }
 }
 
 #[test]
@@ -2377,7 +2570,18 @@ fn test_final_fail_returns_semantic_failures_after_cache_save() {
             if records.as_slice() == [expected_record]
     ));
     let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
-    assert!(matches!(saved.entries()[0].verdict(), ObligationFulfillmentVerdict::Fail { .. }));
+    assert_eq!(saved.entries().len(), 1);
+    let entry = &saved.entries()[0];
+    assert_eq!(entry.edge_id(), &edge());
+    assert_eq!(entry.obligation_id(), obligation().id());
+    let expected_cache = cached_fulfillment_doc(fulfillment_fail());
+    assert_eq!(entry.key(), expected_cache.entries()[0].key());
+    assert_eq!(entry.bound_tests().unwrap().as_slice(), &[location()]);
+    assert!(matches!(entry.verdict(), ObligationFulfillmentVerdict::Fail { .. }));
+    let local_results =
+        h.fulfillment_driver.local_responsibility_probe_results.lock().unwrap().clone();
+    assert_eq!(local_results.iter().filter(|(_, passed)| *passed).count(), 2);
+    assert_eq!(local_results.iter().filter(|(_, passed)| !*passed).count(), 2);
 }
 
 #[test]
@@ -2562,6 +2766,33 @@ fn test_matching_waiver_cache_reuses_frozen_verdict() {
 }
 
 #[test]
+fn test_changed_fulfillment_obligation_brief_invalidates_cache() {
+    let h = harness_with_existing_caches(
+        Some(ObligationsDocument::new(
+            track(),
+            vec![obligation_with_brief("cover positivity and rejection")],
+        )),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        Some(cached_fulfillment_doc(fulfilled())),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_ne!(
+        saved.entries()[0].key().declaration_hash(),
+        cached_fulfillment_doc(fulfilled()).entries()[0].key().declaration_hash(),
+        "a changed responsibility brief must not reuse the old cache identity"
+    );
+}
+
+#[test]
 fn test_parent_only_fulfillment_declaration_hash_reverifies() {
     let obligation = obligation();
     let declaration =
@@ -2743,12 +2974,44 @@ fn test_absent_artifacts_yield_zero_pairs() {
     // IN-14: existence-based scope - both artifacts absent means zero pairs.
     let h = harness(None, None, fulfilled(), fulfilled(), WaiverVerdict::Pending);
     let outcome = run(h.interactor.execute(&command())).unwrap();
+    assert!(matches!(&outcome, super::EvaluateTestObligationsOutcome::NoProductionPairs));
     assert_eq!(outcome.pass_count(), 0);
     assert_eq!(outcome.fail_count(), 0);
     assert_eq!(outcome.pending_count(), 0);
+    assert_eq!(outcome.configured_provider_calibration(), None);
     assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 0);
     assert!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().is_empty());
     assert!(h.waiver_cache.saved.lock().unwrap().clone().unwrap().entries().is_empty());
+}
+
+#[test]
+fn test_empty_production_plan_reports_no_pairs_without_calibration() {
+    let empty = method_anchor_obligation("empty", &[]);
+    let h = harness_with_read_models_and_config(
+        Some(ObligationsDocument::new(track(), vec![empty.clone()])),
+        Some(fulfillment_binding_for(&empty)),
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+        Arc::new(StubScanner),
+        None,
+        None,
+        method_anchor_ownership_spec(),
+        method_anchor_ownership_catalogue(),
+        config(),
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert!(matches!(&outcome, super::EvaluateTestObligationsOutcome::NoProductionPairs));
+    assert_eq!(outcome.configured_provider_calibration(), None);
+    assert_eq!(
+        *h.fulfillment_driver.calibration_calls.lock().unwrap(),
+        0,
+        "an empty concrete production plan must not run calibration"
+    );
+    assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());
+    assert!(h.fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().is_empty());
 }
 
 #[test]

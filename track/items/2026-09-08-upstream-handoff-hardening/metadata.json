@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-09-08-upstream-handoff-hardening",
+  "title": "consumer 運用で見つかった共通ハーネスの責務・復旧・検証契約を整える",
+  "branch": "track/2026-09-08-upstream-handoff-hardening",
+  "created_at": "2026-09-08T16:13:52Z",
+  "updated_at": "2026-09-08T16:13:52Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

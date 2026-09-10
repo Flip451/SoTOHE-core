@@ -16,9 +16,9 @@ provider-agnostic contract for this capability. Do not duplicate it here.
   (`.codex/agents/rollback-diagnoser.toml`).
 - Triggered from `/track:diagnose` (`.claude/commands/track/diagnose.md`) via the same
   capability-resolution path used by the Claude subagent (dispatched by `bin/sotp capability
-  exec rollback-diagnoser --host <current-host> --briefing-file <path>`, where
-  `<current-host>` is the invoking orchestrator's own provider identity — the dispatcher
-  resolves the selected capability's provider independently from the routing SSoT).
+  exec rollback-diagnoser --briefing-file <path>`). A Codex root omits `--host` so the
+  dispatcher resolves the selected capability's provider from the routing SSoT and runs its
+  subprocess; it must not force the root host's provider.
 - This skill is **diagnose-only**: it must not write to any SoT artifact, must not invoke any
   writer agent, and must not run any mutating `bin/sotp` subcommand, including `signal calc-*`
   refreshes. Signal refresh is orchestrator-owned before invocation; this skill may only read
@@ -26,6 +26,6 @@ provider-agnostic contract for this capability. Do not duplicate it here.
   `task-contract coverage` / `check`, `review results`).
 - The structured output is the skill's terminal text — not a human-facing summary. The
   orchestrator parses the three fields (`routing_target` / `reason` / `recommended_next_action`)
-  and dispatches the corresponding writer or applies a source-edit task for `impl`.
+  and dispatches the corresponding writer or the `implementer` capability for `impl`.
 - See the operational SSoT for the 5-class routing taxonomy, mandatory context-file pre-read,
   and the routing procedure.
