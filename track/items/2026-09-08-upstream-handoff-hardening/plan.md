@@ -28,14 +28,14 @@ T001-T013 cover all 35 enforced elements through IN-01-IN-07, OUT-01-OUT-06, CN-
 > Framework PR-review prompts: establish the shared prompt reference. IN-03; CN-03; AC-05.
 > Automated PR-review workflow and adapters: distinguish completion labels. IN-03; AC-06.
 
-- [x] **T004**: `.harness/prompts/pr-reviewer.md` and `.harness/custom/review-prompts/pr-review.md`: establish the framework prompt reference. IN-03; CN-03; AC-05.
-- [x] **T013**: `.harness/workflows/track/pr-review.md`, `.claude/commands/track/pr-review.md`, and `.agents/skills/track-pr-review/SKILL.md`: distinguish explicit zero-findings completion from approved deviations in automated PR-review results. IN-03; AC-06.
+- [x] **T004**: `.harness/prompts/pr-reviewer.md` and `.harness/custom/review-prompts/pr-review.md`: establish the framework prompt reference. IN-03; CN-03; AC-05. (`b27f2726e50b8def151aa38286b24f5e2894bab0`)
+- [x] **T013**: `.harness/workflows/track/pr-review.md`, `.claude/commands/track/pr-review.md`, and `.agents/skills/track-pr-review/SKILL.md`: distinguish explicit zero-findings completion from approved deviations in automated PR-review results. IN-03; AC-06. (`b27f2726e50b8def151aa38286b24f5e2894bab0`)
 
 ### S4 — Open-PR residual-work recovery
 
 > `.harness/workflows/track/pr-review.md`, `.harness/workflows/track/full-cycle.md`, `.harness/policies/review-protocol.md`, and `.harness/policies/task-completion.md`: add open-PR recovery and downstream full-cycle re-entry branches. IN-04; CN-04; AC-07; AC-08.
 
-- [x] **T005**: `.harness/workflows/track/pr-review.md` Step 3, `.harness/workflows/track/full-cycle.md`, `.harness/policies/review-protocol.md`, and `.harness/policies/task-completion.md`: add open-PR residual-work recovery and downstream full-cycle re-entry branches. IN-04; CN-04; AC-07; AC-08.
+- [x] **T005**: `.harness/workflows/track/pr-review.md` Step 3, `.harness/workflows/track/full-cycle.md`, `.harness/policies/review-protocol.md`, and `.harness/policies/task-completion.md`: add open-PR residual-work recovery and downstream full-cycle re-entry branches. IN-04; CN-04; AC-07; AC-08. (`b27f2726e50b8def151aa38286b24f5e2894bab0`)
 
 ### S5 — Reviewer diagnostics and query-only adapter
 
@@ -50,4 +50,4 @@ T001-T013 cover all 35 enforced elements through IN-01-IN-07, OUT-01-OUT-06, CN-
 
 - [x] **T008**: `libs/domain/src/tddd/test_obligation/{pair.rs,ports.rs}`, `libs/usecase/src/test_obligation/evaluate/{plan.rs,mod.rs}`, `libs/infrastructure/src/test_obligation/{fulfillment_verifier.rs,fulfillment_escalation_driver.rs}`, and `apps/cli-composition/src/test_obligation.rs`: implement the pair/port input-contract change and migrate every existing implementation and caller to compile. IN-06; CN-06; AC-11; AC-12. (`55d050fa2b2f51e068bcd3536503b711873ae3c2`)
 - [x] **T009**: `libs/infrastructure/src/test_obligation/fulfillment_verifier.rs` and `libs/usecase/src/test_obligation/evaluate/{mod.rs,plan.rs,cache.rs,calibration.rs,tests.rs}`: apply entry-local responsibility inputs, update prompt/cache identity, add structural regression coverage, and execute configured-provider positive/negative semantic calibration evidence. IN-06; CN-06; AC-11; AC-12. (`55d050fa2b2f51e068bcd3536503b711873ae3c2`)
-- [x] **T010**: `libs/usecase/src/test_obligation/evaluate/`, affected evaluation call sites, and `apps/cli-driver/`: implement `ConfiguredProviderCalibrationOutcome`, `NonZeroProductionVerdictCount`, `ProductionVerdictCounts`, and the modified `EvaluateTestObligationsOutcome`; migrate evaluation/reporting and add zero/`usize::MAX` category-boundary plus typed-outcome rendering tests. IN-06; AC-12.
+- [x] **T010**: `libs/usecase/src/test_obligation/evaluate/`, affected evaluation call sites, and `apps/cli-driver/`: implement `ConfiguredProviderCalibrationOutcome`, `NonZeroProductionVerdictCount`, `ProductionVerdictCounts`, and the modified `EvaluateTestObligationsOutcome`; migrate evaluation/reporting and add zero/`usize::MAX` category-boundary plus typed-outcome rendering tests. IN-06; AC-12. (`b27f2726e50b8def151aa38286b24f5e2894bab0`)

@@ -108,16 +108,19 @@
       "status": "done"
     },
     {
+      "commit_hash": "b27f2726e50b8def151aa38286b24f5e2894bab0",
       "description": "`.harness/prompts/pr-reviewer.md` and `.harness/custom/review-prompts/pr-review.md`: establish the framework prompt reference. IN-03; CN-03; AC-05.",
       "id": "T004",
       "status": "done"
     },
     {
+      "commit_hash": "b27f2726e50b8def151aa38286b24f5e2894bab0",
       "description": "`.harness/workflows/track/pr-review.md`, `.claude/commands/track/pr-review.md`, and `.agents/skills/track-pr-review/SKILL.md`: distinguish explicit zero-findings completion from approved deviations in automated PR-review results. IN-03; AC-06.",
       "id": "T013",
       "status": "done"
     },
     {
+      "commit_hash": "b27f2726e50b8def151aa38286b24f5e2894bab0",
       "depends_on": [
         "T013"
       ],
@@ -156,6 +159,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "b27f2726e50b8def151aa38286b24f5e2894bab0",
       "depends_on": [
         "T009"
       ],
