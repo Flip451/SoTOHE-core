@@ -146,6 +146,20 @@
           "hash": "rvw1:sha256:087f72ec7561b8f0a35084bc50f14b1ee0f16a363df0903fc7f6a3e85d52ebc8",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:00:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d925074dcdd1265c6f630a298ee8debe82a1166eece164e6dae0003eb6a95a6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:06:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d925074dcdd1265c6f630a298ee8debe82a1166eece164e6dae0003eb6a95a6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -210,6 +224,108 @@
           "at": "2026-09-09T04:58:39Z",
           "findings": [],
           "hash": "rvw1:sha256:e84688ada430287879a69c2ab32d30b6aa2b655a7e64fb8253f55eb80409d41e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T02:59:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89bf1ea1e88eb58a3f2cc1d2e338c1ccd55ed44dbec62f6660b229779c4efb58",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:12:30Z",
+          "findings": [
+            {
+              "category": "workflow consistency",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 289,
+              "message": "The new unfinished-task branch is not propagated consistently. Step 3 and residual-recovery step 6 require unfinished tasks to run normal full-cycle through commit/lifecycle tail and then proceed to PR re-review, reserving standalone local review/commit for the no-unfinished-task branch. This recovery summary still directs writer corrections straight to local review/commit; `.claude/commands/track/pr-review.md:27`, `.harness/policies/review-protocol.md:78`, and `.harness/policies/task-completion.md:35`/`:37` contain the same stale or redundant sequence. Following those surfaces can skip unfinished work or attempt another commit after full-cycle has already closed the lifecycle. Align every surface with the mutually exclusive Step 3 split.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 137,
+              "message": "The provider-agnostic workflow now invokes `/track:full-cycle`, which is Claude-specific command syntax; the Codex surface uses `$track-full-cycle`. The same leakage occurs again at line 215. Refer to the `full-cycle` workflow in normal mode here and leave concrete invocation syntax to each provider adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:89bf1ea1e88eb58a3f2cc1d2e338c1ccd55ed44dbec62f6660b229779c4efb58",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:29:34Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".harness/policies/review-protocol.md",
+              "line": 78,
+              "message": "The ADR-repair tail still bypasses the new task-summary/full-cycle split. After the guardian lane can regenerate downstream plan tasks, this sentence unconditionally sends execution to local review and commit, whereas the workflow SSoT requires unfinished tasks to complete normal full-cycle first. The same stale instruction remains at `.harness/policies/task-completion.md:35` and `.claude/commands/track/pr-review.md:35`. Route ADR-lane completion through the same mutually exclusive task-summary paths as every other writer-owned correction.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow consistency",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 222,
+              "message": "A successful `track add-task` creates a genuine residual task in `todo`, so after re-planning the residual branch must still have unfinished work. The no-unfinished fallback permits a dropped or incorrectly settled residual task to proceed through only local review/commit and reach PR re-review without implementation. Make normal full-cycle mandatory after successful residual-task registration, and fail closed if the registered task disappears or is no longer unfinished; align the policy summaries with that invariant.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:684c42af31cc1cae8891cd06273d06711a16609726473e6f5f52d6dce5f2675a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:37:32Z",
+          "findings": [
+            {
+              "category": "command wiring",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "The `machine PASS` condition depends on the absence of an `Accepted Deviations` section in the PR body, but the documented `review-cycle` result only supplies the latest review body/inline comments or a zero-findings signal. No step fetches the current PR body, so a bot zero signal can still be labeled `machine PASS — zero findings` when the PR body contains deviations. Fetch the body through a supported read-only field before labeling the terminal result (or include a typed deviation indicator in `review-cycle`) and fail closed if it cannot be inspected.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow consistency",
+              "file": ".harness/policies/review-protocol.md",
+              "line": 78,
+              "message": "The policy paths jump directly from completion of the ADR guardian lane to task-summary evaluation. That guardian lane only reconverges ADR review; it does not perform the required partial re-entry through spec, types, and plan. The same omission appears in `.harness/policies/task-completion.md:35` and `.claude/commands/track/pr-review.md:35`, while the workflow SSoT correctly requires downstream reconvergence first. Route ADR completion through that descent before checking tasks or choosing full-cycle versus local review/commit.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 27,
+              "message": "This provider adapter now duplicates Step 3's unfinished-task gate, both state-dependent branches, lifecycle-tail waiting, and the ADR recovery branch. That contradicts its declared boundary that provider-independent workflow logic lives in the workflow SSoT and recreates the drift the adapter split is intended to prevent. Keep only Claude-specific invocation mappings (`full-cycle` to `/track:full-cycle`, review/commit to their commands) and defer the conditions and ordering to the SSoT.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01f28bc3b92275258e666eb0db50b127d5a2736d48ada74ff1fca49e620389bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:43:39Z",
+          "findings": [
+            {
+              "category": "review gate correctness",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 106,
+              "message": "The presence of any `Accepted Deviations` section selects this branch before the current review comments are surfaced or assessed. A stale or partial section can therefore let user approval terminate the workflow while the same review round contains new actionable findings that are not listed as deviations. Always assess the complete current round first, require every remaining finding to correspond to an explicit deviation entry, and continue the fix loop for any unlisted finding before offering the deviation terminal state.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:48696c7e73b041ed069019b5d5508f54af6f3e820ebfc09dcd174c4dc7cf90ae",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T03:47:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf06a9f89931fe5c3147f786e736455e834fbc1beb89bac753d6abc036591c4",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -436,6 +552,34 @@
           "at": "2026-09-09T10:44:44Z",
           "findings": [],
           "hash": "rvw1:sha256:7b489df8227e2e04dd0930d43570b23ffa471045339715e95fbdb5ee09e91d2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T01:35:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3cf463def624c13661cf0116f2abe544b74b2efbb0d431b2cf9413573cdd07b8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T01:41:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3cf463def624c13661cf0116f2abe544b74b2efbb0d431b2cf9413573cdd07b8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T02:57:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3aa3c5c0ddc1d1332e36a0526e9e03704ce8614814ec116413f73cdad59138",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:00:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3aa3c5c0ddc1d1332e36a0526e9e03704ce8614814ec116413f73cdad59138",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -684,6 +828,20 @@
           "hash": "rvw1:sha256:947871e7fd3f8fe49e97d5cddddfab4351fb2f9ccb958cd1e65b271ff60081cc",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T02:58:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77c61bb579662e55e5db5215df1f26e5875aaeb40263809c0e1f9f43dc754637",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:05:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77c61bb579662e55e5db5215df1f26e5875aaeb40263809c0e1f9f43dc754637",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -848,6 +1006,78 @@
           "hash": "rvw1:sha256:0c68a9a3cd96a4d3261c01adb7412488a5e4c9b8a586c6027a3fd6465deb8e5d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T00:17:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06d307d0a055eefee0062c162cbaf31c8e49ad8730b7102dfd549e50c67fa650",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T00:26:10Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 578,
+              "message": "`usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome::new` accepts verdict counts and `ConfiguredProviderCalibrationOutcome` independently and infallibly returns `Self`. It therefore permits contradictory states such as a positive production count with `SkippedNoProductionPairs`, or zero counts with `SkippedByConfiguration`. Encode or validate this relationship so the B2 reporting state cannot lie.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsupported semantic placement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 215,
+              "message": "`ConfiguredProviderCalibrationOutcome` is an operation-specific application output discriminant, but is classified as `ValueObject`. Its docs and IN-06/AC-12 record do not establish stable meaning across application operations or independence from workflow/reporting concerns—the required semantic grounds for an application-layer ValueObject. Classify this boundary result as a `Dto`, or provide reviewable grounds that actually support ValueObject placement.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 182,
+              "message": "The `ConfiguredProviderCalibrationOutcome` docs reproduce the upstream behavior and rationale: both skip reasons, actual execution rate, and exclusion of inferred/legacy states. `.harness/policies/no-upstream-restatement.md` requires catalogue docs to identify the type and reference IN-06/AC-12 rather than restating that contract.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:06d307d0a055eefee0062c162cbaf31c8e49ad8730b7102dfd549e50c67fa650",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T00:52:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b6f6b6b8fb388a228365b099f39d48b237becede9b4b0a0d4ee35d66e46f0c89",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T00:58:35Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+              "line": 251,
+              "message": "`ProductionVerdictCounts` exposes `additional_pass_count`, `additional_fail_count`, and `additional_pending_count` as unrestricted `usize` fields on public enum variants. A caller can therefore construct, for example, `Passing { additional_pass_count: usize::MAX, ... }`; after accounting for the guaranteed leading passing verdict, `pass_count()` would need to return `usize::MAX + 1`, forcing overflow, panic, or lossy saturation. Represent the leading totals with a nonzero bounded type such as `NonZeroUsize`, or use private validated storage, so every publicly constructible tally has exact `usize` getters.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b6f6b6b8fb388a228365b099f39d48b237becede9b4b0a0d4ee35d66e46f0c89",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-10T01:20:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:945fa5a443b3f93f15662bbaced37bda2e3bfbfbdb0b67e9dc0007f7fac543e5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T01:26:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:945fa5a443b3f93f15662bbaced37bda2e3bfbfbdb0b67e9dc0007f7fac543e5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -892,6 +1122,20 @@
           "at": "2026-09-09T12:21:16Z",
           "findings": [],
           "hash": "rvw1:sha256:4c093a356ad92c6720c706ef79cce6912edb7580aa6032b4051b8c95625870f3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:01:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fb74621976ecc12e862887533cd25a94a1a7395966c771c3817714b5242f6fc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-10T03:10:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fb74621976ecc12e862887533cd25a94a1a7395966c771c3817714b5242f6fc",
           "type": "final",
           "verdict": "zero_findings"
         }

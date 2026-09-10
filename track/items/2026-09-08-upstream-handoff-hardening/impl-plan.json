@@ -78,26 +78,31 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "description": "`.harness/workflows/track/`, `.harness/capabilities/rollback-diagnoser.md`, Codex track/rollback adapters, and `.codex/instructions.md`: align shared-workflow and Codex dispatch references. IN-01; CN-01; AC-01; AC-02.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "description": "`.claude/commands/track/implement.md`: align the Claude dispatcher’s provider-selection and phase/rollback delegation path. IN-01; AC-02.",
       "id": "T002",
       "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "description": "`.claude/settings.json` `permissions.allow`: align the Claude distribution allowlist with the existing phase, test-obligation, catalog, and ref-verify command surfaces. IN-02; AC-03.",
       "id": "T011",
       "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "description": "`.claude/settings.json` `hooks.PreCompact` and `.claude/agents/README.md`: align compaction context and the Claude capability adapter list. IN-01; CN-01; AC-01.",
       "id": "T012",
       "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "description": "`.harness/capabilities/type-designer.md` and provider type-designer adapters: correct enrollment and inherent-method declaration guidance. IN-02; CN-02; AC-04.",
       "id": "T003",
       "status": "done"
@@ -105,12 +110,12 @@
     {
       "description": "`.harness/prompts/pr-reviewer.md` and `.harness/custom/review-prompts/pr-review.md`: establish the framework prompt reference. IN-03; CN-03; AC-05.",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "`.harness/workflows/track/pr-review.md`, `.claude/commands/track/pr-review.md`, and `.agents/skills/track-pr-review/SKILL.md`: distinguish explicit zero-findings completion from approved deviations in automated PR-review results. IN-03; AC-06.",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -118,14 +123,16 @@
       ],
       "description": "`.harness/workflows/track/pr-review.md` Step 3, `.harness/workflows/track/full-cycle.md`, `.harness/policies/review-protocol.md`, and `.harness/policies/task-completion.md`: add open-PR residual-work recovery and downstream full-cycle re-entry branches. IN-04; CN-04; AC-07; AC-08.",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "description": "`libs/usecase/src/review_v2/`, `libs/infrastructure/src/review_v2/`, `libs/infrastructure/src/track/gate_state.rs`, and `apps/cli-composition/src/review_v2/`: finish reviewer diagnostic/call-site correction, relocate and export `NullReviewer` in infrastructure, remove its production implementation from composition while retaining construction/injection there, and preserve the existing `Reviewer` port declaration. IN-05; IN-07; CN-05; AC-09; AC-10; AC-14; AC-15.",
       "id": "T006",
       "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "depends_on": [
         "T006"
       ],
@@ -134,11 +141,13 @@
       "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "description": "`libs/domain/src/tddd/test_obligation/{pair.rs,ports.rs}`, `libs/usecase/src/test_obligation/evaluate/{plan.rs,mod.rs}`, `libs/infrastructure/src/test_obligation/{fulfillment_verifier.rs,fulfillment_escalation_driver.rs}`, and `apps/cli-composition/src/test_obligation.rs`: implement the pair/port input-contract change and migrate every existing implementation and caller to compile. IN-06; CN-06; AC-11; AC-12.",
       "id": "T008",
       "status": "done"
     },
     {
+      "commit_hash": "55d050fa2b2f51e068bcd3536503b711873ae3c2",
       "depends_on": [
         "T008"
       ],
@@ -150,9 +159,9 @@
       "depends_on": [
         "T009"
       ],
-      "description": "`libs/usecase/src/test_obligation/evaluate/calibration.rs` and the configured-provider evaluation reporting path: separate structural-regression and configured-provider calibration results. IN-06; CN-06; AC-11; AC-12.",
+      "description": "`libs/usecase/src/test_obligation/evaluate/`, affected evaluation call sites, and `apps/cli-driver/`: implement `ConfiguredProviderCalibrationOutcome`, `NonZeroProductionVerdictCount`, `ProductionVerdictCounts`, and the modified `EvaluateTestObligationsOutcome`; migrate evaluation/reporting and add zero/`usize::MAX` category-boundary plus typed-outcome rendering tests. IN-06; AC-12.",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

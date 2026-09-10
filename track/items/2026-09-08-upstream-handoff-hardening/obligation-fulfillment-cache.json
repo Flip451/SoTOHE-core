@@ -603,6 +603,298 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_enabled_calibration_covers_local_responsibility_and_cache_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ConfiguredProviderCalibrationOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "d257d868e4f46de48b19a15776cee4d3fe672bbb1045b5ef40c16a38be76b1f4",
+        "bound_tests_set_hash": "b76a580af6d433690eca9980039ddef2b015b0894947b864b2271c76788de810",
+        "declaration_hash": "8e51c640934e1a2b65767709b748add9e5f3d588099c2c9b5fe678b0d0b46144"
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredProviderCalibrationOutcome",
+        "item_identifier": "voluntary:IN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(local_results.len(), 4);\n    assert_eq!(local_results.iter().filter(|(_, passed)| *passed).count(), 2);\n    assert_eq!(local_results.iter().filter(|(_, passed)| !*passed).count(), 2);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ConfiguredProviderCalibrationOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "50d2f02b9dc3ce5a59925564379c13f54ee8cec2084e55d024e403ee4f7882c2",
+        "bound_tests_set_hash": "eaf12745f90df1eaeecca41faa52608cc8fb0fc957df4b04ad9de50968acb442",
+        "declaration_hash": "3e678512f609b844818e6ebd225505c617cde08ed1ae6a1486f4512be3b81ce2"
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredProviderCalibrationOutcome",
+        "item_identifier": "voluntary:AC-12",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(production.pass_count(), 2);\n    assert_eq!(production.fail_count(), 3);\n    assert_eq!(production.pending_count(), 4);\n    assert_eq!(production.configured_provider_calibration(), Some(&calibration));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_nonzero_production_count_rejects_zero_and_preserves_usize_max"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "NonZeroProductionVerdictCount"
+      },
+      "key": {
+        "anchor_text_hash": "50d2f02b9dc3ce5a59925564379c13f54ee8cec2084e55d024e403ee4f7882c2",
+        "bound_tests_set_hash": "63741a98c74bae8332b41f8e8aa149f34cfad850dd7d53f07cc68501219a008e",
+        "declaration_hash": "5734bb3ce43662cc6b1b3660d60a84aace5d07b5dac4e8df52285f5018c1ba2f"
+      },
+      "obligation_id": {
+        "entry_key": "NonZeroProductionVerdictCount",
+        "item_identifier": "voluntary:AC-12",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(NonZeroProductionVerdictCount::try_new(0).is_none());\n    let maximum = NonZeroProductionVerdictCount::try_new(usize::MAX).unwrap();\n    assert_eq!(maximum.get(), usize::MAX);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ProductionVerdictCounts"
+      },
+      "key": {
+        "anchor_text_hash": "d257d868e4f46de48b19a15776cee4d3fe672bbb1045b5ef40c16a38be76b1f4",
+        "bound_tests_set_hash": "c014c2f17b9cc2d91af2d9e306b2820dee62471073f98dd772bf17ed72160380",
+        "declaration_hash": "89c94d1bfe51e5bcf8fe007ec033a12f399edd8c84860e1dfd0005ed68a0f1ea"
+      },
+      "obligation_id": {
+        "entry_key": "ProductionVerdictCounts",
+        "item_identifier": "voluntary:IN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for (pass_count, fail_count, pending_count) in cases {\n        let counts = ProductionVerdictCounts::try_new(pass_count, fail_count, pending_count)\n            .expect(\"at least one category is non-zero\");\n        assert_eq!(counts.pass_count(), pass_count);\n        assert_eq!(counts.fail_count(), fail_count);\n        assert_eq!(counts.pending_count(), pending_count);\n    }\n    assert!(ProductionVerdictCounts::try_new(0, 0, 0).is_none());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "ProductionVerdictCounts"
+      },
+      "key": {
+        "anchor_text_hash": "50d2f02b9dc3ce5a59925564379c13f54ee8cec2084e55d024e403ee4f7882c2",
+        "bound_tests_set_hash": "c014c2f17b9cc2d91af2d9e306b2820dee62471073f98dd772bf17ed72160380",
+        "declaration_hash": "125c854d84ed83e5b8dee79efbe93e3c6e0891817b081fb5b581e63f763a7d2a"
+      },
+      "obligation_id": {
+        "entry_key": "ProductionVerdictCounts",
+        "item_identifier": "voluntary:AC-12",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let counts = ProductionVerdictCounts::try_new(pass_count, fail_count, pending_count)\n            .expect(\"at least one category is non-zero\");\n        assert_eq!(counts.pass_count(), pass_count);\n        assert_eq!(counts.fail_count(), fail_count);\n        assert_eq!(counts.pending_count(), pending_count);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_enabled_calibration_covers_local_responsibility_and_cache_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "d257d868e4f46de48b19a15776cee4d3fe672bbb1045b5ef40c16a38be76b1f4",
+        "bound_tests_set_hash": "b57bc35553873d6f623850ddccf1f20dea018b915906e8cb5c1f73ece99aac83",
+        "declaration_hash": "c359ae6c2aa82fafd894e8f529c1a69d045080a93dbfa2642d2e0befe8e9cf0e"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+        "item_identifier": "voluntary:IN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "The configured-provider locality calibration must exercise both the target-owned positive and negative branches, independently of the known-bad category probes.",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_artifacts_yield_zero_pairs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "50d2f02b9dc3ce5a59925564379c13f54ee8cec2084e55d024e403ee4f7882c2",
+        "bound_tests_set_hash": "c9681b8047060f558c246ad02055fde4475aa084299651d68a375fda14a7845a",
+        "declaration_hash": "513c082ce56df93753f9488ecf4fdb45bf1fcc113f28a919eaa908816c373a5d"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+        "item_identifier": "voluntary:AC-12",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(production.pass_count(), 2);\n    assert_eq!(production.fail_count(), 3);\n    assert_eq!(production.pending_count(), 4);\n    assert_eq!(production.configured_provider_calibration(), Some(&calibration));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "cabe5206975038b819c1466aa42623decd64e0c8c344b3b644130b061222431f"
     }
   ],
   "track_id": "2026-09-08-upstream-handoff-hardening"

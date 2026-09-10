@@ -179,8 +179,13 @@
       "scope_estimates": [
         {
           "scope": "usecase",
-          "production_lines": 60,
-          "test_lines": 45
+          "production_lines": 145,
+          "test_lines": 150
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 45,
+          "test_lines": 70
         }
       ],
       "oversize_justification": null

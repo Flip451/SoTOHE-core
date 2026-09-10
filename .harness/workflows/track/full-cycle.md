@@ -79,6 +79,25 @@ Within the batch, run `implement` in dependency order for `todo` / `in_progress`
 honouring the `depends_on` edges declared in `impl-plan.json` (lower-layer first where no
 edge dictates otherwise). DonePending tasks keep their position for downstream gates.
 
+### Re-entry after PR correction or residual-work recovery
+
+When the `pr-review` workflow has completed a writer-owned correction's partial-reentry /
+post-routing descent, or has verified a matching open PR and registered genuine residual work
+through `bin/sotp track add-task`, the caller returns here only after the required Phase 3 re-plan
+and on-branch obligation derivation for that correction have converged. Rebuild the task summaries
+from durable task data with `bin/sotp track resolve`, `bin/sotp track task-counts`, and
+`bin/sotp track next-task`, then rebuild the execution plan from the durable `impl-plan.json`,
+`batch-plan.json`, and those summaries; do not reuse an earlier in-memory batch selection. This
+check includes unfinished tasks already represented before the correction, not only newly
+registered residual tasks. The first unfinished declared batch is the re-entry point, while
+existing `done` / `skipped` history and `DonePending` handling remain unchanged.
+
+Use a normal full-cycle invocation (without `--single-batch`) for this re-entry. It must consume
+all remaining batches and the lifecycle tail before the caller re-runs `pr-review`. This workflow
+does not query GitHub or decide whether a PR is recoverable; the one remote-state check belongs to
+the `pr-review` recovery branch. Ordinary pre-PR full-cycle, task authoring, and obligation
+derivation therefore remain usable without PR state.
+
 ### Long-running gate waiting
 
 Every long-running capability dispatch, workflow, or gate wrapper in this loop is one blocking
@@ -201,6 +220,11 @@ units. Once the selected declared batch is complete, return to the caller before
 Post-loop, even when no later declared batch remains. The caller refreshes and a subsequent
 normal invocation runs Step 4 when no unfinished declared batch remains.
 
+For a PR correction or residual-work re-entry, the caller must use the normal-mode path above and
+wait for this workflow's terminal result, including the lifecycle tail, before triggering another
+PR review. Returning after a single batch or re-reviewing while an unfinished task remains is not
+a complete recovery.
+
 ### Step 4: Lifecycle tail commit (after all batches)
 
 Run this section only after Step 3a finds no unfinished declared batch. A `--single-batch`
@@ -275,6 +299,9 @@ Otherwise, skip (file absence = no observations).
 - **Review `blocked_cross_scope`**: fix cross-scope dependencies, then relaunch the affected scope.
 - **Review `failed` / timeout**: relaunch (up to 2 retries per fixer), then report.
 - **Commit failure**: fix CI or staging issue. Do not re-stage until the issue is resolved.
+- **PR correction/residual-work re-entry**: reconstruct the first unfinished batch from durable
+  task and batch state and run normal full-cycle to completion. Do not query PR state here; return
+  to `pr-review` only after every remaining batch and the lifecycle tail succeed.
 - **Unexpected dirty state in Step 4**: stop and investigate before declaring completion.
 
 ## Outputs

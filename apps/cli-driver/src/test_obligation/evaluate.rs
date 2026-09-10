@@ -7,13 +7,35 @@ use std::sync::Arc;
 use std::task::{Context, Poll, Waker};
 
 use usecase::test_obligation::evaluate::{
-    EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
+    ConfiguredProviderCalibrationOutcome, EvaluateTestObligationsApplicationService,
+    EvaluateTestObligationsCommand, EvaluateTestObligationsOutcome,
 };
 use usecase::{DiagnosticMessage, TrackId};
 
 use crate::render::CommandOutcome;
 
 use super::{default_catalogue_paths, resolve_track_id};
+
+/// Renders the successful evaluation lanes without presenting a cached or
+/// compatibility value as structural-test or provider evidence.
+fn render_evaluation_success(output: &EvaluateTestObligationsOutcome) -> String {
+    let calibration = match output.configured_provider_calibration() {
+        None => "skipped(reason=no_production_pairs)".to_owned(),
+        Some(ConfiguredProviderCalibrationOutcome::SkippedByConfiguration) => {
+            "skipped(reason=disabled_by_configuration)".to_owned()
+        }
+        Some(ConfiguredProviderCalibrationOutcome::Executed { known_bad_detection_rate }) => {
+            format!("executed known_bad_detection_rate={}", known_bad_detection_rate.value())
+        }
+    };
+
+    format!(
+        "[OK] test-obligation evaluate completed: structural_regression=not_run_by_evaluate production_verdicts=pass={} fail={} pending={} configured_provider_calibration={calibration}",
+        output.pass_count(),
+        output.fail_count(),
+        output.pending_count(),
+    )
+}
 
 /// cli_driver-local DTO for `sotp test-obligation evaluate`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -95,13 +117,7 @@ impl TestObligationEvaluateHandler {
             spec_path,
         );
         match block_on(self.service.execute(&command)) {
-            Ok(output) => CommandOutcome::success(Some(format!(
-                "[OK] test-obligation evaluate completed: pass={} fail={} pending={} known_bad_detection_rate={}",
-                output.pass_count(),
-                output.fail_count(),
-                output.pending_count(),
-                output.known_bad_detection_rate().value()
-            ))),
+            Ok(output) => CommandOutcome::success(Some(render_evaluation_success(&output))),
             Err(error) => {
                 CommandOutcome::failure(Some(format!("test-obligation evaluate failed: {error:?}")))
             }
@@ -138,7 +154,8 @@ fn block_on<F: Future>(future: F) -> F::Output {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use usecase::test_obligation::evaluate::{
-        EvaluateTestObligationsFuture, EvaluateTestObligationsOutcome,
+        ConfiguredProviderCalibrationOutcome, EvaluateTestObligationsFuture,
+        EvaluateTestObligationsOutcome, ProductionVerdictCounts,
     };
 
     use super::*;
@@ -151,11 +168,39 @@ mod tests {
             _cmd: &'a EvaluateTestObligationsCommand,
         ) -> EvaluateTestObligationsFuture<'a> {
             Box::pin(async {
-                Ok(EvaluateTestObligationsOutcome::new(
-                    1,
-                    0,
-                    0,
-                    usecase::DetectionRatePercent::try_new(100).unwrap(),
+                Ok(EvaluateTestObligationsOutcome::new_production_pairs(
+                    ProductionVerdictCounts::try_new(1, 0, 0).unwrap(),
+                    ConfiguredProviderCalibrationOutcome::Executed {
+                        known_bad_detection_rate: usecase::DetectionRatePercent::try_new(100)
+                            .unwrap(),
+                    },
+                ))
+            })
+        }
+    }
+
+    struct EmptyStubService;
+
+    impl EvaluateTestObligationsApplicationService for EmptyStubService {
+        fn execute<'a>(
+            &'a self,
+            _cmd: &'a EvaluateTestObligationsCommand,
+        ) -> EvaluateTestObligationsFuture<'a> {
+            Box::pin(async { Ok(EvaluateTestObligationsOutcome::new_no_production_pairs()) })
+        }
+    }
+
+    struct DisabledCalibrationStubService;
+
+    impl EvaluateTestObligationsApplicationService for DisabledCalibrationStubService {
+        fn execute<'a>(
+            &'a self,
+            _cmd: &'a EvaluateTestObligationsCommand,
+        ) -> EvaluateTestObligationsFuture<'a> {
+            Box::pin(async {
+                Ok(EvaluateTestObligationsOutcome::new_production_pairs(
+                    ProductionVerdictCounts::try_new(1, 2, 3).unwrap(),
+                    ConfiguredProviderCalibrationOutcome::SkippedByConfiguration,
                 ))
             })
         }
@@ -170,7 +215,51 @@ mod tests {
         let outcome = handler.handle(TestObligationEvaluateInput::new(None, branch));
 
         assert_eq!(outcome.exit_code, 0);
-        assert!(outcome.stdout.unwrap().contains("pass=1"));
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("structural_regression=not_run_by_evaluate"));
+        assert!(stdout.contains("production_verdicts=pass=1 fail=0 pending=0"));
+        assert!(stdout.contains("configured_provider_calibration=executed"));
+        assert!(stdout.contains("known_bad_detection_rate=100"));
+    }
+
+    #[test]
+    fn test_evaluate_handler_reports_empty_scope_calibration_as_skipped() {
+        let handler =
+            TestObligationEvaluateHandler::new(Arc::new(EmptyStubService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationEvaluateInput::new(None, branch));
+
+        // The typed no-production outcome has no calibration result to render.
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("structural_regression=not_run_by_evaluate"));
+        assert!(stdout.contains("production_verdicts=pass=0 fail=0 pending=0"));
+        assert!(
+            stdout.contains("configured_provider_calibration=skipped(reason=no_production_pairs)")
+        );
+        assert!(!stdout.contains("known_bad_detection_rate=100"));
+    }
+
+    #[test]
+    fn test_evaluate_handler_renders_disabled_calibration_with_exact_counts() {
+        let handler = TestObligationEvaluateHandler::new(
+            Arc::new(DisabledCalibrationStubService),
+            PathBuf::from("/repo"),
+        );
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationEvaluateInput::new(None, branch));
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("production_verdicts=pass=1 fail=2 pending=3"));
+        assert!(
+            stdout.contains(
+                "configured_provider_calibration=skipped(reason=disabled_by_configuration)"
+            )
+        );
+        assert!(!stdout.contains("known_bad_detection_rate"));
     }
 
     #[test]
@@ -193,14 +282,7 @@ mod tests {
                 cmd: &'a EvaluateTestObligationsCommand,
             ) -> EvaluateTestObligationsFuture<'a> {
                 *self.captured.lock().unwrap() = Some(cmd.clone());
-                Box::pin(async {
-                    Ok(EvaluateTestObligationsOutcome::new(
-                        0,
-                        0,
-                        0,
-                        usecase::DetectionRatePercent::try_new(100).unwrap(),
-                    ))
-                })
+                Box::pin(async { Ok(EvaluateTestObligationsOutcome::new_no_production_pairs()) })
             }
         }
 

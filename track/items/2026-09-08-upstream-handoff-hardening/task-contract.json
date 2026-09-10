@@ -53,7 +53,24 @@
       }
     ],
     "T009": [],
-    "T010": [],
+    "T010": [
+      {
+        "layer": "usecase",
+        "entry_key": "ConfiguredProviderCalibrationOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "NonZeroProductionVerdictCount"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ProductionVerdictCounts"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome"
+      }
+    ],
     "T011": [],
     "T012": [],
     "T013": []

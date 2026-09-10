@@ -362,6 +362,200 @@
           "test_name": "test_review_query_paths_read_state_without_reviewer_execution"
         }
       ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConfiguredProviderCalibrationOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_enabled_calibration_covers_local_responsibility_and_cache_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConfiguredProviderCalibrationOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NonZeroProductionVerdictCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_nonzero_production_count_rejects_zero_and_preserves_usize_max"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ProductionVerdictCounts",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ProductionVerdictCounts",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_production_verdict_counts_preserve_exact_category_combinations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_enabled_calibration_covers_local_responsibility_and_cache_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_outcome_exposes_typed_variants_and_count_accessors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_artifacts_yield_zero_pairs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_disabled_calibration_with_production_pairs_skips_provider_and_is_reported"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfilled_on_fast_counts_pass_without_escalation"
+        }
+      ]
     }
   ]
 }

@@ -52,7 +52,9 @@ or failure-recovery procedures here.
 
 ### (5) Reporting format
 
-- On successful completion (only when the PR review reaches explicit zero findings or the user
-  approves an Accepted Deviations exception per `.harness/workflows/track/pr-review.md`),
-  print: `PR_REVIEW_STATUS: completed — PR <url> zero findings`
+- On an explicit zero-findings terminal signal per the workflow SSoT, print:
+  `PR_REVIEW_STATUS: completed — PR <url> machine PASS — zero findings`
+- On an Accepted Deviations exception explicitly approved by the user per the workflow SSoT,
+  print: `PR_REVIEW_STATUS: completed — PR <url> user-approved Accepted Deviations — not zero findings`
+  Include the user's approval citation; reviewer approval alone is not user approval.
 - On failure or block, print: `PR_REVIEW_STATUS: blocked — <reason>`

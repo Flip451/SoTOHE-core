@@ -75,7 +75,33 @@ bypass が動かすのは判定の**時期**だけで、判定の要否ではな
 
 PR review で actionable finding が返った場合、orchestrator は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作り、対象 artifact の owner に委譲する。実装変更と implementer の boundary 内の通常の policy / documentation は `implementer`、`spec.json` とその生成 view は `spec-designer` の `spec-design`、`<layer>-types.json` とその生成 view は `type-designer` の `type-design`、`impl-plan.json`、`task-coverage.json`、`task-contract.json`、`batch-plan.json` は `impl-planner` の `impl-plan` の通常 writer workflow が扱う。生成された plan view は sanctioned views-sync operation で更新する。writer-owned artifact を implementer の focused dispatch に入れてはならない。`review-fix-lead` は通常の `scope-review` 専用であり、wrapper が typed focused mode をサポートするまでは PR finding の transport として使用しない。親コンテキストでの inline edit は通常経路にしてはならず、委譲先が scoped change を適用して completion を返すまで修正済みと扱わない。
 
-委譲先の completion 後、writer-owned artifact の修正であれば完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させる。生成された plan view は sanctioned views-sync operation で更新する。その後、orchestrator は local review workflow を `zero_findings` まで収束させ、`commit` workflow で修正をコミットしてから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として許すが、これは implementer-owned non-ADR finding に限る。writer-owned artifact はその owner workflow に戻し、親が inline edit してはならない。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
+委譲先の completion 後、writer-owned artifact の修正であれば完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させる。生成された plan view は sanctioned views-sync operation で更新する。downstream 再収束後の task summary に未完了 task が 1 件でも残る場合（新規 residual task だけでなく既存の represented task を含む）は、shared `full-cycle` の通常 mode を terminal implementation、obligation verification、review、commit、lifecycle tail まで完了させてから PR review を再実行する。未完了 task がない場合だけ既存の local review を `zero_findings` まで収束させ、`commit` workflow を完了して PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として許すが、これは implementer-owned non-ADR finding に限る。writer-owned artifact はその owner workflow に戻し、親が inline edit してはならない。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後は、まず workflow SSoT の partial-reentry / post-routing descent を spec、types、plan の downstream phases まで完了させてから task summary を再導出して同じ mutually exclusive paths に戻り、未完了 task があれば shared `full-cycle` の通常 mode を terminal implementation、obligation verification、review、commit、lifecycle tail まで完了させてから PR review を再実行する。未完了 task がない場合だけ local review と `commit` workflow を完了して PR review を再実行する。
+
+### Open-PR residual-work recovery
+
+PR review 後に、現行 task 群に表現されていない実在の残作業が見つかった場合だけ、
+`.harness/workflows/track/pr-review.md` の Open-PR residual-work recovery branch を使う。
+これは通常の PR 作成前の task authoring / planning / `derive` に GitHub 照会を持ち込む規則ではない。
+
+- recovery の変更前に `gh repo view --json nameWithOwner -q .nameWithOwner` で現在の repository
+  identity を取得し、remote PR の `state`、`headRefName`、`headRepository`、
+  `headRepositoryOwner`、`baseRefName`、`number`、`url` を確認する。`headRepository.nameWithOwner`
+  が現在の `nameWithOwner` と一致し、`OPEN` かつ現在の `track/<id>` と configured base に対応
+  することを検証する。照会失敗、identity / 値の欠落、対応不一致は原因を報告して停止する。
+  `MERGED` / `CLOSED` または Archived の作業は既存 track を再開せず corrective track へ送る。
+- 対応する open PR で実在する未登録作業だけを、orchestrator が `bin/sotp track add-task`
+  で正規 task として登録する。既存の `Done` / `Skipped` を reopen せず、dummy task や
+  無意味な status toggle で完了履歴を書き換えない。Done / Archived に対する
+  test-obligation の freeze も bypass しない。
+- 追加後の task 状態は task 群から再導出する。成功した `track add-task` で登録した residual
+  task は、Phase 3 の re-plan と通常の `bin/sotp test-obligation derive` の後も未完了として
+  存在しなければならず、消失または完了済みになっていれば recovery failure として停止する。
+  登録 task が未完了であることを確認した後は、shared `full-cycle` の通常 mode を完了してから
+  PR review を再実行する。
+- writer-owned correction の downstream 再収束後も task 状態を task 群から再導出する。未完了
+  task があれば shared `full-cycle` の通常 mode、なければ local review と `commit` workflow を
+  完了してから PR review を再実行する。手順の詳細と terminal failure の扱いは workflow SSoT が
+  所有する。
 
 ### レビュー対象サイズ
 

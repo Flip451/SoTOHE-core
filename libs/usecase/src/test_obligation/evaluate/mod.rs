@@ -16,7 +16,7 @@
 #![allow(clippy::result_large_err)]
 
 use std::future::Future;
-use std::num::NonZeroU8;
+use std::num::{NonZeroU8, NonZeroUsize};
 use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -173,49 +173,178 @@ impl Default for TestObligationEvaluateConfig {
     }
 }
 
-/// Structured output of [`EvaluateTestObligationsInteractor`] (IN-09 / AC-06).
+/// Configured-provider calibration result exposed by the evaluation use case
+/// (IN-06 / AC-12).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct EvaluateTestObligationsOutcome {
-    pass_count: usize,
-    fail_count: usize,
-    pending_count: usize,
-    known_bad_detection_rate: DetectionRatePercent,
+pub enum ConfiguredProviderCalibrationOutcome {
+    /// Calibration was disabled by the configured injection rate.
+    SkippedByConfiguration,
+    /// Calibration ran against the configured provider.
+    Executed {
+        /// Detection rate for the known-bad calibration probes.
+        known_bad_detection_rate: DetectionRatePercent,
+    },
+}
+
+/// A validated non-zero production-verdict category count (AC-12).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NonZeroProductionVerdictCount {
+    value: NonZeroUsize,
+}
+
+impl NonZeroProductionVerdictCount {
+    /// Builds a count, rejecting zero while preserving every non-zero `usize`.
+    #[must_use]
+    pub fn try_new(value: usize) -> Option<Self> {
+        NonZeroUsize::new(value).map(|value| Self { value })
+    }
+
+    /// Returns the exact validated count.
+    #[must_use]
+    pub fn get(&self) -> usize {
+        self.value.get()
+    }
+}
+
+/// Exact, non-empty production-verdict counts (IN-06 / AC-12).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ProductionVerdictCounts {
+    /// At least one production verdict passed.
+    Passing {
+        /// Exact number of passing verdicts.
+        pass_count: NonZeroProductionVerdictCount,
+        /// Exact number of failing verdicts.
+        fail_count: usize,
+        /// Exact number of pending verdicts.
+        pending_count: usize,
+    },
+    /// No verdict passed, and at least one failed.
+    Failing {
+        /// Exact number of failing verdicts.
+        fail_count: NonZeroProductionVerdictCount,
+        /// Exact number of pending verdicts.
+        pending_count: usize,
+    },
+    /// Only pending verdicts were recorded.
+    Pending {
+        /// Exact number of pending verdicts.
+        pending_count: NonZeroProductionVerdictCount,
+    },
+}
+
+impl ProductionVerdictCounts {
+    /// Builds exact counts, returning `None` only when all categories are zero.
+    #[must_use]
+    pub fn try_new(pass_count: usize, fail_count: usize, pending_count: usize) -> Option<Self> {
+        if let Some(pass_count) = NonZeroProductionVerdictCount::try_new(pass_count) {
+            return Some(Self::Passing { pass_count, fail_count, pending_count });
+        }
+        if let Some(fail_count) = NonZeroProductionVerdictCount::try_new(fail_count) {
+            return Some(Self::Failing { fail_count, pending_count });
+        }
+        NonZeroProductionVerdictCount::try_new(pending_count)
+            .map(|pending_count| Self::Pending { pending_count })
+    }
+
+    /// Returns the exact number of passing verdicts.
+    #[must_use]
+    pub fn pass_count(&self) -> usize {
+        match self {
+            Self::Passing { pass_count, .. } => pass_count.get(),
+            Self::Failing { .. } | Self::Pending { .. } => 0,
+        }
+    }
+
+    /// Returns the exact number of failing verdicts.
+    #[must_use]
+    pub fn fail_count(&self) -> usize {
+        match self {
+            Self::Passing { fail_count, .. } => *fail_count,
+            Self::Failing { fail_count, .. } => fail_count.get(),
+            Self::Pending { .. } => 0,
+        }
+    }
+
+    /// Returns the exact number of pending verdicts.
+    #[must_use]
+    pub fn pending_count(&self) -> usize {
+        match self {
+            Self::Passing { pending_count, .. } | Self::Failing { pending_count, .. } => {
+                *pending_count
+            }
+            Self::Pending { pending_count } => pending_count.get(),
+        }
+    }
+}
+
+/// Structured output of [`EvaluateTestObligationsInteractor`] (IN-06 / AC-12).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EvaluateTestObligationsOutcome {
+    /// No production action was planned or recorded.
+    NoProductionPairs,
+    /// Production verdicts were recorded and calibration has an explicit
+    /// configured-provider result.
+    ProductionPairs {
+        /// Exact production verdict counts.
+        verdicts: ProductionVerdictCounts,
+        /// Actual configured-provider calibration result.
+        configured_provider_calibration: ConfiguredProviderCalibrationOutcome,
+    },
 }
 
 impl EvaluateTestObligationsOutcome {
-    /// Builds an [`EvaluateTestObligationsOutcome`].
+    /// Builds an outcome for an empty production scope.
     #[must_use]
-    pub fn new(
-        pass_count: usize,
-        fail_count: usize,
-        pending_count: usize,
-        known_bad_detection_rate: DetectionRatePercent,
+    pub fn new_no_production_pairs() -> Self {
+        Self::NoProductionPairs
+    }
+
+    /// Builds an outcome containing production verdicts and calibration.
+    #[must_use]
+    pub fn new_production_pairs(
+        verdicts: ProductionVerdictCounts,
+        configured_provider_calibration: ConfiguredProviderCalibrationOutcome,
     ) -> Self {
-        Self { pass_count, fail_count, pending_count, known_bad_detection_rate }
+        Self::ProductionPairs { verdicts, configured_provider_calibration }
     }
 
     /// Returns the count of passing verdicts.
     #[must_use]
     pub fn pass_count(&self) -> usize {
-        self.pass_count
+        match self {
+            Self::NoProductionPairs => 0,
+            Self::ProductionPairs { verdicts, .. } => verdicts.pass_count(),
+        }
     }
 
     /// Returns the count of failing verdicts.
     #[must_use]
     pub fn fail_count(&self) -> usize {
-        self.fail_count
+        match self {
+            Self::NoProductionPairs => 0,
+            Self::ProductionPairs { verdicts, .. } => verdicts.fail_count(),
+        }
     }
 
     /// Returns the count of pending verdicts.
     #[must_use]
     pub fn pending_count(&self) -> usize {
-        self.pending_count
+        match self {
+            Self::NoProductionPairs => 0,
+            Self::ProductionPairs { verdicts, .. } => verdicts.pending_count(),
+        }
     }
 
-    /// Returns the known-bad calibration-probe detection rate.
+    /// Returns the configured-provider calibration result when production
+    /// pairs were evaluated.
     #[must_use]
-    pub fn known_bad_detection_rate(&self) -> DetectionRatePercent {
-        self.known_bad_detection_rate.clone()
+    pub fn configured_provider_calibration(&self) -> Option<&ConfiguredProviderCalibrationOutcome> {
+        match self {
+            Self::NoProductionPairs => None,
+            Self::ProductionPairs { configured_provider_calibration, .. } => {
+                Some(configured_provider_calibration)
+            }
+        }
     }
 }
 
@@ -379,40 +508,6 @@ fn half_materialized_scope_error(missing: &str) -> ObligationEvaluateError {
     ))))
 }
 
-fn production_pair_count(
-    obligations: &ObligationsDocument,
-    bindings: &TestBindingsDocument,
-) -> usize {
-    let mut count = 0usize;
-    for record in bindings.records() {
-        match record {
-            TestBindingRecord::Fulfillment { obligation_id, .. } => {
-                let edge_count = obligations
-                    .obligations()
-                    .iter()
-                    .find(|obligation| obligation.id() == obligation_id)
-                    .map(|obligation| obligation.spec_refs().len())
-                    .unwrap_or(1);
-                count = count.saturating_add(edge_count.max(1));
-            }
-            TestBindingRecord::VoluntaryBinding { .. } => {
-                // Validation rejects a voluntary binding with any derived
-                // owner before this count is read, so every valid voluntary
-                // record contributes exactly one catalogue-only edge.
-                count = count.saturating_add(1);
-            }
-            TestBindingRecord::Waiver { edge_id, .. } => {
-                // Waivers are adjudicated once per owning obligation, so the
-                // calibration budget scales with the owner count (minimum one
-                // for catalogue-only edges).
-                let owner_count = obligations.owners_of_edge(edge_id).len();
-                count = count.saturating_add(owner_count.max(1));
-            }
-        }
-    }
-    count
-}
-
 impl EvaluateTestObligationsApplicationService for EvaluateTestObligationsInteractor {
     fn execute<'a>(
         &'a self,
@@ -444,12 +539,11 @@ impl EvaluateTestObligationsInteractor {
 
         let (obligations, bindings) = match (obligations, bindings) {
             (None, None) => {
-                let detection_rate = self.known_bad_detection_rate(0).await?;
                 // Existence-based scope: no materialized scope to evaluate
                 // (IN-14). Rewrite caches to empty documents so `results` cannot
                 // report verdicts from a previous materialized scope.
                 self.save_caches(&cmd.track_id, Vec::new(), Vec::new())?;
-                return Ok(EvaluateTestObligationsOutcome::new(0, 0, 0, detection_rate));
+                return Ok(EvaluateTestObligationsOutcome::new_no_production_pairs());
             }
             (Some(obligations), Some(bindings)) => (obligations, bindings),
             (None, Some(_)) => return Err(half_materialized_scope_error("obligations")),
@@ -459,9 +553,6 @@ impl EvaluateTestObligationsInteractor {
         validate_voluntary_bindings(&obligations, &bindings)
             .map_err(ObligationEvaluateError::BindingConsistency)?;
 
-        let production_pair_count = production_pair_count(&obligations, &bindings);
-        let detection_rate = self.known_bad_detection_rate(production_pair_count).await?;
-        self.local_responsibility_calibration(production_pair_count).await?;
         let catalogues = self.load_catalogues(cmd)?;
         let spec =
             self.spec_reader.load(&cmd.spec_path).map_err(ObligationEvaluateError::SpecLoad)?;
@@ -490,6 +581,27 @@ impl EvaluateTestObligationsInteractor {
             existing_fulfillment_cache.as_ref(),
             existing_waiver_cache.as_ref(),
         )?;
+
+        // Calibration is classified from the concrete production plan rather
+        // than from binding-record arithmetic. This keeps an empty plan from
+        // being reported as provider execution and preserves the explicit
+        // configuration opt-out for real production pairs.
+        let configured_provider_calibration = match calibration::CalibrationExecution::for_inputs(
+            plan.len(),
+            self.config.injection_rate(),
+        ) {
+            calibration::CalibrationExecution::SkippedNoProductionPairs => None,
+            calibration::CalibrationExecution::SkippedByConfiguration => {
+                Some(ConfiguredProviderCalibrationOutcome::SkippedByConfiguration)
+            }
+            calibration::CalibrationExecution::Provider { .. } => {
+                let detection_rate = self.known_bad_detection_rate(plan.len()).await?;
+                self.local_responsibility_calibration(plan.len()).await?;
+                Some(ConfiguredProviderCalibrationOutcome::Executed {
+                    known_bad_detection_rate: detection_rate,
+                })
+            }
+        };
 
         // Build futures for the LLM tasks in plan order, then fan them out
         // through the bounded multiplexer. Verdict order mirrors the input
@@ -533,11 +645,17 @@ impl EvaluateTestObligationsInteractor {
             return Err(ObligationEvaluateError::HumanEscalationRequired { records });
         }
 
-        Ok(EvaluateTestObligationsOutcome::new(
-            tally.pass,
-            tally.fail,
-            tally.pending,
-            detection_rate,
+        let Some(verdicts) =
+            ProductionVerdictCounts::try_new(tally.pass, tally.fail, tally.pending)
+        else {
+            return Ok(EvaluateTestObligationsOutcome::new_no_production_pairs());
+        };
+        let Some(configured_provider_calibration) = configured_provider_calibration else {
+            return Err(invalid_input_error("configured_provider_calibration"));
+        };
+        Ok(EvaluateTestObligationsOutcome::new_production_pairs(
+            verdicts,
+            configured_provider_calibration,
         ))
     }
 }

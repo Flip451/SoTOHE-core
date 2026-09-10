@@ -16,7 +16,10 @@
 //! provider sees both sides of each ownership boundary without any
 //! external-project special case. These probes are dispatched by the existing
 //! host-owned `test-obligation evaluate` path; the structural Rust tests only
-//! verify that the probe set is deterministic and executable-looking.
+//! verify that the probe set is deterministic and executable-looking. A skipped
+//! calibration is intentionally not provider evidence: the compatibility rate
+//! returned by the evaluator for a skipped run must not be rendered as a fresh
+//! provider result.
 
 use domain::tddd::test_obligation::vocab::FulfillmentFailCategory;
 
@@ -51,6 +54,46 @@ pub(super) struct LocalResponsibilityProbeShape {
     pub(super) entry_declaration: &'static str,
     pub(super) anchor_text: &'static str,
     pub(super) expectation: LocalResponsibilityExpectation,
+}
+
+/// Whether the current evaluation has a configured-provider calibration pass.
+///
+/// This is private to the usecase implementation because the outer application
+/// outcome owns the no-production-pairs state. Keeping the classification here
+/// prevents the probe-count calculation from accidentally turning either an
+/// empty production scope or the explicit opt-out into a provider call.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum CalibrationExecution {
+    /// There are no production pairs, so there is nothing to calibrate.
+    SkippedNoProductionPairs,
+    /// Calibration was explicitly disabled by configuration.
+    SkippedByConfiguration,
+    /// The configured provider will receive this many known-bad probes.
+    Provider { probe_count: usize },
+}
+
+impl CalibrationExecution {
+    /// Classifies calibration without performing provider work.
+    pub(super) fn for_inputs(production_pair_count: usize, injection_rate: u8) -> Self {
+        if production_pair_count == 0 {
+            return Self::SkippedNoProductionPairs;
+        }
+        if injection_rate == 0 {
+            return Self::SkippedByConfiguration;
+        }
+
+        let scaled = production_pair_count.saturating_mul(usize::from(injection_rate));
+        let count = scaled.saturating_add(99) / 100;
+        Self::Provider { probe_count: count.max(3) }
+    }
+
+    /// Returns the number of provider probes for this execution plan.
+    pub(super) const fn probe_count(self) -> usize {
+        match self {
+            Self::SkippedNoProductionPairs | Self::SkippedByConfiguration => 0,
+            Self::Provider { probe_count } => probe_count,
+        }
+    }
 }
 
 /// AC-08 (a) — contradiction anchor: promises 🔴 always blocks.
@@ -239,12 +282,7 @@ fn persistence_negative_probe_source() -> String {
 /// The percentage-derived count therefore has a floor of three probes; once
 /// the rate-derived count exceeds that floor, its normal scaling is preserved.
 pub(super) fn calibration_probe_count(production_pair_count: usize, injection_rate: u8) -> usize {
-    if production_pair_count == 0 || injection_rate == 0 {
-        return 0;
-    }
-    let scaled = production_pair_count.saturating_mul(usize::from(injection_rate));
-    let count = scaled.saturating_add(99) / 100;
-    count.max(3)
+    CalibrationExecution::for_inputs(production_pair_count, injection_rate).probe_count()
 }
 
 /// Per-category detection tally for the calibration loop (AC-08).

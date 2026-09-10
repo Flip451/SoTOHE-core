@@ -91,6 +91,74 @@
     {
       "for_type": "ReviewerExecutionProvenance",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConfiguredProviderCalibrationOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProductionVerdictCounts",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "NonZeroProductionVerdictCount",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
@@ -141,6 +209,248 @@
     }
   },
   "types": {
+    "ConfiguredProviderCalibrationOutcome": {
+      "action": "add",
+      "docs": "Configured-provider calibration result reported at the application boundary for IN-06 / AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SkippedByConfiguration",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Executed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "known_bad_detection_rate",
+                  "ty": "domain::tddd::test_obligation::verdict::DetectionRatePercent"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "NonZeroProductionVerdictCount": {
+      "action": "add",
+      "docs": "Application-boundary nonzero production-verdict category count for AC-12 with private validated storage.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Option<Self>",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "get",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "ProductionVerdictCounts": {
+      "action": "add",
+      "docs": "Non-empty production-verdict tally for IN-06 / AC-12 with exact per-category counts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pass_count",
+                  "ty": "NonZeroProductionVerdictCount"
+                },
+                {
+                  "name": "fail_count",
+                  "ty": "usize"
+                },
+                {
+                  "name": "pending_count",
+                  "ty": "usize"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Failing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "fail_count",
+                  "ty": "NonZeroProductionVerdictCount"
+                },
+                {
+                  "name": "pending_count",
+                  "ty": "usize"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pending_count",
+                  "ty": "NonZeroProductionVerdictCount"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "pass_count",
+              "ty": "usize"
+            },
+            {
+              "name": "fail_count",
+              "ty": "usize"
+            },
+            {
+              "name": "pending_count",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Option<Self>",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pass_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fail_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pending_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
     "ReviewerDiagnostic": {
       "action": "add",
       "docs": "Validated reviewer diagnostic text value.",
@@ -469,6 +779,133 @@
         },
         {
           "anchor": "AC-10",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome": {
+      "action": "modify",
+      "docs": "Application outcome for production-verdict and configured-provider calibration reporting; see IN-06 / AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoProductionPairs",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ProductionPairs",
+            "payload": {
+              "fields": [
+                {
+                  "name": "verdicts",
+                  "ty": "ProductionVerdictCounts"
+                },
+                {
+                  "name": "configured_provider_calibration",
+                  "ty": "ConfiguredProviderCalibrationOutcome"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_no_production_pairs",
+          "params": [],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_production_pairs",
+          "params": [
+            {
+              "name": "verdicts",
+              "ty": "ProductionVerdictCounts"
+            },
+            {
+              "name": "configured_provider_calibration",
+              "ty": "ConfiguredProviderCalibrationOutcome"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pass_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fail_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pending_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "configured_provider_calibration",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ConfiguredProviderCalibrationOutcome>",
+          "spec_refs": [
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
+        },
+        {
+          "anchor": "AC-12",
           "file": "track/items/2026-09-08-upstream-handoff-hardening/spec.json"
         }
       ]

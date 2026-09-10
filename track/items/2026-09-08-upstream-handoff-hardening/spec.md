@@ -28,7 +28,7 @@ signals: { blue: 35, yellow: 0, red: 0 }
 - [OUT-03] ユーザー承認済み逸脱の既存承認要件を緩和すること、または共通 PR review 方法論を root の常時入力へ複製すること。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D3] [tasks: T004, T013]
 - [OUT-04] merge 済み、archived、または closed PR の修正を既存 track に復旧すること、あるいは task 追加・義務 derive のたびに GitHub 照会を要求すること。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D4] [tasks: T005]
 - [OUT-05] stderr 全文や任意の subprocess 出力を上位 error、debug、log に露出すること、または新しい生診断ログ参照を追加すること。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
-- [OUT-06] 他 entry の検証済み状態を仮定・探索する新たな横断検査、既存の矛盾・すり替え・中心部未検証の検出を撤去すること、または有限の較正例を未知の複合 anchor を完全に判定する証明として扱うこと。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009, T010]
+- [OUT-06] 他 entry の検証済み状態を仮定・探索する新たな横断検査、既存の矛盾・すり替え・中心部未検証の検出を撤去すること、または有限の較正例を未知の複合 anchor を完全に判定する証明として扱うこと。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009]
 
 ## Constraints
 - [CN-01] 運用文書は provider の現在の割当数や特定の担当者数を固定せず、実際の割当ては既存 profile から判断できるようにする。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D1] [tasks: T001, T012]
@@ -36,7 +36,7 @@ signals: { blue: 35, yellow: 0, red: 0 }
 - [CN-03] PR review の共通方法論を root の常時入力へ本文として追加しない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D3] [tasks: T004]
 - [CN-04] Done / Archived の凍結を撤去せず、完了履歴をダミー task または無意味な状態往復で変更しない。通常の PR 作成前の開発手順に PR 復旧条件を課さない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D4] [tasks: T005]
 - [CN-05] 任意の subprocess 出力をそのまま error、debug、または log へ保存・追加せず、新たな診断ログ保存機構も導入しない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
-- [CN-06] モデル名変更だけによる再判定、force、cache 手編集・削除、無意味な hash 変更、有効な参照の削除、責務越境した実装または不適切な waiver を判定回避策にしない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009, T010]
+- [CN-06] モデル名変更だけによる再判定、force、cache 手編集・削除、無意味な hash 変更、有効な参照の削除、責務越境した実装または不適切な waiver を判定回避策にしない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009]
 
 ## Acceptance Criteria
 - [ ] [AC-01] 共通 workflow は手順、状態遷移、入力取得、再開条件の正本として機能し、provider adapter は provider 固有の呼出し面・配線・制約・報告だけを担う。既存の入力確認と裁定境界は維持される。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D1] [tasks: T001, T012]
@@ -49,7 +49,7 @@ signals: { blue: 35, yellow: 0, red: 0 }
 - [ ] [AC-08] PR writer の修正後は下流成果物を依存順に再収束し、未完了 task があれば通常の full-cycle を完了してから PR を再審査する。対応する PR 状態を確認できない場合は復旧を仮定せず原因を報告する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D4] [tasks: T005]
 - [ ] [AC-09] reviewer subprocess の失敗は provider、取得できた終了コード、および安全な失敗分類を保ったまま上位 CLI へ伝わり、利用者中断、timeout、出力形式不正と区別される。失敗から成功 verdict は生成されない。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
 - [ ] [AC-10] 自由文の subprocess 診断を表示する場合は既存の秘匿境界を通し、秘匿後の UTF-8 byte 列を 4 KiB（4096 bytes）以下に制限する。上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D5] [tasks: T006, T007]
-- [ ] [AC-11] 複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009, T010]
+- [ ] [AC-11] 複合 anchor の判定は対象 obligation item と entry declaration が所有する振る舞いを局所的に評価し、同じ anchor 内で別 entry が所有する部分を Fail の根拠にしない。一方で対象の中心的振る舞いが未検証なら既存の Fail 類型を適用する。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009]
 - [ ] [AC-12] 較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。 [adr: knowledge/adr/2026-09-08-1610-upstream-handoff-hardening.md#D6] [tasks: T008, T009, T010]
 - [ ] [AC-14] review_v2 の状態照会専用構成では、NullReviewer を infrastructure の secondary adapter とし、composition root はそれを構築して ReviewCycle へ注入するだけにする。既存の Reviewer port の method 契約は変更しない。 [adr: knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md#D1] [tasks: T006, T007]
 - [ ] [AC-15] review results の state-summary は get_review_states で状態を読み、review check-approved は evaluate_approval を通じて同じ get_review_states を用いる。どちらも Reviewer を実行しない。NullReviewer の review または fast_review が誤って呼ばれた場合は、成功 verdict または provider 実行を生成せず、型付き PreSpawn / Unavailable 診断で fail-closed に失敗する。 [adr: knowledge/adr/2026-09-09-0916-query-only-reviewer-safety.md#D1] [tasks: T006, T007]

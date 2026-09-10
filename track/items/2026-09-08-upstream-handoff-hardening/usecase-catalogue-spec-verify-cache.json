@@ -1,6 +1,126 @@
 {
   "entries": [
     {
+      "claim_hash": "477d780266b779ec0e25555e8e3bf687c68367674bbae022177fc24978993da2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ConfiguredProviderCalibrationOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e23944bbbb9a7cc9e3003b561037911943bf2d6f0e454f26a928395d18659de9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "477d780266b779ec0e25555e8e3bf687c68367674bbae022177fc24978993da2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ConfiguredProviderCalibrationOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実際の設定 provider による結果を別々に報告する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a50ccea56ffbfb8138a3a835c4b735cbdb25872fdcde1db6c2e596dc05bfcfee",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NonZeroProductionVerdictCount",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a4f699347e5c5fd2b449b38731fa313e265160067b1ce0ccacff2c47fe703416",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProductionVerdictCounts",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e23944bbbb9a7cc9e3003b561037911943bf2d6f0e454f26a928395d18659de9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a4f699347e5c5fd2b449b38731fa313e265160067b1ce0ccacff2c47fe703416",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProductionVerdictCounts",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "9e9895752a6a9f39c5946b01ed27448e8b325103cf6e29f42bd3f802830867ce",
       "claim_origin": {
         "data": {
@@ -189,6 +309,54 @@
       },
       "verdict": {
         "citation": "上限を超えた、UTF-8 として扱えない、または秘匿できない内容は自由文を表示せず、固定分類 `diagnostic_unavailable` と取得済みの失敗終了コードへ縮退する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e6d2615c89852a247e5780366d116a0c579eac8f9ca6f1b034d86fa1452403de",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e23944bbbb9a7cc9e3003b561037911943bf2d6f0e454f26a928395d18659de9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複合 anchor の obligation 判定を対象 entry の局所責務へ較正し、合格例・不合格例と cache 同一性でその契約を検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e6d2615c89852a247e5780366d116a0c579eac8f9ca6f1b034d86fa1452403de",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsOutcome",
+          "file_path": "track/items/2026-09-08-upstream-handoff-hardening/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82871b74f7347bcbea8c3aaae22b37ffd17777336c3f9fc52d0e0adcc4b5c13e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。prompt または判定入力の実質的変更は cache 同一性に反映される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "較正は局所責務を満たす合格例と中心的振る舞いが未検証の不合格例の双方を用い、構造的回帰試験と実際の設定 provider による結果を別々に報告する。",
         "kind": "pass"
       }
     },

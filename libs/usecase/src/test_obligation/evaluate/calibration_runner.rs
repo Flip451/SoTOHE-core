@@ -101,7 +101,9 @@ impl EvaluateTestObligationsInteractor {
     /// the latter measures contradiction/substitution/central-unverified
     /// detection, while these probes check that a target-owned memory or
     /// persistence responsibility is accepted only on its own evidence. The
-    /// result is enforced here; T010 owns any additional reporting surface.
+    /// result is enforced here; the CLI reports it under the configured
+    /// provider-calibration lane rather than mixing it with production
+    /// verdict counts.
     pub(super) async fn local_responsibility_calibration(
         &self,
         production_pair_count: usize,
