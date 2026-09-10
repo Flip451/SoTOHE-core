@@ -92,12 +92,15 @@ Use the gate aggregates via `cargo make` and single workflow operations via guar
 - `bin/sotp pr push`
 - `bin/sotp pr ensure-pr`
 - `bin/sotp pr review-cycle`
+- `gh repo view --json nameWithOwner -q .nameWithOwner` (read-only repository identity lookup for open-PR residual-work recovery)
 - `bin/sotp capability exec <capability> --briefing-file <path>` (the primary delegation route;
   omit `--host` from a Codex root so the dispatcher runs the provider subprocess itself)
 - `bin/sotp phase enter spec-design|type-design|impl-plan` (phase-writer entry)
+- `bin/sotp track add-task "<residual work description>" [--section <section-id>] [--after <task-id>]` (guarded canonical task API for genuine residual work in the open-PR recovery branch)
 - `bin/sotp track transition <task-id> <state> [--commit-hash <hash>]` (task-state transitions
   are performed only by the root orchestrator session, at the points the full-cycle workflow
   SSoT fixes)
+- `bin/sotp test-obligation derive` (guarded on-branch obligation re-derivation after residual-work re-planning; never hand-edit obligations)
 - read-only summary intake (the primary information named in the Root Orchestrator Rules):
   `bin/sotp track resolve`, `bin/sotp track task-counts`, `bin/sotp track next-task`,
   `bin/sotp review results`, `bin/sotp test-obligation results`, `bin/sotp catalog check`,
