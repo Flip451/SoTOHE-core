@@ -54,35 +54,27 @@ impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, Sem
         _key: &'a WaiverCacheKey,
         initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, WaiverVerdict, SemanticVerifierError> {
-        // Materialise the pair inputs into owned values before the async move
+        // Materialise the typed pair into an owned value before the async move
         // so each `SpawnBlocking` closure has an `'static` capture and can be
         // driven on a worker thread while the usecase-level bounded
-        // multiplexer polls its siblings.
+        // multiplexer polls its siblings. Keeping the pair intact prevents the
+        // specification section and obligation responsibility from being lost
+        // at this boundary.
         let verifier = Arc::clone(&self.verifier);
-        let waived_reason = pair.waived_reason().as_str().to_owned();
-        let entry_declaration = pair.entry_declaration().as_str().to_owned();
-        let anchor_text = pair.anchor_text().as_str().to_owned();
+        let pair = pair.clone();
         Box::pin(async move {
             let fast_verifier = Arc::clone(&verifier);
-            let (wr, ed, at, tier) = (
-                waived_reason.clone(),
-                entry_declaration.clone(),
-                anchor_text.clone(),
-                initial_tier.clone(),
-            );
+            let fast_pair = pair.clone();
+            let fast_tier = initial_tier.clone();
             let verdict =
-                SpawnBlocking::new(move || fast_verifier.verify_pair(&wr, &ed, &at, tier)).await?;
+                SpawnBlocking::new(move || fast_verifier.verify_pair(&fast_pair, fast_tier))
+                    .await?;
             if matches!(initial_tier, ModelTier::Fast)
                 && !matches!(verdict, WaiverVerdict::Waived { .. })
             {
                 let final_verifier = Arc::clone(&verifier);
                 return SpawnBlocking::new(move || {
-                    final_verifier.verify_pair(
-                        &waived_reason,
-                        &entry_declaration,
-                        &anchor_text,
-                        ModelTier::Final,
-                    )
+                    final_verifier.verify_pair(&pair, ModelTier::Final)
                 })
                 .await;
             }
@@ -101,11 +93,17 @@ mod tests {
     use std::task::{Context, Poll, Waker};
 
     use domain::EvidenceCitation;
+    use domain::SpecElementId;
+    use domain::tddd::semantic_verify::{CatalogueEntryKey, SpecElementRef, SpecSectionKind};
     use domain::tddd::test_obligation::hashes::{
-        AnchorTextHash, DeclarationHash, WaivedReasonHash,
+        DeclarationHash, ObligationResponsibilityHash, SpecElementHash, WaivedReasonHash,
     };
-    use domain::tddd::test_obligation::ids::{DiagnosticMessage, WaivedReason};
-    use domain::tddd::test_obligation::pair::{AnchorText, EntryDeclaration};
+    use domain::tddd::test_obligation::ids::{
+        DiagnosticMessage, TestObligationBrief, TestObligationId, TestObligationItemIdentifier,
+        WaivedReason,
+    };
+    use domain::tddd::test_obligation::pair::{EntryDeclaration, WaiverPair};
+    use domain::tddd::test_obligation::vocab::TestObligationKind;
 
     use super::*;
 
@@ -133,10 +131,21 @@ mod tests {
     }
 
     fn pair() -> WaiverPair {
+        let obligation_id = TestObligationId::new(
+            CatalogueEntryKey::try_new("Entry".to_owned()).unwrap(),
+            TestObligationKind::Contract,
+            TestObligationItemIdentifier::try_new("trait_method:verify".to_owned()).unwrap(),
+        );
         WaiverPair::new(
             WaivedReason::try_new("type system guarantee".to_owned()).unwrap(),
             EntryDeclaration::try_new("entry declaration".to_owned()).unwrap(),
-            AnchorText::try_new("anchor text".to_owned()).unwrap(),
+            SpecElementRef::new(
+                SpecSectionKind::InScope,
+                SpecElementId::try_new("IN-01".to_owned()).unwrap(),
+                "anchor text".to_owned(),
+            ),
+            obligation_id,
+            TestObligationBrief::try_new("verify the entry-local contract".to_owned()).unwrap(),
         )
     }
 
@@ -144,7 +153,8 @@ mod tests {
         WaiverCacheKey::new(
             WaivedReasonHash::new(domain::ContentHash::from_bytes([1; 32])),
             DeclarationHash::new(domain::ContentHash::from_bytes([2; 32])),
-            AnchorTextHash::new(domain::ContentHash::from_bytes([3; 32])),
+            SpecElementHash::new(domain::ContentHash::from_bytes([3; 32])),
+            ObligationResponsibilityHash::new(domain::ContentHash::from_bytes([4; 32])),
         )
     }
 
@@ -173,14 +183,15 @@ mod tests {
     impl WaiverVerifierPort for StubVerifier {
         fn verify_pair(
             &self,
-            waived_reason: &str,
-            entry_declaration: &str,
-            anchor_text: &str,
+            pair: &WaiverPair,
             tier: ModelTier,
         ) -> Result<WaiverVerdict, SemanticVerifierError> {
-            assert_eq!(waived_reason, "type system guarantee");
-            assert_eq!(entry_declaration, "entry declaration");
-            assert_eq!(anchor_text, "anchor text");
+            assert_eq!(pair.waived_reason().as_str(), "type system guarantee");
+            assert_eq!(pair.entry_declaration().as_str(), "entry declaration");
+            assert_eq!(pair.spec_element().text_label, "anchor text");
+            assert_eq!(pair.spec_element().element_id.as_ref(), "IN-01");
+            assert_eq!(pair.obligation_id().entry_key().as_str(), "Entry");
+            assert_eq!(pair.obligation_brief().as_str(), "verify the entry-local contract");
             self.calls.lock().unwrap().push(tier);
             Ok(self.verdicts.lock().unwrap().remove(0))
         }

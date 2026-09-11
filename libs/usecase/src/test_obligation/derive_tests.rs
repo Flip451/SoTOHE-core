@@ -1859,7 +1859,7 @@ fn test_trait_impl_declaration_resolves_self_crate_trait_from_other_catalogue() 
     let mut impl_catalogue = empty_catalogue("infrastructure", "infrastructure");
     impl_catalogue.insert_type(
         CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
-        value_object_entry(ItemAction::Add, vec![]),
+        with_docs(value_object_entry(ItemAction::Add, vec![])),
     );
     impl_catalogue.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("MyPort").unwrap(),
@@ -1886,6 +1886,8 @@ fn test_trait_impl_declaration_resolves_self_crate_trait_from_other_catalogue() 
 
     let declaration =
         obligation_declaration_text(&[trait_catalogue, impl_catalogue], obligation).unwrap();
+    assert!(declaration.contains("implementing_type: TypeEntry"));
+    assert!(declaration.contains("changed body"));
     assert!(declaration.contains("trait_declaration:"));
 }
 
@@ -2047,6 +2049,85 @@ fn test_trait_impl_declaration_hash_includes_resolved_port_contract() {
     let second_obligation = second.obligations().first().unwrap();
 
     assert_eq!(first_obligation.id(), second_obligation.id());
+    assert_ne!(first_obligation.declaration_hash(), second_obligation.declaration_hash());
+}
+
+#[test]
+fn test_trait_impl_declaration_hash_includes_implementing_type_purpose() {
+    let trait_path = PathBuf::from("usecase-types.json");
+    let implementation_path = PathBuf::from("infrastructure-types.json");
+    let mut trait_catalogue = empty_catalogue("usecase", "usecase");
+    trait_catalogue.insert_trait(
+        CatalogueEntryKey::try_new("ObligationFulfillmentCachePort".to_owned()).unwrap(),
+        fulfillment_cache_port_entry(None),
+    );
+
+    let mut first_implementation = empty_catalogue("infrastructure", "infrastructure");
+    first_implementation.insert_type(
+        CatalogueEntryKey::try_new("JsonObligationFulfillmentCacheCodec".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
+    first_implementation.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("usecase::ObligationFulfillmentCachePort").unwrap(),
+        TypeRef::new("JsonObligationFulfillmentCacheCodec").unwrap(),
+    ));
+
+    let (first_interactor, first_sink) = interactor_with_catalogues(
+        rules_doc(),
+        vec![
+            (trait_path.clone(), trait_catalogue.clone()),
+            (implementation_path.clone(), first_implementation.clone()),
+        ],
+    );
+    first_interactor
+        .execute(&command(vec![trait_path.clone(), implementation_path.clone()]))
+        .unwrap();
+    let first = first_sink.saved.lock().unwrap().clone().unwrap();
+    let first_obligation = first
+        .obligations()
+        .iter()
+        .find(|obligation| {
+            obligation.id().entry_key().as_str() == "JsonObligationFulfillmentCacheCodec"
+        })
+        .unwrap();
+    let first_declaration = obligation_declaration_text(
+        &[trait_catalogue.clone(), first_implementation],
+        first_obligation,
+    )
+    .unwrap();
+    assert!(first_declaration.contains("implementing_type: TypeEntry"));
+    let first_canonical_hash = domain::tddd::test_obligation::hashes::DeclarationHash::new(
+        crate::test_obligation::sha256_content_hash(first_declaration.as_bytes()),
+    );
+    assert_eq!(first_obligation.declaration_hash(), &first_canonical_hash);
+
+    let mut changed_implementation = empty_catalogue("infrastructure", "infrastructure");
+    changed_implementation.insert_type(
+        CatalogueEntryKey::try_new("JsonObligationFulfillmentCacheCodec".to_owned()).unwrap(),
+        with_docs(value_object_entry(ItemAction::Add, vec![])),
+    );
+    changed_implementation.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("usecase::ObligationFulfillmentCachePort").unwrap(),
+        TypeRef::new("JsonObligationFulfillmentCacheCodec").unwrap(),
+    ));
+
+    let (second_interactor, second_sink) = interactor_with_catalogues(
+        rules_doc(),
+        vec![
+            (trait_path.clone(), trait_catalogue.clone()),
+            (implementation_path.clone(), changed_implementation.clone()),
+        ],
+    );
+    second_interactor.execute(&command(vec![trait_path, implementation_path])).unwrap();
+    let second = second_sink.saved.lock().unwrap().clone().unwrap();
+    let second_obligation = second.obligations().first().unwrap();
+    let second_declaration =
+        obligation_declaration_text(&[trait_catalogue, changed_implementation], second_obligation)
+            .unwrap();
+    assert!(second_declaration.contains("changed body"));
+
+    assert_eq!(first_obligation.id(), second_obligation.id());
+    assert_ne!(first_declaration, second_declaration);
     assert_ne!(first_obligation.declaration_hash(), second_obligation.declaration_hash());
 }
 

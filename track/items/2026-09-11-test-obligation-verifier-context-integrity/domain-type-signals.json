@@ -1,9 +1,9 @@
 {
   "baseline_hash": "dd0644534c12e93b56324583c5857eb8b9fa42f07fa49b650c45122614301ff8",
   "declaration_hash": "b9961e87bb958ff6f0199651251774085a4c2c2ec98805d6642753421487b55a",
-  "generated_at": "2026-09-11T16:42:55Z",
-  "head_commit": "d507fef07d667a51c18891b89558e506b2ce6480",
-  "implementation_fingerprint": "01a6b4ab89a46a10b26e7d5b4d38ae0dc04ffd31e8357fb10e47c4858c208326",
+  "generated_at": "2026-09-11T22:03:43Z",
+  "head_commit": "0532f22fede3bf5c20b535a03d5301f56045d575",
+  "implementation_fingerprint": "877cbe4e023c1945654bcd9407a2f9e13f3a8acb604d91d0b638edd478d60f8f",
   "resolution_fingerprint": "7244581995b2e34ce6186ea9a8d66ef4b623086270c49939ed37f08e14c7aba5",
   "rustdoc_execution_identity": {
     "crate_name": "domain",
@@ -15,90 +15,78 @@
   "schema_version": 6,
   "signals": [
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug"
       ],
+      "found_type": true,
+      "kind_tag": "value_object",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "ObligationResponsibilityHash"
     },
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug"
       ],
+      "found_type": true,
+      "kind_tag": "value_object",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "SpecElementHash"
     },
     {
       "found_type": true,
       "kind_tag": "value_object",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
     },
     {
       "found_type": true,
       "kind_tag": "value_object",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "domain::tddd::test_obligation::pair::WaiverPair"
     },
     {
       "found_type": true,
       "kind_tag": "secondary_port",
       "namespace": "trait",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "WaiverVerifierPort"
     },
     {
       "found_type": true,
       "kind_tag": "value_object",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey"
     },
     {
       "found_type": true,
       "kind_tag": "value_object",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "domain::tddd::test_obligation::verdict::WaiverCacheKey"
     },
     {
-      "found_type": true,
+      "found_type": false,
       "kind_tag": "unknown",
-      "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
-      ],
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "domain::tddd::test_obligation::hashes::AnchorTextHash"
     },
     {
-      "found_type": true,
+      "found_type": false,
       "kind_tag": "unknown",
-      "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
-      ],
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "domain::tddd::test_obligation::pair::AnchorText"
     },
     {

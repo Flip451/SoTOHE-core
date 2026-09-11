@@ -10,21 +10,21 @@
     {
       "task_id": "T002",
       "scope_estimates": [
-        {"scope": "usecase", "production_lines": 45, "test_lines": 15},
+        {"scope": "usecase", "production_lines": 295, "test_lines": 241},
         {"scope": "infrastructure", "production_lines": 55, "test_lines": 25},
         {"scope": "cli_driver", "production_lines": 15, "test_lines": 10},
         {"scope": "cli_composition", "production_lines": 25, "test_lines": 15}
       ],
-      "oversize_justification": null
+      "oversize_justification": "The usecase estimate is 536 lines against the resolved 500-line ceiling. T002 is the already-admitted in-progress B1 compatibility closure, and the implementing-TypeEntry declaration composition must change together with derivation and the evaluate/check/results declaration-hash consumers so the batch remains buildable and all lanes share one cache identity; splitting this closure would leave the admitted prefix with mismatched declaration evidence and freshness hashes."
     },
     {
       "task_id": "T003",
-      "scope_estimates": [{"scope": "usecase", "production_lines": 175, "test_lines": 165}],
+      "scope_estimates": [{"scope": "usecase", "production_lines": 100, "test_lines": 120}],
       "oversize_justification": null
     },
     {
       "task_id": "T004",
-      "scope_estimates": [{"scope": "usecase", "production_lines": 130, "test_lines": 170}],
+      "scope_estimates": [{"scope": "usecase", "production_lines": 150, "test_lines": 170}],
       "oversize_justification": null
     },
     {
@@ -60,8 +60,9 @@
     }
   ],
   "batches": [
-    {"id": "B1", "task_ids": ["T001", "T002", "T003", "T005", "T006"]},
-    {"id": "B2", "task_ids": ["T004", "T007"]},
-    {"id": "B3", "task_ids": ["T008", "T009"]}
+    {"id": "B1", "task_ids": ["T001", "T002", "T005", "T006"]},
+    {"id": "B2", "task_ids": ["T003", "T007"]},
+    {"id": "B3", "task_ids": ["T004"]},
+    {"id": "B4", "task_ids": ["T008", "T009"]}
   ]
 }

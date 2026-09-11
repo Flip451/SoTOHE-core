@@ -4,7 +4,7 @@
 //! semantic-review outcomes: a passing verdict structurally carries an
 //! [`EvidenceCitation`] so "pass without citation" is impossible, a fail carries
 //! a reason (and, for fulfillment, a [`FulfillmentFailCategory`]), and `Pending`
-//! is treated as fail at the gate. Verdicts are frozen against a three-component
+//! is treated as fail at the gate. Verdicts are frozen against a four-component
 //! cache key ([`ObligationFulfillmentCacheKey`] / [`WaiverCacheKey`]) plus the
 //! verifier-prompt fingerprint that makes the recorded verdict valid. When any
 //! key component or the prompt fingerprint changes, the entry is stale and
@@ -13,7 +13,8 @@
 
 use crate::tddd::test_obligation::binding::NonEmptyTestLocations;
 use crate::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint, WaivedReasonHash,
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+    VerifierPromptFingerprint, WaivedReasonHash,
 };
 use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationEdgeId, TestObligationId,
@@ -102,27 +103,30 @@ pub enum WaiverVerdict {
     Pending,
 }
 
-/// Three-component cache key freezing an obligation-fulfillment verdict.
+/// Four-component cache key freezing an obligation-fulfillment verdict.
 ///
-/// Combines the bound-tests-set hash (claim side) with the declaration and
-/// anchor-text hashes (evidence side). Any component changing produces a
+/// Combines the bound-tests-set hash (claim side) with the declaration,
+/// specification-element, and responsibility hashes (evidence and
+/// entry-local responsibility sides). Any component changing produces a
 /// different key, so the frozen verdict is no longer found (IN-09 / CN-04).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObligationFulfillmentCacheKey {
     bound_tests_set_hash: BoundTestsSetHash,
     declaration_hash: DeclarationHash,
-    anchor_text_hash: AnchorTextHash,
+    spec_element_hash: SpecElementHash,
+    responsibility_hash: ObligationResponsibilityHash,
 }
 
 impl ObligationFulfillmentCacheKey {
-    /// Builds an [`ObligationFulfillmentCacheKey`] from its three hash components.
+    /// Builds an [`ObligationFulfillmentCacheKey`] from its four hash components.
     #[must_use]
     pub fn new(
         bound_tests_set_hash: BoundTestsSetHash,
         declaration_hash: DeclarationHash,
-        anchor_text_hash: AnchorTextHash,
+        spec_element_hash: SpecElementHash,
+        responsibility_hash: ObligationResponsibilityHash,
     ) -> Self {
-        Self { bound_tests_set_hash, declaration_hash, anchor_text_hash }
+        Self { bound_tests_set_hash, declaration_hash, spec_element_hash, responsibility_hash }
     }
 
     /// Returns the bound-tests-set hash (claim side).
@@ -137,10 +141,16 @@ impl ObligationFulfillmentCacheKey {
         &self.declaration_hash
     }
 
-    /// Returns the anchor-text hash (evidence side).
+    /// Returns the specification-element hash (evidence side).
     #[must_use]
-    pub fn anchor_text_hash(&self) -> &AnchorTextHash {
-        &self.anchor_text_hash
+    pub fn spec_element_hash(&self) -> &SpecElementHash {
+        &self.spec_element_hash
+    }
+
+    /// Returns the entry-local responsibility hash (responsibility side).
+    #[must_use]
+    pub fn responsibility_hash(&self) -> &ObligationResponsibilityHash {
+        &self.responsibility_hash
     }
 }
 
@@ -201,7 +211,7 @@ impl ObligationFulfillmentCacheEntry {
         &self.obligation_id
     }
 
-    /// Returns the three-component cache key freezing this verdict.
+    /// Returns the four-component cache key freezing this verdict.
     #[must_use]
     pub fn key(&self) -> &ObligationFulfillmentCacheKey {
         &self.key
@@ -298,27 +308,30 @@ impl ObligationFulfillmentCacheDocument {
     }
 }
 
-/// Three-component cache key freezing a waiver verdict.
+/// Four-component cache key freezing a waiver verdict.
 ///
-/// Combines the waived-reason hash (claim side) with the declaration and
-/// anchor-text hashes (evidence side). Any component changing produces a
+/// Combines the waived-reason hash (claim side) with the declaration,
+/// specification-element, and responsibility hashes (evidence and
+/// entry-local responsibility sides). Any component changing produces a
 /// different key, so the frozen verdict is no longer found (IN-09 / CN-04).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WaiverCacheKey {
     waived_reason_hash: WaivedReasonHash,
     declaration_hash: DeclarationHash,
-    anchor_text_hash: AnchorTextHash,
+    spec_element_hash: SpecElementHash,
+    responsibility_hash: ObligationResponsibilityHash,
 }
 
 impl WaiverCacheKey {
-    /// Builds a [`WaiverCacheKey`] from its three hash components.
+    /// Builds a [`WaiverCacheKey`] from its four hash components.
     #[must_use]
     pub fn new(
         waived_reason_hash: WaivedReasonHash,
         declaration_hash: DeclarationHash,
-        anchor_text_hash: AnchorTextHash,
+        spec_element_hash: SpecElementHash,
+        responsibility_hash: ObligationResponsibilityHash,
     ) -> Self {
-        Self { waived_reason_hash, declaration_hash, anchor_text_hash }
+        Self { waived_reason_hash, declaration_hash, spec_element_hash, responsibility_hash }
     }
 
     /// Returns the waived-reason hash (claim side).
@@ -333,10 +346,16 @@ impl WaiverCacheKey {
         &self.declaration_hash
     }
 
-    /// Returns the anchor-text hash (evidence side).
+    /// Returns the specification-element hash (evidence side).
     #[must_use]
-    pub fn anchor_text_hash(&self) -> &AnchorTextHash {
-        &self.anchor_text_hash
+    pub fn spec_element_hash(&self) -> &SpecElementHash {
+        &self.spec_element_hash
+    }
+
+    /// Returns the entry-local responsibility hash (responsibility side).
+    #[must_use]
+    pub fn responsibility_hash(&self) -> &ObligationResponsibilityHash {
+        &self.responsibility_hash
     }
 }
 
@@ -378,7 +397,7 @@ impl WaiverCacheEntry {
         self.obligation_id.as_ref()
     }
 
-    /// Returns the three-component cache key freezing this verdict.
+    /// Returns the four-component cache key freezing this verdict.
     #[must_use]
     pub fn key(&self) -> &WaiverCacheKey {
         &self.key
@@ -434,6 +453,7 @@ mod tests {
     use crate::tddd::LayerId;
     use crate::tddd::semantic_verify::CatalogueEntryKey;
     use crate::tddd::test_obligation::binding::{NonEmptyTestLocations, TestLocation};
+    use crate::tddd::test_obligation::hashes::SpecElementHash;
     use crate::tddd::test_obligation::ids::{
         TestFunctionName, TestModulePath, TestObligationAnchorId, TestObligationItemIdentifier,
     };
@@ -480,7 +500,8 @@ mod tests {
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),
         )
     }
 
@@ -488,7 +509,8 @@ mod tests {
         WaiverCacheKey::new(
             WaivedReasonHash::new(ContentHash::from_bytes([4u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([5u8; 32])),
         )
     }
 
@@ -548,21 +570,31 @@ mod tests {
         let different_tests = ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([9u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),
         );
         let different_declaration = ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([8u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),
         );
         let different_anchor = ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([7u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([7u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),
+        );
+        let different_responsibility = ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([8u8; 32])),
         );
         assert_ne!(base, different_tests);
         assert_ne!(base, different_declaration);
         assert_ne!(base, different_anchor);
+        assert_ne!(base, different_responsibility);
     }
 
     #[test]
@@ -571,21 +603,31 @@ mod tests {
         let different_reason = WaiverCacheKey::new(
             WaivedReasonHash::new(ContentHash::from_bytes([9u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([5u8; 32])),
         );
         let different_declaration = WaiverCacheKey::new(
             WaivedReasonHash::new(ContentHash::from_bytes([1u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([8u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([5u8; 32])),
         );
         let different_anchor = WaiverCacheKey::new(
             WaivedReasonHash::new(ContentHash::from_bytes([1u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([7u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([7u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([5u8; 32])),
+        );
+        let different_responsibility = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([1u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([8u8; 32])),
         );
         assert_ne!(base, different_reason);
         assert_ne!(base, different_declaration);
         assert_ne!(base, different_anchor);
+        assert_ne!(base, different_responsibility);
     }
 
     #[test]
@@ -686,7 +728,8 @@ mod tests {
         let historical_key = ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([9u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),
         );
         let historical = cache_entry(
             edge_id(),
@@ -800,19 +843,27 @@ mod tests {
     }
 
     #[test]
-    fn test_fulfillment_cache_lookup_with_declaration_or_anchor_mismatch_returns_none() {
+    fn test_fulfillment_cache_lookup_with_declaration_or_context_mismatch_returns_none() {
         let current_key = fulfillment_key();
         let fingerprint = verifier_fingerprint();
         let mismatched_keys = [
             ObligationFulfillmentCacheKey::new(
                 current_key.bound_tests_set_hash().clone(),
                 DeclarationHash::new(ContentHash::from_bytes([6u8; 32])),
-                current_key.anchor_text_hash().clone(),
+                current_key.spec_element_hash().clone(),
+                current_key.responsibility_hash().clone(),
             ),
             ObligationFulfillmentCacheKey::new(
                 current_key.bound_tests_set_hash().clone(),
                 current_key.declaration_hash().clone(),
-                AnchorTextHash::new(ContentHash::from_bytes([7u8; 32])),
+                SpecElementHash::new(ContentHash::from_bytes([7u8; 32])),
+                current_key.responsibility_hash().clone(),
+            ),
+            ObligationFulfillmentCacheKey::new(
+                current_key.bound_tests_set_hash().clone(),
+                current_key.declaration_hash().clone(),
+                current_key.spec_element_hash().clone(),
+                ObligationResponsibilityHash::new(ContentHash::from_bytes([8u8; 32])),
             ),
         ];
 

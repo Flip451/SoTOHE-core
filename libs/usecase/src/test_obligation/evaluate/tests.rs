@@ -29,8 +29,8 @@ use domain::tddd::test_obligation::errors::{
     VerifyCacheError,
 };
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, TestBodySpanHash,
-    VerifierPromptFingerprint, WaivedReasonHash,
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+    TestBodySpanHash, VerifierPromptFingerprint, WaivedReasonHash,
 };
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestFunctionName, TestModulePath, TestObligationAnchorId,
@@ -838,9 +838,10 @@ fn fulfillment_binding_for(obligation: &TestObligation) -> TestBindingsDocument 
 fn planned_fulfillment_edges(plan: &[PlannedAction]) -> Vec<(String, String)> {
     plan.iter()
         .filter_map(|action| match action {
-            PlannedAction::Fulfillment(task) => {
-                Some((task.edge_id.anchor_id().element_id().to_owned(), task.anchor_text.clone()))
-            }
+            PlannedAction::Fulfillment(task) => Some((
+                task.edge_id.anchor_id().element_id().to_owned(),
+                task.spec_element.text_label.clone(),
+            )),
             PlannedAction::Immediate(_) | PlannedAction::Waiver(_) => None,
         })
         .collect()
@@ -1267,6 +1268,28 @@ fn sum_hash(bytes: &[u8]) -> ContentHash {
     SumHasher.sha256(bytes)
 }
 
+fn spec_element_hash_for(edge: &TestObligationEdgeId, text: &str) -> SpecElementHash {
+    SpecElementHash::new(sum_hash(
+        format!("element_id={}\ntext_label={}", edge.anchor_id().element_id(), text).as_bytes(),
+    ))
+}
+
+fn responsibility_hash_for(
+    obligation_id: &TestObligationId,
+    obligation_brief: &TestObligationBrief,
+) -> ObligationResponsibilityHash {
+    ObligationResponsibilityHash::new(sum_hash(
+        format!(
+            "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
+            obligation_id.entry_key().as_str(),
+            obligation_id.obligation_kind().as_kebab(),
+            obligation_id.item_identifier().as_str(),
+            obligation_brief.as_str(),
+        )
+        .as_bytes(),
+    ))
+}
+
 fn cached_fulfillment_doc(
     verdict: ObligationFulfillmentVerdict,
 ) -> ObligationFulfillmentCacheDocument {
@@ -1289,7 +1312,8 @@ fn cached_fulfillment_doc_with_fingerprint(
     let key = ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes())),
         DeclarationHash::new(sum_hash(declaration.as_bytes())),
-        AnchorTextHash::new(sum_hash(anchor_text().as_bytes())),
+        spec_element_hash_for(&edge(), anchor_text()),
+        responsibility_hash_for(obligation.id(), obligation.brief()),
     );
     ObligationFulfillmentCacheDocument::new(
         track(),
@@ -1314,7 +1338,8 @@ fn cached_waiver_doc_with_fingerprint(
     let key = WaiverCacheKey::new(
         WaivedReasonHash::new(sum_hash(waiver_reason().as_str().as_bytes())),
         DeclarationHash::new(sum_hash(declaration.as_bytes())),
-        AnchorTextHash::new(sum_hash(anchor_text().as_bytes())),
+        spec_element_hash_for(&edge(), anchor_text()),
+        responsibility_hash_for(obligation().id(), obligation().brief()),
     );
     WaiverCacheDocument::new(
         track(),
@@ -2174,7 +2199,8 @@ fn test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches() {
             ObligationFulfillmentCacheKey::new(
                 BoundTestsSetHash::new(sum_hash(b"historical bound-test source")),
                 current.key().declaration_hash().clone(),
-                current.key().anchor_text_hash().clone(),
+                current.key().spec_element_hash().clone(),
+                current.key().responsibility_hash().clone(),
             ),
             fulfillment_fail(),
             Some(fulfillment_verifier_fingerprint()),
@@ -2185,7 +2211,8 @@ fn test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches() {
             ObligationFulfillmentCacheKey::new(
                 current.key().bound_tests_set_hash().clone(),
                 DeclarationHash::new(sum_hash(b"historical entry declaration")),
-                current.key().anchor_text_hash().clone(),
+                current.key().spec_element_hash().clone(),
+                current.key().responsibility_hash().clone(),
             ),
             fulfillment_fail(),
             Some(fulfillment_verifier_fingerprint()),
@@ -2196,7 +2223,8 @@ fn test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches() {
             ObligationFulfillmentCacheKey::new(
                 current.key().bound_tests_set_hash().clone(),
                 current.key().declaration_hash().clone(),
-                AnchorTextHash::new(sum_hash(b"historical anchor text")),
+                SpecElementHash::new(sum_hash(b"historical anchor text")),
+                current.key().responsibility_hash().clone(),
             ),
             fulfillment_fail(),
             Some(fulfillment_verifier_fingerprint()),
@@ -2209,7 +2237,7 @@ fn test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches() {
             Some(VerifierPromptFingerprint::new(sum_hash(b"historical verifier prompt"))),
         ),
     ];
-    let [bound_tests_mismatch, declaration_mismatch, anchor_mismatch, fingerprint_mismatch] =
+    let [bound_tests_mismatch, declaration_mismatch, spec_element_mismatch, fingerprint_mismatch] =
         historical_entries.as_slice()
     else {
         panic!("fixture must include one row for every cache identity mismatch");
@@ -2219,7 +2247,7 @@ fn test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches() {
         current.key().bound_tests_set_hash()
     );
     assert_ne!(declaration_mismatch.key().declaration_hash(), current.key().declaration_hash());
-    assert_ne!(anchor_mismatch.key().anchor_text_hash(), current.key().anchor_text_hash());
+    assert_ne!(spec_element_mismatch.key().spec_element_hash(), current.key().spec_element_hash());
     assert_ne!(fingerprint_mismatch.verifier_fingerprint(), current.verifier_fingerprint());
     let mut entries = historical_entries;
     entries.push(current.clone());
@@ -2801,7 +2829,8 @@ fn test_parent_only_fulfillment_declaration_hash_reverifies() {
     let parent_only_key = ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes())),
         DeclarationHash::new(sum_hash(declaration.as_bytes())),
-        AnchorTextHash::new(sum_hash(anchor_text().as_bytes())),
+        spec_element_hash_for(&edge(), anchor_text()),
+        responsibility_hash_for(obligation.id(), obligation.brief()),
     );
     let cache = ObligationFulfillmentCacheDocument::new(
         track(),
@@ -2836,7 +2865,8 @@ fn test_parent_only_waiver_declaration_hash_reverifies() {
     let parent_only_key = WaiverCacheKey::new(
         WaivedReasonHash::new(sum_hash(waiver_reason().as_str().as_bytes())),
         DeclarationHash::new(sum_hash(declaration.as_bytes())),
-        AnchorTextHash::new(sum_hash(anchor_text().as_bytes())),
+        spec_element_hash_for(&edge(), anchor_text()),
+        responsibility_hash_for(obligation().id(), obligation().brief()),
     );
     let cache = WaiverCacheDocument::new(
         track(),

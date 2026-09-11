@@ -4,18 +4,18 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ObligationResponsibilityHash | value_object | add | — | 🟡 | 🔵 |
-| SpecElementHash | value_object | add | — | 🟡 | 🔵 |
+| ObligationResponsibilityHash | value_object | add | — | 🔵 | 🔵 |
+| SpecElementHash | value_object | add | — | 🔵 | 🔵 |
 | domain::tddd::semantic_verify::SpecElementRef | value_object | reference | — | 🔵 | 🔵 |
-| domain::tddd::test_obligation::pair::ObligationFulfillmentPair | value_object | modify | — | 🟡 | 🔵 |
-| domain::tddd::test_obligation::pair::WaiverPair | value_object | modify | — | 🟡 | 🔵 |
-| domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey | value_object | modify | — | 🟡 | 🔵 |
-| domain::tddd::test_obligation::verdict::WaiverCacheKey | value_object | modify | — | 🟡 | 🔵 |
+| domain::tddd::test_obligation::pair::ObligationFulfillmentPair | value_object | modify | — | 🔵 | 🔵 |
+| domain::tddd::test_obligation::pair::WaiverPair | value_object | modify | — | 🔵 | 🔵 |
+| domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey | value_object | modify | — | 🔵 | 🔵 |
+| domain::tddd::test_obligation::verdict::WaiverCacheKey | value_object | modify | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ObligationFulfillmentVerifierPort | secondary_port | reference | fn verify_pair(&self, pair: &ObligationFulfillmentPair, tier: ModelTier) -> Result<ObligationFulfillmentVerdict, SemanticVerifierError> | 🔵 | 🔵 |
-| WaiverVerifierPort | secondary_port | modify | fn verify_pair(&self, pair: &WaiverPair, tier: ModelTier) -> Result<WaiverVerdict, SemanticVerifierError> | 🟡 | 🔵 |
+| WaiverVerifierPort | secondary_port | modify | fn verify_pair(&self, pair: &WaiverPair, tier: ModelTier) -> Result<WaiverVerdict, SemanticVerifierError> | 🔵 | 🔵 |
 

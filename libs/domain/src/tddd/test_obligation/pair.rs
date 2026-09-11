@@ -7,15 +7,17 @@
 //! be positionally swapped:
 //!
 //! - [`ObligationFulfillmentPair`]: bound test source vs. the catalogue entry
-//!   declaration and the anchor text (the fulfillment lane).
-//! - [`WaiverPair`]: the waiver reason vs. the same declaration and anchor text
-//!   (the waiver lane).
+//!   declaration and structured specification element (the fulfillment lane).
+//! - [`WaiverPair`]: the waiver reason vs. the same declaration and structured
+//!   specification element (the waiver lane).
 //!
-//! Every component is a validated non-empty newtype ([`TestsSource`],
-//! [`EntryDeclaration`], [`AnchorText`], and [`WaivedReason`]) so a pair can
-//! never be constructed with an empty claim or evidence side.
+//! Every textual claim, reason, and declaration component is a validated
+//! non-empty newtype ([`TestsSource`], [`EntryDeclaration`], and
+//! [`WaivedReason`]); the existing structured reference ([`SpecElementRef`])
+//! preserves the specification element's identity, section, and verbatim text.
 
 use crate::ValidationError;
+use crate::tddd::semantic_verify::SpecElementRef;
 use crate::tddd::test_obligation::ids::{TestObligationBrief, TestObligationId, WaivedReason};
 
 /// Validated non-empty bound-test source text (the fulfillment claim side).
@@ -72,39 +74,12 @@ impl EntryDeclaration {
     }
 }
 
-/// Validated non-empty anchor text an obligation binds to.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AnchorText {
-    value: String,
-}
-
-impl AnchorText {
-    /// Validates and wraps `text` as an [`AnchorText`].
-    ///
-    /// # Errors
-    ///
-    /// Returns [`ValidationError::EmptyString`] when `text` is empty or
-    /// whitespace-only.
-    pub fn try_new(text: String) -> Result<Self, ValidationError> {
-        if text.trim().is_empty() {
-            return Err(ValidationError::EmptyString);
-        }
-        Ok(Self { value: text })
-    }
-
-    /// Borrows the inner anchor text.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.value
-    }
-}
-
 /// Claim/evidence payload for the obligation-fulfillment lane (IN-09).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObligationFulfillmentPair {
     tests_source: TestsSource,
     entry_declaration: EntryDeclaration,
-    anchor_text: AnchorText,
+    spec_element: SpecElementRef,
     obligation_id: TestObligationId,
     obligation_brief: TestObligationBrief,
 }
@@ -116,11 +91,11 @@ impl ObligationFulfillmentPair {
     pub fn new(
         tests_source: TestsSource,
         entry_declaration: EntryDeclaration,
-        anchor_text: AnchorText,
+        spec_element: SpecElementRef,
         obligation_id: TestObligationId,
         obligation_brief: TestObligationBrief,
     ) -> Self {
-        Self { tests_source, entry_declaration, anchor_text, obligation_id, obligation_brief }
+        Self { tests_source, entry_declaration, spec_element, obligation_id, obligation_brief }
     }
 
     /// Borrows the concatenated bound test source (the claim side).
@@ -135,10 +110,10 @@ impl ObligationFulfillmentPair {
         &self.entry_declaration
     }
 
-    /// Borrows the anchor text the obligation binds to.
+    /// Borrows the structured specification element the obligation binds to.
     #[must_use]
-    pub fn anchor_text(&self) -> &AnchorText {
-        &self.anchor_text
+    pub fn spec_element(&self) -> &SpecElementRef {
+        &self.spec_element
     }
 
     /// Borrows the stable identity of the obligation being judged.
@@ -159,18 +134,23 @@ impl ObligationFulfillmentPair {
 pub struct WaiverPair {
     waived_reason: WaivedReason,
     entry_declaration: EntryDeclaration,
-    anchor_text: AnchorText,
+    spec_element: SpecElementRef,
+    obligation_id: TestObligationId,
+    obligation_brief: TestObligationBrief,
 }
 
 impl WaiverPair {
-    /// Builds a [`WaiverPair`] from its three validated components.
+    /// Builds a [`WaiverPair`] from its validated claim, evidence, and
+    /// entry-local responsibility components.
     #[must_use]
     pub fn new(
         waived_reason: WaivedReason,
         entry_declaration: EntryDeclaration,
-        anchor_text: AnchorText,
+        spec_element: SpecElementRef,
+        obligation_id: TestObligationId,
+        obligation_brief: TestObligationBrief,
     ) -> Self {
-        Self { waived_reason, entry_declaration, anchor_text }
+        Self { waived_reason, entry_declaration, spec_element, obligation_id, obligation_brief }
     }
 
     /// Borrows the waiver reason (the claim side).
@@ -185,10 +165,22 @@ impl WaiverPair {
         &self.entry_declaration
     }
 
-    /// Borrows the anchor text the obligation binds to.
+    /// Borrows the structured specification element the obligation binds to.
     #[must_use]
-    pub fn anchor_text(&self) -> &AnchorText {
-        &self.anchor_text
+    pub fn spec_element(&self) -> &SpecElementRef {
+        &self.spec_element
+    }
+
+    /// Borrows the stable identity of the obligation being judged.
+    #[must_use]
+    pub fn obligation_id(&self) -> &TestObligationId {
+        &self.obligation_id
+    }
+
+    /// Borrows the responsibility brief for the obligation being judged.
+    #[must_use]
+    pub fn obligation_brief(&self) -> &TestObligationBrief {
+        &self.obligation_brief
     }
 }
 
@@ -196,7 +188,9 @@ impl WaiverPair {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::plan_ref::SpecElementId;
     use crate::tddd::catalogue_v2::CatalogueEntryKey;
+    use crate::tddd::semantic_verify::SpecSectionKind;
     use crate::tddd::test_obligation::ids::TestObligationItemIdentifier;
     use crate::tddd::test_obligation::vocab::TestObligationKind;
 
@@ -212,18 +206,24 @@ mod tests {
         TestObligationBrief::try_new("verify the entry-local contract".to_owned()).unwrap()
     }
 
+    fn spec_element() -> SpecElementRef {
+        SpecElementRef::new(
+            SpecSectionKind::InScope,
+            SpecElementId::try_new("IN-01".to_owned()).unwrap(),
+            "the entry-local contract".to_owned(),
+        )
+    }
+
     #[test]
     fn newtypes_reject_blank_input() {
         assert_eq!(TestsSource::try_new(String::new()), Err(ValidationError::EmptyString));
         assert_eq!(EntryDeclaration::try_new("   ".to_owned()), Err(ValidationError::EmptyString));
-        assert_eq!(AnchorText::try_new(" \n\t ".to_owned()), Err(ValidationError::EmptyString));
     }
 
     #[test]
     fn newtypes_expose_non_empty_input() {
         assert_eq!(TestsSource::try_new("tests".to_owned()).unwrap().as_str(), "tests");
         assert_eq!(EntryDeclaration::try_new("decl".to_owned()).unwrap().as_str(), "decl");
-        assert_eq!(AnchorText::try_new("anchor".to_owned()).unwrap().as_str(), "anchor");
     }
 
     #[test]
@@ -231,13 +231,13 @@ mod tests {
         let pair = ObligationFulfillmentPair::new(
             TestsSource::try_new("tests".to_owned()).unwrap(),
             EntryDeclaration::try_new("decl".to_owned()).unwrap(),
-            AnchorText::try_new("anchor".to_owned()).unwrap(),
+            spec_element(),
             obligation_id(),
             obligation_brief(),
         );
         assert_eq!(pair.tests_source().as_str(), "tests");
         assert_eq!(pair.entry_declaration().as_str(), "decl");
-        assert_eq!(pair.anchor_text().as_str(), "anchor");
+        assert_eq!(pair.spec_element(), &spec_element());
         assert_eq!(pair.obligation_id(), &obligation_id());
         assert_eq!(pair.obligation_brief(), &obligation_brief());
     }
@@ -247,11 +247,15 @@ mod tests {
         let pair = WaiverPair::new(
             WaivedReason::try_new("reason".to_owned()).unwrap(),
             EntryDeclaration::try_new("decl".to_owned()).unwrap(),
-            AnchorText::try_new("anchor".to_owned()).unwrap(),
+            spec_element(),
+            obligation_id(),
+            obligation_brief(),
         );
         assert_eq!(pair.waived_reason().as_str(), "reason");
         assert_eq!(pair.entry_declaration().as_str(), "decl");
-        assert_eq!(pair.anchor_text().as_str(), "anchor");
+        assert_eq!(pair.spec_element(), &spec_element());
+        assert_eq!(pair.obligation_id(), &obligation_id());
+        assert_eq!(pair.obligation_brief(), &obligation_brief());
     }
 
     #[test]
@@ -260,7 +264,7 @@ mod tests {
             ObligationFulfillmentPair::new(
                 TestsSource::try_new(tests.to_owned()).unwrap(),
                 EntryDeclaration::try_new("d".to_owned()).unwrap(),
-                AnchorText::try_new("a".to_owned()).unwrap(),
+                spec_element(),
                 obligation_id(),
                 obligation_brief(),
             )

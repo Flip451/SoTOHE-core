@@ -1,6 +1,8 @@
 //! Edge / obligation lookup and spec-anchor resolution helpers for `evaluate`.
 
 use domain::SpecDocument;
+use domain::SpecElementId;
+use domain::tddd::semantic_verify::{SpecElementRef, SpecSectionKind};
 use domain::tddd::test_obligation::ids::{
     TestObligationAnchorId, TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
 };
@@ -15,19 +17,27 @@ pub(super) fn find_obligation<'a>(
     obligations.obligations().iter().find(|o| o.id() == id)
 }
 
-/// Resolves the anchor text of the spec element `element_id`, searching every
-/// section of the spec document.
-pub(super) fn resolve_anchor_text(spec: &SpecDocument, element_id: &str) -> Option<String> {
+/// Resolves the structured specification element `element_id`, preserving its
+/// actual section membership and verbatim text.
+pub(super) fn resolve_spec_element(
+    spec: &SpecDocument,
+    element_id: &str,
+) -> Option<SpecElementRef> {
+    let element_id = SpecElementId::try_new(element_id.to_owned()).ok()?;
     let sections = [
-        spec.goal(),
-        spec.scope().in_scope(),
-        spec.scope().out_of_scope(),
-        spec.constraints(),
-        spec.acceptance_criteria(),
+        (SpecSectionKind::Goal, spec.goal()),
+        (SpecSectionKind::InScope, spec.scope().in_scope()),
+        (SpecSectionKind::OutOfScope, spec.scope().out_of_scope()),
+        (SpecSectionKind::Constraint, spec.constraints()),
+        (SpecSectionKind::AcceptanceCriteria, spec.acceptance_criteria()),
     ];
-    for section in sections {
-        if let Some(requirement) = section.iter().find(|r| r.id().as_ref() == element_id) {
-            return Some(requirement.text().to_owned());
+    for (section_kind, requirements) in sections {
+        if let Some(requirement) = requirements.iter().find(|r| r.id() == &element_id) {
+            return Some(SpecElementRef::new(
+                section_kind,
+                element_id,
+                requirement.text().to_owned(),
+            ));
         }
     }
     None

@@ -4,33 +4,33 @@
 ## Summary
 
 T001-T009 implement GO-01 through the cited specification anchors.
-The dependency order closes API migration in B1, then completes shared freshness regressions and the validation handoff in B2.
+The dependency order closes the admitted API migration in B1, then serializes later semantic and regression ownership through B2-B4.
 
-## Tasks (0/9 resolved)
+## Tasks (4/9 resolved)
 
 ### S1 — Typed request and compatibility closure
 
 > `libs/domain/src/tddd/{semantic_verify,test_obligation}/`: update the catalogued request, pair, hash, cache-key, and verifier-port symbols; add domain unit tests. IN-01; IN-03; IN-04; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.
-> Non-evaluate use-case, infrastructure, CLI-driver, and CLI-composition constructor/codec call sites, followed by the evaluate request/cache-key files: migrate the domain API within one buildable batch. IN-01; IN-03; IN-04; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.
+> `libs/usecase/src/test_obligation/`, `libs/infrastructure/src/test_obligation/`, `apps/cli-driver/src/test_obligation/check.rs`, and `apps/cli-composition/src/test_obligation.rs`: migrate removed domain API callers and cache codecs, and update the shared trait-implementation declaration composition, as one buildable compatibility closure. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.
 
-- [ ] **T001**: `libs/domain/src/tddd/test_obligation/{hashes,pair,verdict,ports}.rs` and `libs/domain/src/tddd/semantic_verify/`: add `SpecElementHash` and `ObligationResponsibilityHash`; replace `AnchorText`/`AnchorTextHash` uses with the catalogued `SpecElementRef`; update pair, cache-key, and `WaiverVerifierPort` constructors/accessors; update domain tests. IN-01; IN-03; IN-04; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.
-- [ ] **T002**: Exclusively migrate the non-evaluate pair/cache-key/port/interactor call sites in `libs/usecase/src/test_obligation/{check.rs,check_tests.rs,results.rs,results_tests.rs,evaluate/calibration_runner.rs}`, `libs/infrastructure/src/test_obligation/{fulfillment_cache_codec.rs,fulfillment_cache_codec/tests.rs,waiver_cache_codec.rs,fulfillment_escalation_driver.rs,waiver_escalation_driver.rs,sha256_content_hasher.rs}`, `apps/cli-driver/src/test_obligation/check.rs`, and `apps/cli-composition/src/test_obligation.rs`; update the fulfillment and waiver cache wire conversions and compatibility tests. IN-01; IN-03; IN-04; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.
+- [x] **T001**: `libs/domain/src/tddd/test_obligation/{hashes,pair,verdict,ports}.rs` and `libs/domain/src/tddd/semantic_verify/`: add `SpecElementHash` and `ObligationResponsibilityHash`; replace `AnchorText`/`AnchorTextHash` uses with the catalogued `SpecElementRef`; update pair, cache-key, and `WaiverVerifierPort` constructors/accessors; update domain tests. IN-01; IN-03; IN-04; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.
+- [x] **T002**: Own the B1 compatibility closure in `libs/usecase/src/test_obligation/{mod.rs,tests.rs,derive/mod.rs,check.rs,check_tests.rs,results.rs,results_status.rs,results_tests.rs,evaluate/calibration_runner.rs,evaluate/mod.rs,evaluate/edges.rs,evaluate/plan.rs,evaluate/cache.rs,evaluate/tests.rs}`, `libs/infrastructure/src/test_obligation/{fulfillment_cache_codec.rs,fulfillment_cache_codec/tests.rs,waiver_cache_codec.rs,fulfillment_escalation_driver.rs,waiver_escalation_driver.rs,sha256_content_hasher.rs}`, `apps/cli-driver/src/test_obligation/check.rs`, and `apps/cli-composition/src/test_obligation.rs`: mechanically remove legacy `AnchorText`/`AnchorTextHash` imports, constructors, and cache-key accessors; migrate pair/cache-key/port/interactor callers and cache wire conversions; extend `trait_impl_declaration_text_in` and `trait_impl_pair_declaration_text` with the implementing `TypeEntry` declaration and docs; make derivation and evaluate/check/results use that canonical composition and declaration hash; add focused compatibility and shared-composition regressions. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.
 
 ### S2 — Evaluate, check, and results freshness
 
-> `libs/usecase/src/test_obligation/evaluate/`: update request construction and freshness operations with focused tests. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
-> `libs/usecase/src/test_obligation/{check,results,check_support}.rs`: update shared freshness operations and focused tests. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-02; AC-03; AC-04.
+> `libs/usecase/src/test_obligation/evaluate/`: after compatibility closure, update request construction and freshness operations with focused tests. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
+> `libs/usecase/src/test_obligation/{check,check_support,results,results_status}.rs` and focused test modules: after compatibility closure, update shared freshness operations. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.
 
-- [ ] **T003**: Exclusively update `EvaluateTestObligationsInteractor`, request builders, cache-key derivation, constructor migrations, and focused unit tests in `libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,cache.rs,tests.rs}`. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
-- [ ] **T004**: `libs/usecase/src/test_obligation/{check.rs,check_support.rs,check_tests.rs,results.rs,results_tests.rs}`: update `CheckTestObligationsInteractor` and `TestObligationResultsInteractor` freshness checks; add focused unit tests. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-02; AC-03; AC-04.
+- [ ] **T003**: After T002's compatibility closure, own the remaining `EvaluateTestObligationsInteractor` request-construction and freshness operations plus focused regressions in `libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,cache.rs,tests.rs}`. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
+- [ ] **T004**: After T002's compatibility closure, own `CheckTestObligationsInteractor` and `TestObligationResultsInteractor` freshness operations in `libs/usecase/src/test_obligation/{check.rs,check_support.rs,check_tests.rs,results.rs,results_status.rs,results_tests.rs}` and add focused unit tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.
 
 ### S3 — Verifier adapters and fingerprints
 
 > `libs/infrastructure/src/test_obligation/fulfillment_verifier.rs`: update the catalogued adapter and fingerprint with focused tests. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-01; OUT-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
 > `libs/infrastructure/src/test_obligation/waiver_verifier.rs`: update the catalogued adapters and fingerprint with focused tests. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-01; OUT-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
 
-- [ ] **T005**: `libs/infrastructure/src/test_obligation/fulfillment_verifier.rs`: update `ObligationFulfillmentVerifierAdapter`, prompt rendering, and `fulfillment_verifier_fingerprint`; update its test module. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-01; OUT-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
-- [ ] **T006**: `libs/infrastructure/src/test_obligation/waiver_verifier.rs`: update `WaiverVerifierAdapter`, `FailingWaiverVerifier`, prompt rendering, and `waiver_verifier_fingerprint`; update its test module. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-01; OUT-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
+- [x] **T005**: `libs/infrastructure/src/test_obligation/fulfillment_verifier.rs`: update `ObligationFulfillmentVerifierAdapter`, prompt rendering, and `fulfillment_verifier_fingerprint`; update its test module. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-01; OUT-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
+- [x] **T006**: `libs/infrastructure/src/test_obligation/waiver_verifier.rs`: update `WaiverVerifierAdapter`, `FailingWaiverVerifier`, prompt rendering, and `waiver_verifier_fingerprint`; update its test module. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-01; OUT-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
 
 ### S4 — Deterministic regression units
 

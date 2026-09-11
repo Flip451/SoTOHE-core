@@ -17,7 +17,7 @@ signals: { blue: 16, yellow: 0, red: 0 }
 - [IN-02] 対象外を、実装義務を生まない範囲境界、非保証、対象責務に属する明示禁止として区別して解釈する。対象外の参照関係を一括除外・自動免除せず、材料不足は既存の保留経路で扱う。 [adr: knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md#D2] [tasks: T005, T006, T007]
 - [IN-03] 履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。 [adr: knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md#D3] [tasks: T001, T002, T003, T004, T005, T006, T007]
 - [IN-04] 評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。 [adr: knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md#D4] [tasks: T001, T002, T003, T004, T005, T006, T008]
-- [IN-05] 入力構築・検証器指示・鮮度判定について決定的な回帰検証を追加し、通常のビルド・更新経路で、既存キャッシュを残したまま修正後の評価と確認を行う。 [adr: knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md#D5] [tasks: T003, T004, T005, T006, T008, T009]
+- [IN-05] 入力構築・検証器指示・鮮度判定について決定的な回帰検証を追加し、通常のビルド・更新経路で、既存キャッシュを残したまま修正後の評価と確認を行う。 [adr: knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md#D5] [tasks: T002, T003, T004, T005, T006, T008, T009]
 
 ### Out of Scope
 - [OUT-01] 参照関係を評価対象から除外・自動免除して対象外の問題を回避すること、または対象の責務を増やして既存の判定に合わせること。 [adr: knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md#D2, knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md#D3] [tasks: T001, T002, T003, T005, T006, T007]

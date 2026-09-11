@@ -2,11 +2,14 @@
 //!
 //! Serialises the domain [`ObligationFulfillmentCacheDocument`] to a track-scoped
 //! `obligation-fulfillment-cache.json` and validates it back (IN-09 / AC-06 /
-//! CN-04). Each entry freezes a verdict against the three-hash cache key
-//! (bound-tests-set hash, entry-declaration hash, anchor-text hash, ADR D6): the
-//! hashes are serialised as lowercase hex and any change to a component produces a
-//! different key. Each entry also persists its verifier-prompt fingerprint; an
-//! absent legacy fingerprint remains readable but is fail-closed by cache readers.
+//! CN-04). Each entry freezes a verdict against the four-hash cache key
+//! (bound-tests-set hash, entry-declaration hash, specification-element hash,
+//! and obligation-responsibility hash): the hashes are serialised as lowercase
+//! hex and any change to a component produces a different key. Each entry also
+//! persists its verifier-prompt fingerprint; an absent legacy fingerprint
+//! remains readable but is fail-closed by cache readers. A historical
+//! three-hash key is also decoded as a legacy row so informational consumers
+//! can inspect old caches without allowing those verdicts to be reused.
 //! Recovery is only via re-evaluation (CN-04). A passing verdict structurally
 //! carries its evidence citation, so "pass without citation" cannot be represented.
 
@@ -16,7 +19,8 @@ use std::path::PathBuf;
 use domain::tddd::test_obligation::binding::NonEmptyTestLocations;
 use domain::tddd::test_obligation::errors::VerifyCacheError;
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint,
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+    VerifierPromptFingerprint,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::verdict::{
@@ -41,10 +45,16 @@ use crate::track::symlink_guard::reject_symlinks_below;
 
 mod fulfillment_cache_io;
 
-use fulfillment_cache_io::{
-    open_fulfillment_cache_for_write_guarded, read_bounded_fulfillment_cache,
-    serialize_bounded_fulfillment_cache,
-};
+use fulfillment_cache_io::{read_bounded_fulfillment_cache, serialize_bounded_fulfillment_cache};
+
+/// Opens a cache leaf for overwrite through the descriptor-pinned, no-follow
+/// path guard shared by the fulfillment and waiver cache codecs.
+pub(crate) fn open_fulfillment_cache_for_write_guarded(
+    path: &std::path::Path,
+    trusted_root: &std::path::Path,
+) -> Result<std::fs::File, std::io::Error> {
+    fulfillment_cache_io::open_fulfillment_cache_for_write_guarded(path, trusted_root)
+}
 
 /// Artifact filename for the obligation-fulfillment verdict cache.
 const FULFILLMENT_CACHE_ARTIFACT: &str = "obligation-fulfillment-cache.json";
@@ -87,17 +97,24 @@ pub enum ObligationFulfillmentVerdictDto {
     Pending,
 }
 
-/// Wire form of the three-component fulfillment cache key (IN-09 / CN-04).
+/// Wire form of the four-component fulfillment cache key (IN-09 / CN-04).
 ///
 /// Private helper: the domain [`ObligationFulfillmentCacheKey`] has no dedicated
-/// DTO in the type contract, so its three hashes are carried inline as lowercase
-/// hex strings.
+/// DTO in the type contract, so its four hashes are carried inline as lowercase
+/// hex strings. The optional legacy field permits historical three-component
+/// rows to remain readable; [`Self::anchor_text_hash`] is never emitted for a
+/// current row and such a row is marked legacy before any lookup can reuse it.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct FulfillmentCacheKeyWire {
     bound_tests_set_hash: String,
     declaration_hash: String,
-    anchor_text_hash: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    spec_element_hash: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    responsibility_hash: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    anchor_text_hash: Option<String>,
 }
 
 /// Serde DTO for [`ObligationFulfillmentCacheEntry`] (IN-09).
@@ -287,7 +304,7 @@ impl JsonObligationFulfillmentCacheCodec {
         let edge_id = edge_id_from_dto(dto.edge_id).map_err(verify_cache_error_from_artifact)?;
         let obligation_id =
             obligation_id_from_dto(dto.obligation_id).map_err(verify_cache_error_from_artifact)?;
-        let key = key_from_wire(dto.key)?;
+        let (key, legacy_key) = key_from_wire(dto.key)?;
         let verdict = verdict_from_dto(dto.verdict)?;
         let verifier_fingerprint = dto
             .verifier_fingerprint
@@ -298,12 +315,14 @@ impl JsonObligationFulfillmentCacheCodec {
             })
             .transpose()?;
         let bound_tests = dto.bound_tests.map(parse_bound_tests).transpose()?;
-        let state = match verifier_fingerprint {
-            Some(verifier_fingerprint) => ObligationFulfillmentCacheEntryState::Identified {
-                verifier_fingerprint,
-                bound_tests,
-            },
-            None => ObligationFulfillmentCacheEntryState::Legacy,
+        let state = match (verifier_fingerprint, legacy_key) {
+            (Some(verifier_fingerprint), false) => {
+                ObligationFulfillmentCacheEntryState::Identified {
+                    verifier_fingerprint,
+                    bound_tests,
+                }
+            }
+            _ => ObligationFulfillmentCacheEntryState::Legacy,
         };
         Ok(ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict, state))
     }
@@ -328,13 +347,30 @@ fn key_to_wire(key: &ObligationFulfillmentCacheKey) -> FulfillmentCacheKeyWire {
     FulfillmentCacheKeyWire {
         bound_tests_set_hash: key.bound_tests_set_hash().as_hash().to_hex(),
         declaration_hash: key.declaration_hash().as_hash().to_hex(),
-        anchor_text_hash: key.anchor_text_hash().as_hash().to_hex(),
+        spec_element_hash: key.spec_element_hash().as_hash().to_hex(),
+        responsibility_hash: key.responsibility_hash().as_hash().to_hex(),
+        anchor_text_hash: None,
     }
 }
 
 fn key_from_wire(
     wire: FulfillmentCacheKeyWire,
-) -> Result<ObligationFulfillmentCacheKey, VerifyCacheError> {
+) -> Result<(ObligationFulfillmentCacheKey, bool), VerifyCacheError> {
+    let legacy_key = wire.spec_element_hash.is_empty() || wire.responsibility_hash.is_empty();
+    if !legacy_key && wire.anchor_text_hash.is_some() {
+        return Err(VerifyCacheError::MalformedJson(diagnostic(
+            "current fulfillment cache key cannot include anchor_text_hash",
+        )));
+    }
+    let spec_element_hex = if wire.spec_element_hash.is_empty() {
+        wire.anchor_text_hash.ok_or_else(|| {
+            VerifyCacheError::MalformedJson(diagnostic(
+                "legacy fulfillment cache key is missing anchor_text_hash",
+            ))
+        })?
+    } else {
+        wire.spec_element_hash
+    };
     let bound_tests_set_hash = BoundTestsSetHash::new(
         parse_cache_hash(&wire.bound_tests_set_hash)
             .map_err(verify_cache_error_from_verify_cache)?,
@@ -342,10 +378,26 @@ fn key_from_wire(
     let declaration_hash = DeclarationHash::new(
         parse_cache_hash(&wire.declaration_hash).map_err(verify_cache_error_from_verify_cache)?,
     );
-    let anchor_text_hash = AnchorTextHash::new(
-        parse_cache_hash(&wire.anchor_text_hash).map_err(verify_cache_error_from_verify_cache)?,
+    let spec_element_hash = SpecElementHash::new(
+        parse_cache_hash(&spec_element_hex).map_err(verify_cache_error_from_verify_cache)?,
     );
-    Ok(ObligationFulfillmentCacheKey::new(bound_tests_set_hash, declaration_hash, anchor_text_hash))
+    let responsibility_hash = if wire.responsibility_hash.is_empty() {
+        ObligationResponsibilityHash::new(domain::ContentHash::from_bytes([0u8; 32]))
+    } else {
+        ObligationResponsibilityHash::new(
+            parse_cache_hash(&wire.responsibility_hash)
+                .map_err(verify_cache_error_from_verify_cache)?,
+        )
+    };
+    Ok((
+        ObligationFulfillmentCacheKey::new(
+            bound_tests_set_hash,
+            declaration_hash,
+            spec_element_hash,
+            responsibility_hash,
+        ),
+        legacy_key,
+    ))
 }
 
 fn verdict_to_dto(verdict: &ObligationFulfillmentVerdict) -> ObligationFulfillmentVerdictDto {

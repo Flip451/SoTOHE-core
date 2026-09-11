@@ -45,7 +45,7 @@ mod tests {
     use domain::tddd::test_obligation::binding::{NonEmptyTestLocations, TestLocation};
     use domain::tddd::test_obligation::errors::TestSourceScanError;
     use domain::tddd::test_obligation::hashes::{
-        AnchorTextHash, DeclarationHash, TestBodySpanHash,
+        DeclarationHash, ObligationResponsibilityHash, SpecElementHash, TestBodySpanHash,
     };
     use domain::tddd::test_obligation::ids::{TestFunctionName, TestModulePath};
     use domain::tddd::test_obligation::ports::TestSourceScannerPort;
@@ -130,16 +130,20 @@ mod tests {
 
         let hasher = Sha256ContentHasher::new();
         let declaration_hash = DeclarationHash::new(hasher.sha256(b"declaration"));
-        let anchor_hash = AnchorTextHash::new(hasher.sha256(b"anchor"));
+        let spec_element_hash = SpecElementHash::new(hasher.sha256(b"anchor"));
+        let responsibility_hash =
+            ObligationResponsibilityHash::new(hasher.sha256(b"responsibility"));
         let first_key = ObligationFulfillmentCacheKey::new(
             first_resolution.set_hash().clone(),
             declaration_hash.clone(),
-            anchor_hash.clone(),
+            spec_element_hash.clone(),
+            responsibility_hash.clone(),
         );
         let second_key = ObligationFulfillmentCacheKey::new(
             second_resolution.set_hash().clone(),
             declaration_hash,
-            anchor_hash,
+            spec_element_hash,
+            responsibility_hash,
         );
 
         assert_eq!(first_key, second_key);

@@ -2,9 +2,10 @@
 //!
 //! [`EvaluateTestObligationsInteractor`] drives the obligation-fulfillment and
 //! waiver lanes through their semantic verifiers, freezing each verdict against a
-//! three-component cache key (IN-09 / AC-06 / CN-04 — D6): the fulfillment key is
-//! `(bound_tests_set_hash, declaration_hash, anchor_text_hash)` and the waiver key
-//! is `(waived_reason_hash, declaration_hash, anchor_text_hash)`. A verdict is
+//! four-component cache key (IN-09 / AC-06 / CN-04 — D6): the fulfillment key is
+//! `(bound_tests_set_hash, declaration_hash, spec_element_hash, responsibility_hash)`
+//! and the waiver key is
+//! `(waived_reason_hash, declaration_hash, spec_element_hash, responsibility_hash)`. A verdict is
 //! reused only when its verifier-prompt fingerprint also matches; otherwise the
 //! pair is escalated `fast → final` and the fresh verdict is persisted (CN-03
 //! edge-local).

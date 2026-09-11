@@ -238,7 +238,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort' of infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
-      "declaration_hash": "2896ef21ed10509a3ee71a975eadaed7aaf236e150bb97ce39f7467c1e388be5",
+      "declaration_hash": "2698cfe5a38cab8bb6ef4bdb8360003e593e7634c4df2c78a85e9845d2d4aabd",
       "id": {
         "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort",
@@ -262,7 +262,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort' of infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
-      "declaration_hash": "3aefad3c0cd60871092f6f4acb5093fa2d12034a74d560249809450ec3e8905a",
+      "declaration_hash": "91a3c7c4d24cc228531f7cac44ae23a4315413fbb087507b5e7dde93c07a4ebb",
       "id": {
         "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
@@ -294,7 +294,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort' of infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
-      "declaration_hash": "c644ab33458e7bea77811588e6d92b9195891123551cad1eee54a3fd599d7796",
+      "declaration_hash": "e2d4f30e259808130b1850c4402eb71424232a9e2b00689de7b723a9ec4002aa",
       "id": {
         "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",

@@ -31,3 +31,11 @@ The cited cases were examined in the sibling consumer checkout through declarati
 ## Source authority
 
 The local test-obligation ADR's D3, D4, D6 and D16 already establish section priors, edge-locality and instruction-fingerprint invalidation. The new ADR refines those mechanisms. Consumer examples and temporary handoff files are diagnostic input only, not references for the new ADR body.
+
+## Follow-up evidence from B1 evaluation
+
+The second B1 evaluation exposed a concrete responsibility-input omission that limits the initial reconstruction-based model-noncompliance conclusion. For derived trait-implementation obligations, `libs/usecase/src/test_obligation/mod.rs` resolves the impl and trait through `trait_impl_declaration_text_in`, then composes only `trait_impl` and `trait_declaration` with `trait_impl_pair_declaration_text`. The implementing type's catalogue declaration and purpose docs are not included in that evidence, even though normal entry rendering includes them.
+
+For the local `FailingWaiverVerifier` example, the catalogue explicitly describes a configuration-error-only fail-closed adapter. The CN-02 waiver was nevertheless rejected because the supplied declaration only established the port's semantic-judgment role, not the implementing type's error-only purpose. This is current input-construction evidence, not a claim that historical consumer request bytes were observed.
+
+Provider-backed adapter failures also demanded that deterministic adapter tests themselves perform external semantic judgment despite verifying input/prompt transport and response mapping. That may additionally need verifier-boundary guidance; complete input repair and honest deterministic counterexamples must precede any claim that the issue is resolved. No blanket adapter exemption or automatic pass is justified.

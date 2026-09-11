@@ -32,8 +32,8 @@ use domain::tddd::test_obligation::errors::{
     VerifyCacheError,
 };
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, TestBodySpanHash,
-    VerifierPromptFingerprint, WaivedReasonHash,
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+    TestBodySpanHash, VerifierPromptFingerprint, WaivedReasonHash,
 };
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, RoleName, TestFunctionName, TestModulePath, TestObligationAnchorId,
@@ -1253,6 +1253,26 @@ fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfill
     )
 }
 
+fn spec_element_hash_for_money() -> SpecElementHash {
+    SpecElementHash::new(sha256_content_hash(b"element_id=IN-05\ntext_label=Money positive"))
+}
+
+fn responsibility_hash(
+    obligation_id: &TestObligationId,
+    obligation_brief: &TestObligationBrief,
+) -> ObligationResponsibilityHash {
+    ObligationResponsibilityHash::new(sha256_content_hash(
+        format!(
+            "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
+            obligation_id.entry_key().as_str(),
+            obligation_id.obligation_kind().as_kebab(),
+            obligation_id.item_identifier().as_str(),
+            obligation_brief.as_str(),
+        )
+        .as_bytes(),
+    ))
+}
+
 fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
     let catalogue = money_catalogue();
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
@@ -1269,15 +1289,18 @@ fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
         )
         .as_bytes(),
     ));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash =
+        responsibility_hash(&synthetic, &synthetic_voluntary_obligation_brief(&edge()).unwrap());
     let entry = cache_entry(
         edge(),
-        TestObligationId::new(
-            entry_key(),
-            TestObligationKind::Logic,
-            TestObligationItemIdentifier::try_new("voluntary:IN-05".to_owned()).unwrap(),
+        synthetic,
+        ObligationFulfillmentCacheKey::new(
+            bound,
+            declaration,
+            spec_element_hash,
+            responsibility_hash,
         ),
-        ObligationFulfillmentCacheKey::new(bound, declaration, anchor_hash),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
@@ -1307,11 +1330,12 @@ fn fresh_fulfillment_cache_for_catalogue(
         )
         .as_bytes(),
     ));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash = responsibility_hash(obligation.id(), obligation.brief());
     let entry = cache_entry(
         edge(),
         obligation.id().clone(),
-        ObligationFulfillmentCacheKey::new(bound, decl, anchor_hash),
+        ObligationFulfillmentCacheKey::new(bound, decl, spec_element_hash, responsibility_hash),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
@@ -1340,11 +1364,13 @@ fn fresh_direct_waiver_cache() -> WaiverCacheDocument {
         synthetic.item_identifier().as_str(),
     );
     let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash =
+        responsibility_hash(&synthetic, &synthetic_voluntary_obligation_brief(&edge()).unwrap());
     let entry = WaiverCacheEntry::new(
         edge(),
         Some(synthetic),
-        WaiverCacheKey::new(reason_hash, decl, anchor_hash),
+        WaiverCacheKey::new(reason_hash, decl, spec_element_hash, responsibility_hash),
         WaiverVerdict::Waived {
             citation: EvidenceCitation::try_new("waived by policy".to_owned()).unwrap(),
         },
@@ -1372,11 +1398,12 @@ fn fresh_waiver_cache_for_catalogue(
         obligation.id().item_identifier().as_str(),
     );
     let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash = responsibility_hash(obligation.id(), obligation.brief());
     let entry = WaiverCacheEntry::new(
         edge(),
         Some(obligation.id().clone()),
-        WaiverCacheKey::new(reason_hash, decl, anchor_hash),
+        WaiverCacheKey::new(reason_hash, decl, spec_element_hash, responsibility_hash),
         WaiverVerdict::Waived {
             citation: EvidenceCitation::try_new("waived by policy".to_owned()).unwrap(),
         },
@@ -3310,11 +3337,17 @@ fn test_declaration_change_stales_verdict_as_drift() {
     // A cache entry whose declaration_hash does not match the current catalogue.
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let stale_decl = DeclarationHash::new(sha256_content_hash(b"an older declaration"));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash = responsibility_hash(obligation().id(), obligation().brief());
     let entry = cache_entry(
         edge(),
         obligation().id().clone(),
-        ObligationFulfillmentCacheKey::new(bound, stale_decl, anchor_hash),
+        ObligationFulfillmentCacheKey::new(
+            bound,
+            stale_decl,
+            spec_element_hash,
+            responsibility_hash,
+        ),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
@@ -3333,19 +3366,22 @@ fn test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift() {
     let fresh = fresh_fulfillment_cache();
     let entry = fresh.entries().first().unwrap();
     let current_declaration = entry.key().declaration_hash().clone();
-    let current_anchor = entry.key().anchor_text_hash().clone();
+    let current_spec_element = entry.key().spec_element_hash().clone();
+    let current_responsibility = entry.key().responsibility_hash().clone();
     let current_bound_tests = entry.key().bound_tests_set_hash().clone();
 
     for key in [
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
             current_declaration.clone(),
-            current_anchor.clone(),
+            current_spec_element.clone(),
+            current_responsibility.clone(),
         ),
         ObligationFulfillmentCacheKey::new(
             current_bound_tests.clone(),
             current_declaration.clone(),
-            AnchorTextHash::new(ContentHash::from_bytes([2u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([2u8; 32])),
+            current_responsibility.clone(),
         ),
     ] {
         let cache = ObligationFulfillmentCacheDocument::new(
@@ -3446,7 +3482,8 @@ fn test_check_with_historical_fulfillment_row_uses_current_full_key() {
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
             current.key().declaration_hash().clone(),
-            current.key().anchor_text_hash().clone(),
+            current.key().spec_element_hash().clone(),
+            current.key().responsibility_hash().clone(),
         ),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("historical cite".to_owned()).unwrap(),
@@ -3477,7 +3514,8 @@ fn test_check_aggregates_historical_fulfillment_key_drifts_independent_of_row_or
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
             current.key().declaration_hash().clone(),
-            current.key().anchor_text_hash().clone(),
+            current.key().spec_element_hash().clone(),
+            current.key().responsibility_hash().clone(),
         ),
         ObligationFulfillmentVerdict::Pending,
         Some(fulfillment_verifier_fingerprint()),
@@ -3488,7 +3526,8 @@ fn test_check_aggregates_historical_fulfillment_key_drifts_independent_of_row_or
         ObligationFulfillmentCacheKey::new(
             current.key().bound_tests_set_hash().clone(),
             DeclarationHash::new(ContentHash::from_bytes([7u8; 32])),
-            current.key().anchor_text_hash().clone(),
+            current.key().spec_element_hash().clone(),
+            current.key().responsibility_hash().clone(),
         ),
         ObligationFulfillmentVerdict::Pending,
         Some(fulfillment_verifier_fingerprint()),

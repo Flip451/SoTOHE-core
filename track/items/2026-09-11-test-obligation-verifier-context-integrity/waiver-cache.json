@@ -1,4 +1,180 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+      },
+      "key": {
+        "declaration_hash": "a4998cf271dde302273f33f070b9edf15a2b30e2e2798bfd3ffddd40134c6f9a",
+        "responsibility_hash": "7fda6a0cdcf7509c4d517b022c7ce6d0a17af04e404b9f15e3eda1181c6d05f5",
+        "spec_element_hash": "a513f1e0d635518656e19a1177642097efd759d4f1bf4ab5117865f33de50c8d",
+        "waived_reason_hash": "fa3d67f6b1354f56f44becc9f8c74ee82bdba453e888b2409b1949c904ddff2c"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Computes the waiver verifier contract fingerprint.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "ObligationResponsibilityHash"
+      },
+      "key": {
+        "declaration_hash": "62fab80747fb3b33418cd8ada2505cb4685ccb6e4e4bd457b3c2b87dcfc27606",
+        "responsibility_hash": "11f3a01e44b33b8fbe541f208972f6b3bf4adae0b99681f390576fb1ec2f625b",
+        "spec_element_hash": "a513f1e0d635518656e19a1177642097efd759d4f1bf4ab5117865f33de50c8d",
+        "waived_reason_hash": "f90c71d5b473f88056d41c17e0c37b311e579c3a51bbd18ac9c2df566fd9c5ce"
+      },
+      "obligation_id": {
+        "entry_key": "ObligationResponsibilityHash",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "DocString(\"Value-equivalent domain wrapper for the hash of typed obligation identity and responsibility context.\")",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "SpecElementHash"
+      },
+      "key": {
+        "declaration_hash": "0e0ba050137a924e229df06a0fc73404bd07262c58c373149158af920d7292b8",
+        "responsibility_hash": "da2cac9ac69907e3d892d24ebaa42c4515dc06c01e535f312dc9782f71ace1fe",
+        "spec_element_hash": "a513f1e0d635518656e19a1177642097efd759d4f1bf4ab5117865f33de50c8d",
+        "waived_reason_hash": "44ffac93110d29c6f42529f87d5a3bebaac2a8d1ce59bb00ab9feeaa779148cf"
+      },
+      "obligation_id": {
+        "entry_key": "SpecElementHash",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Value-equivalent domain wrapper for the hash of one normalized specification element.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "SpecElementHash"
+      },
+      "key": {
+        "declaration_hash": "2f6c1b3ba965b8bdd37ac4dfbfd94af25a8ac5987e8b8a39701cd29cb759e67c",
+        "responsibility_hash": "715f22eedbebd2e179a1ba6e44841d46d33ccd5fc93b78e109d88e3a77fb3ac7",
+        "spec_element_hash": "519f1cb17c4cb4407784aacb31fb1f2c1ecec6732ca451dc280e2c525f6a8195",
+        "waived_reason_hash": "f445a260bad9ddb3a1b0ed5b02df287c6b420aa30a01a15ea636699f8c9e0c36"
+      },
+      "obligation_id": {
+        "entry_key": "SpecElementHash",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "DocString(\"Value-equivalent domain wrapper for the hash of one normalized specification element.\")",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+      },
+      "key": {
+        "declaration_hash": "1a4118614e1b69ff6c1c33ce593c4bdf383171b35ae4580001dbb68a7f5cbdd2",
+        "responsibility_hash": "ed2f5359cf77b992a4f4d0049145f5414a674e0c69e77af960950e871cce6f43",
+        "spec_element_hash": "a2a5793031e519cd9d00c4357957a0e9533f305a1012582680f5ff314222323d",
+        "waived_reason_hash": "15c0bae18f4d149b370ec285e4c34c78d56837086de9a6da258ad6817218ba48"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "Fail-closed driven adapter for the normalized WaiverVerifierPort; preserves the existing bounded diagnostic when verifier configuration cannot be loaded.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+      },
+      "key": {
+        "declaration_hash": "1a4118614e1b69ff6c1c33ce593c4bdf383171b35ae4580001dbb68a7f5cbdd2",
+        "responsibility_hash": "ed2f5359cf77b992a4f4d0049145f5414a674e0c69e77af960950e871cce6f43",
+        "spec_element_hash": "e73c787a58aa9db242a71ea49a014c4971d10f7006bc246b9a734a781adab1ff",
+        "waived_reason_hash": "ae620abb90e0e7a1bfed2505d32247c445dc38948a2ea7bf7e61438b3b8deab9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "\"Fail-closed driven adapter for the normalized WaiverVerifierPort; preserves the existing bounded diagnostic when verifier configuration cannot be loaded.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+      },
+      "key": {
+        "declaration_hash": "1a4118614e1b69ff6c1c33ce593c4bdf383171b35ae4580001dbb68a7f5cbdd2",
+        "responsibility_hash": "ed2f5359cf77b992a4f4d0049145f5414a674e0c69e77af960950e871cce6f43",
+        "spec_element_hash": "8a2759591bb77fc08a9e386605f0286282b6806da855d5841cacf925a950a360",
+        "waived_reason_hash": "eb71fbe3b02c002162de33d742c34fdb3a489f17a63e11010d0935c67c19bddf"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "Fail-closed driven adapter for the normalized WaiverVerifierPort; preserves the existing bounded diagnostic when verifier configuration cannot be loaded.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    }
+  ],
   "track_id": "2026-09-11-test-obligation-verifier-context-integrity"
 }

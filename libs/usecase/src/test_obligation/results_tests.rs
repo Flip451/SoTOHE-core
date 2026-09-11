@@ -26,7 +26,9 @@ use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, ObligationResultsError, VerifyCacheError,
 };
 use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
-use domain::tddd::test_obligation::hashes::{AnchorTextHash, BoundTestsSetHash, DeclarationHash};
+use domain::tddd::test_obligation::hashes::{
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+};
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestFunctionName, TestModulePath, TestObligationAnchorId,
     TestObligationBrief, TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
@@ -322,7 +324,8 @@ fn fulfillment_key() -> ObligationFulfillmentCacheKey {
     ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(hash(1)),
         DeclarationHash::new(hash(2)),
-        AnchorTextHash::new(hash(3)),
+        SpecElementHash::new(hash(3)),
+        ObligationResponsibilityHash::new(hash(4)),
     )
 }
 
@@ -389,7 +392,8 @@ fn waiver_failure_cache(edge_id: TestObligationEdgeId) -> WaiverCacheDocument {
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
                 DeclarationHash::new(hash(2)),
-                AnchorTextHash::new(hash(3)),
+                SpecElementHash::new(hash(3)),
+                ObligationResponsibilityHash::new(hash(4)),
             ),
             WaiverVerdict::Fail { reason: reason("does not hold") },
             None,
@@ -681,7 +685,8 @@ fn test_waiver_lane_counts() {
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(4)),
                 DeclarationHash::new(hash(2)),
-                AnchorTextHash::new(hash(3)),
+                SpecElementHash::new(hash(3)),
+                ObligationResponsibilityHash::new(hash(4)),
             ),
             WaiverVerdict::Waived { citation: citation() },
             None,
@@ -692,7 +697,8 @@ fn test_waiver_lane_counts() {
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
                 DeclarationHash::new(hash(2)),
-                AnchorTextHash::new(hash(3)),
+                SpecElementHash::new(hash(3)),
+                ObligationResponsibilityHash::new(hash(4)),
             ),
             WaiverVerdict::Fail { reason: reason("does not hold") },
             None,

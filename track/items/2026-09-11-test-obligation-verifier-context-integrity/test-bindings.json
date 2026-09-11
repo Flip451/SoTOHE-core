@@ -1,4 +1,811 @@
 {
   "track_id": "2026-09-11-test-obligation-verifier-context-integrity",
-  "records": []
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "WaiverVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_verifier_fingerprint_hashes_prompt_contract"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_verifier_fingerprint_hashes_contract_without_provider_identity"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_failing_waiver_verifier_for_each_pair_returns_fail_closed_port_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ObligationResponsibilityHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::hashes::tests",
+          "test_name": "test_obligation_responsibility_hash_round_trips"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "SpecElementHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::hashes::tests",
+          "test_name": "test_spec_element_hash_round_trips"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::hashes::tests",
+          "test_name": "test_spec_element_hash_distinguishes_revised_specification_inputs"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "waiver_pair_exposes_components_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "waiver_pair_exposes_components_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "waiver_pair_exposes_components_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_key_changes_with_any_component"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_key_changes_with_any_component"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_key_changes_with_any_component"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_key_changes_with_any_component"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_key_changes_with_any_component"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_key_changes_with_any_component"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_carries_target_identity_and_brief_with_payload"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_preserves_fail_categories_and_pending_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_embeds_the_structured_specification_element"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_keeps_same_text_in_distinct_spec_sections_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_carries_target_identity_and_brief_with_payload"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_preserves_fail_categories_and_pending_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_preserves_fail_categories_and_pending_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_embeds_the_structured_specification_element"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_keeps_same_text_in_distinct_spec_sections_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_every_specification_section"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_carries_target_identity_and_brief_with_payload"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_keeps_single_input_and_selection_responsibilities_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_distinguishes_specification_sections_with_identical_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_complete_waiver_pair"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_distinguishes_specification_sections_with_identical_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_every_specification_section"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_complete_waiver_pair"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_keeps_single_input_and_selection_responsibilities_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "At waiver_verifier_fingerprint × CN-01, this function only computes and returns the static verifier-contract fingerprint from its format version, instructions, and input layout. It does not own cache lookup, stale-result rejection, task-state pending transitions, or reevaluation; those behaviors belong to EvaluateTestObligationsInteractor, CheckTestObligationsInteractor, and TestObligationResultsInteractor."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationResponsibilityHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "At ObligationResponsibilityHash × CN-01, this value object only wraps and exposes a precomputed typed-obligation responsibility hash. It does not own cache lookup, stale-result rejection, task-state pending transitions, or reevaluation; those behaviors belong to the cache consumers."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "SpecElementHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "At SpecElementHash × CN-01, this value object only wraps and exposes a precomputed normalized specification-element hash; it does not own cache lookup, stale-result rejection, task-state pending transitions, or reevaluation. Its value-preservation and changed-input identity remain covered by the IN-04 binding."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "SpecElementHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "reason": "At SpecElementHash × AC-03, this value object only wraps and exposes a precomputed normalized specification-element hash; it does not own cache invalidation, old-verdict replacement, or post-reevaluation agreement. Those behaviors belong to the evaluation, check, and results consumers."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "At FailingWaiverVerifier × IN-01, this fail-closed fallback only returns its configured VerifierPort error when verifier configuration is unavailable. It never constructs or forwards a semantic-judgment input; structured specification preservation belongs to WaiverVerifierAdapter."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "At FailingWaiverVerifier × IN-03, this fail-closed fallback only propagates a bounded configuration error and performs no waiver judgment or responsibility comparison. Those behaviors belong to WaiverVerifierAdapter and its configured semantic verifier."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "reason": "At FailingWaiverVerifier × CN-02, this fail-closed fallback always returns the configured VerifierPort error; it does not classify contradiction, substitution, missing evidence, or pending semantic material. Those classifications belong to WaiverVerifierAdapter and the configured semantic verifier."
+    }
+  ]
 }

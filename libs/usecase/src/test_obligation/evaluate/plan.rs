@@ -19,19 +19,18 @@
 //!    layout the serial loop produced.
 
 use domain::SpecDocument;
-use domain::tddd::semantic_verify::ModelTier;
+use domain::tddd::semantic_verify::{ModelTier, SpecElementRef};
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
 use domain::tddd::test_obligation::errors::ObligationEvaluateError;
-use domain::tddd::test_obligation::hashes::{AnchorTextHash, DeclarationHash, WaivedReasonHash};
+use domain::tddd::test_obligation::hashes::{
+    DeclarationHash, ObligationResponsibilityHash, SpecElementHash, WaivedReasonHash,
+};
 use domain::tddd::test_obligation::ids::{
     TestObligationBrief, TestObligationEdgeId, TestObligationId, WaivedReason,
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
-use domain::tddd::test_obligation::pair::{
-    AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
-};
 use domain::tddd::test_obligation::verdict::{
     FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument,
     ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheEntryState,
@@ -40,7 +39,7 @@ use domain::tddd::test_obligation::verdict::{
 };
 
 use super::cache::{cached_fulfillment_verdict, cached_waiver_verdict};
-use super::edges::{find_obligation, resolve_anchor_text, synthetic_obligation_id};
+use super::edges::{find_obligation, resolve_spec_element, synthetic_obligation_id};
 use super::verify::{
     map_verifier_error, record_fulfillment, record_pending_fulfillment_edge,
     record_pending_obligation_edges, record_pending_obligation_id, record_pending_waiver_edge,
@@ -54,6 +53,14 @@ use crate::test_obligation::{
     synthetic_voluntary_obligation_brief,
 };
 
+#[path = "plan_input.rs"]
+mod input;
+
+use input::{
+    build_fulfillment_pair_input, build_waiver_pair_input, responsibility_material,
+    spec_element_material,
+};
+
 /// A single plan step — either an outcome we already know, or an LLM task the
 /// caller must dispatch through the escalation driver.
 pub(super) enum PlannedAction {
@@ -65,7 +72,7 @@ pub(super) enum PlannedAction {
 }
 
 /// An outcome resolved during planning — pending edges (no LLM needed) and
-/// cache hits (verdict already frozen against the same three-hash key).
+/// cache hits (verdict already frozen against the same four-hash key).
 pub(super) enum ImmediateOutcome {
     PendingObligationId(TestObligationId),
     PendingObligationEdges(TestObligation),
@@ -96,17 +103,18 @@ pub(super) struct FulfillmentLlmTask {
     pub(super) resolved_bound_tests: ResolvedBoundTests,
     pub(super) tests_source: String,
     pub(super) declaration: String,
-    pub(super) anchor_text: String,
+    pub(super) spec_element: SpecElementRef,
 }
 
 /// LLM task for the waiver lane.
 pub(super) struct WaiverLlmTask {
     pub(super) edge_id: TestObligationEdgeId,
     pub(super) obligation_id: TestObligationId,
+    pub(super) obligation_brief: TestObligationBrief,
     pub(super) key: WaiverCacheKey,
     pub(super) reason: WaivedReason,
     pub(super) declaration: String,
-    pub(super) anchor_text: String,
+    pub(super) spec_element: SpecElementRef,
 }
 
 impl EvaluateTestObligationsInteractor {
@@ -213,7 +221,7 @@ impl EvaluateTestObligationsInteractor {
                 // the bound tests against a claim the waiver already covers.
                 continue;
             }
-            let Some(anchor_text) = resolve_anchor_text(spec, anchor.element_id()) else {
+            let Some(spec_element) = resolve_spec_element(spec, anchor.element_id()) else {
                 plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
                     edge_id,
                 )));
@@ -224,7 +232,7 @@ impl EvaluateTestObligationsInteractor {
                 obligation.id().clone(),
                 obligation.brief(),
                 &declaration,
-                &anchor_text,
+                &spec_element,
                 tests,
                 existing_fulfillment_cache,
                 plan,
@@ -250,7 +258,7 @@ impl EvaluateTestObligationsInteractor {
         // (edge × obligation) pair is adjudicated independently.
         let owners = obligations.owners_of_edge(edge_id);
         if !owners.is_empty() {
-            let Some(anchor_text) = resolve_anchor_text(spec, edge_id.anchor_id().element_id())
+            let Some(spec_element) = resolve_spec_element(spec, edge_id.anchor_id().element_id())
             else {
                 plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
                     edge_id.clone(),
@@ -271,7 +279,7 @@ impl EvaluateTestObligationsInteractor {
                     obligation.id().clone(),
                     obligation.brief(),
                     &declaration,
-                    &anchor_text,
+                    &spec_element,
                     tests,
                     existing_fulfillment_cache,
                     plan,
@@ -280,7 +288,7 @@ impl EvaluateTestObligationsInteractor {
             return Ok(());
         }
 
-        let Some((declaration, anchor_text)) = self.resolve_edge(edge_id, catalogues, spec) else {
+        let Some((declaration, spec_element)) = self.resolve_edge(edge_id, catalogues, spec) else {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
                 edge_id.clone(),
             )));
@@ -295,7 +303,7 @@ impl EvaluateTestObligationsInteractor {
             obligation_id,
             &obligation_brief,
             &declaration,
-            &anchor_text,
+            &spec_element,
             tests,
             existing_fulfillment_cache,
             plan,
@@ -318,7 +326,7 @@ impl EvaluateTestObligationsInteractor {
         // adjudication per owner, using that owner's declaration as evidence.
         let owners = obligations.owners_of_edge(edge_id);
         if !owners.is_empty() {
-            let Some(anchor_text) = resolve_anchor_text(spec, edge_id.anchor_id().element_id())
+            let Some(spec_element) = resolve_spec_element(spec, edge_id.anchor_id().element_id())
             else {
                 plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingWaiverEdge(
                     edge_id.clone(),
@@ -337,9 +345,10 @@ impl EvaluateTestObligationsInteractor {
                 self.emit_waiver_action(
                     edge_id,
                     obligation.id().clone(),
+                    obligation.brief(),
                     reason,
                     declaration,
-                    &anchor_text,
+                    &spec_element,
                     existing_waiver_cache,
                     plan,
                 );
@@ -347,18 +356,23 @@ impl EvaluateTestObligationsInteractor {
             return Ok(());
         }
 
-        let Some((declaration, anchor_text)) = self.resolve_edge(edge_id, catalogues, spec) else {
+        let Some((declaration, spec_element)) = self.resolve_edge(edge_id, catalogues, spec) else {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingWaiverEdge(
                 edge_id.clone(),
             )));
             return Ok(());
         };
+        let obligation_id = synthetic_obligation_id(edge_id);
+        let obligation_brief = synthetic_voluntary_obligation_brief(edge_id).map_err(|error| {
+            super::invalid_input_error(&format!("voluntary_obligation_brief: {error}"))
+        })?;
         self.emit_waiver_action(
             edge_id,
-            synthetic_obligation_id(edge_id),
+            obligation_id,
+            &obligation_brief,
             reason,
             declaration,
-            &anchor_text,
+            &spec_element,
             existing_waiver_cache,
             plan,
         );
@@ -370,9 +384,10 @@ impl EvaluateTestObligationsInteractor {
         &self,
         edge_id: &TestObligationEdgeId,
         obligation_id: TestObligationId,
+        obligation_brief: &TestObligationBrief,
         reason: &WaivedReason,
         declaration: String,
-        anchor_text: &str,
+        spec_element: &SpecElementRef,
         existing_waiver_cache: Option<&WaiverCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) {
@@ -383,8 +398,19 @@ impl EvaluateTestObligationsInteractor {
         let reason_hash = WaivedReasonHash::new(self.hasher.sha256(reason.as_str().as_bytes()));
         let declaration_hash_actual =
             DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
-        let anchor_hash = AnchorTextHash::new(self.hasher.sha256(anchor_text.as_bytes()));
-        let key = WaiverCacheKey::new(reason_hash, declaration_hash_actual, anchor_hash);
+        let spec_element_hash = SpecElementHash::new(
+            self.hasher.sha256(spec_element_material(spec_element).as_bytes()),
+        );
+        let responsibility_hash = ObligationResponsibilityHash::new(
+            self.hasher
+                .sha256(responsibility_material(&obligation_id, obligation_brief).as_bytes()),
+        );
+        let key = WaiverCacheKey::new(
+            reason_hash,
+            declaration_hash_actual,
+            spec_element_hash,
+            responsibility_hash,
+        );
         if let Some(verdict) = cached_waiver_verdict(
             existing_waiver_cache,
             edge_id,
@@ -403,10 +429,11 @@ impl EvaluateTestObligationsInteractor {
         plan.push(PlannedAction::Waiver(WaiverLlmTask {
             edge_id: edge_id.clone(),
             obligation_id,
+            obligation_brief: obligation_brief.clone(),
             key,
             reason: reason.clone(),
             declaration,
-            anchor_text: anchor_text.to_owned(),
+            spec_element: spec_element.clone(),
         }));
     }
 
@@ -418,7 +445,7 @@ impl EvaluateTestObligationsInteractor {
         obligation_id: TestObligationId,
         obligation_brief: &TestObligationBrief,
         declaration: &str,
-        anchor_text: &str,
+        spec_element: &SpecElementRef,
         tests: &[TestLocation],
         existing_fulfillment_cache: Option<&ObligationFulfillmentCacheDocument>,
         plan: &mut Vec<PlannedAction>,
@@ -433,8 +460,19 @@ impl EvaluateTestObligationsInteractor {
         let declaration =
             declaration_with_obligation_context(declaration, &obligation_id, obligation_brief);
         let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
-        let anchor_hash = AnchorTextHash::new(self.hasher.sha256(anchor_text.as_bytes()));
-        let key = ObligationFulfillmentCacheKey::new(bound_hash, declaration_hash, anchor_hash);
+        let spec_element_hash = SpecElementHash::new(
+            self.hasher.sha256(spec_element_material(spec_element).as_bytes()),
+        );
+        let responsibility_hash = ObligationResponsibilityHash::new(
+            self.hasher
+                .sha256(responsibility_material(&obligation_id, obligation_brief).as_bytes()),
+        );
+        let key = ObligationFulfillmentCacheKey::new(
+            bound_hash,
+            declaration_hash,
+            spec_element_hash,
+            responsibility_hash,
+        );
         let cached_verdict = cached_fulfillment_verdict(
             existing_fulfillment_cache,
             &edge_id,
@@ -466,7 +504,7 @@ impl EvaluateTestObligationsInteractor {
             resolved_bound_tests,
             tests_source,
             declaration,
-            anchor_text: anchor_text.to_owned(),
+            spec_element: spec_element.clone(),
         }));
         Ok(())
     }
@@ -628,46 +666,10 @@ impl EvaluateTestObligationsInteractor {
         edge_id: &TestObligationEdgeId,
         catalogues: &[LoadedCatalogueDocument],
         spec: &SpecDocument,
-    ) -> Option<(String, String)> {
+    ) -> Option<(String, SpecElementRef)> {
         let declaration =
             find_declaration_text_from_loaded(catalogues, edge_id.entry_key().as_str())?;
-        let anchor_text = resolve_anchor_text(spec, edge_id.anchor_id().element_id())?;
-        Some((declaration, anchor_text))
+        let spec_element = resolve_spec_element(spec, edge_id.anchor_id().element_id())?;
+        Some((declaration, spec_element))
     }
-}
-
-/// Materialises the fulfillment pair value once so the LLM future's async
-/// block only borrows it — reduces per-poll allocations in the multiplexer.
-fn build_fulfillment_pair_input(
-    task: &FulfillmentLlmTask,
-) -> Result<ObligationFulfillmentPair, ObligationEvaluateError> {
-    let tests_source = TestsSource::try_new(task.tests_source.clone())
-        .map_err(|_| invalid_input_error("tests_source"))?;
-    let entry_declaration = EntryDeclaration::try_new(task.declaration.clone())
-        .map_err(|_| invalid_input_error("entry_declaration"))?;
-    let anchor_text = AnchorText::try_new(task.anchor_text.clone())
-        .map_err(|_| invalid_input_error("anchor_text"))?;
-    Ok(ObligationFulfillmentPair::new(
-        tests_source,
-        entry_declaration,
-        anchor_text,
-        task.obligation_id.clone(),
-        task.obligation_brief.clone(),
-    ))
-}
-
-fn build_waiver_pair_input(task: &WaiverLlmTask) -> Result<WaiverPair, ObligationEvaluateError> {
-    let entry_declaration = EntryDeclaration::try_new(task.declaration.clone())
-        .map_err(|_| invalid_input_error("entry_declaration"))?;
-    let anchor_text = AnchorText::try_new(task.anchor_text.clone())
-        .map_err(|_| invalid_input_error("anchor_text"))?;
-    Ok(WaiverPair::new(task.reason.clone(), entry_declaration, anchor_text))
-}
-
-fn invalid_input_error(field: &str) -> ObligationEvaluateError {
-    ObligationEvaluateError::VerifierPort(
-        domain::tddd::test_obligation::errors::SemanticVerifierError::VerifierPort(super::diag(
-            &format!("invalid evaluate input: {field}"),
-        )),
-    )
 }

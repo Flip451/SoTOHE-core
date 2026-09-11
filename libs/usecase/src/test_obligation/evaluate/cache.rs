@@ -8,7 +8,7 @@ use domain::tddd::test_obligation::verdict::{
 };
 
 /// Returns a frozen fulfillment verdict only when the edge, obligation, and
-/// complete three-hash cache key and verifier fingerprint still match the
+/// complete four-hash cache key and verifier fingerprint still match the
 /// current inputs. A cached `Pending` verdict is never replayed: it records an
 /// unadjudicated pair (e.g. a transient verifier failure), so treating it as
 /// frozen would deadlock the pair — the pair must re-verify instead.
@@ -58,7 +58,8 @@ mod tests {
     use domain::tddd::semantic_verify::CatalogueEntryKey;
     use domain::tddd::test_obligation::binding::NonEmptyTestLocations;
     use domain::tddd::test_obligation::hashes::{
-        AnchorTextHash, BoundTestsSetHash, DeclarationHash, WaivedReasonHash,
+        BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+        WaivedReasonHash,
     };
     use domain::tddd::test_obligation::ids::{
         TestObligationAnchorId, TestObligationItemIdentifier,
@@ -95,7 +96,8 @@ mod tests {
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(hash(1)),
             DeclarationHash::new(hash(2)),
-            AnchorTextHash::new(hash(3)),
+            SpecElementHash::new(hash(3)),
+            ObligationResponsibilityHash::new(hash(4)),
         )
     }
 
@@ -103,7 +105,8 @@ mod tests {
         WaiverCacheKey::new(
             WaivedReasonHash::new(hash(5)),
             DeclarationHash::new(hash(2)),
-            AnchorTextHash::new(hash(3)),
+            SpecElementHash::new(hash(3)),
+            ObligationResponsibilityHash::new(hash(4)),
         )
     }
 

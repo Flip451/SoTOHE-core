@@ -100,14 +100,16 @@ mod tests {
     use std::task::{Context, Poll, Waker};
 
     use domain::EvidenceCitation;
+    use domain::SpecElementId;
     use domain::tddd::catalogue_v2::CatalogueEntryKey;
+    use domain::tddd::semantic_verify::{SpecElementRef, SpecSectionKind};
     use domain::tddd::test_obligation::hashes::{
-        AnchorTextHash, BoundTestsSetHash, DeclarationHash,
+        BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
     };
     use domain::tddd::test_obligation::ids::{
         DiagnosticMessage, TestObligationBrief, TestObligationId, TestObligationItemIdentifier,
     };
-    use domain::tddd::test_obligation::pair::{AnchorText, EntryDeclaration, TestsSource};
+    use domain::tddd::test_obligation::pair::{EntryDeclaration, TestsSource};
     use domain::tddd::test_obligation::vocab::FulfillmentFailCategory;
 
     use super::*;
@@ -141,7 +143,11 @@ mod tests {
         ObligationFulfillmentPair::new(
             TestsSource::try_new("test body".to_owned()).unwrap(),
             EntryDeclaration::try_new("entry declaration".to_owned()).unwrap(),
-            AnchorText::try_new("anchor text".to_owned()).unwrap(),
+            SpecElementRef::new(
+                SpecSectionKind::InScope,
+                SpecElementId::try_new("IN-01".to_owned()).unwrap(),
+                "anchor text".to_owned(),
+            ),
             TestObligationId::new(
                 CatalogueEntryKey::try_new("Entry".to_owned()).unwrap(),
                 domain::tddd::test_obligation::vocab::TestObligationKind::Contract,
@@ -155,7 +161,8 @@ mod tests {
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(domain::ContentHash::from_bytes([1; 32])),
             DeclarationHash::new(domain::ContentHash::from_bytes([2; 32])),
-            AnchorTextHash::new(domain::ContentHash::from_bytes([3; 32])),
+            SpecElementHash::new(domain::ContentHash::from_bytes([3; 32])),
+            ObligationResponsibilityHash::new(domain::ContentHash::from_bytes([4; 32])),
         )
     }
 
@@ -189,7 +196,8 @@ mod tests {
         ) -> Result<ObligationFulfillmentVerdict, SemanticVerifierError> {
             assert_eq!(pair.tests_source().as_str(), "test body");
             assert_eq!(pair.entry_declaration().as_str(), "entry declaration");
-            assert_eq!(pair.anchor_text().as_str(), "anchor text");
+            assert_eq!(pair.spec_element().text_label, "anchor text");
+            assert_eq!(pair.spec_element().element_id.as_ref(), "IN-01");
             assert_eq!(pair.obligation_id().entry_key().as_str(), "Entry");
             assert_eq!(pair.obligation_id().item_identifier().as_str(), "trait_method:verify");
             assert_eq!(pair.obligation_brief().as_str(), "verify the entry-local contract");

@@ -48,6 +48,60 @@
         }
       ]
     },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:50:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f3444437ea6286721f330e42832cbc99fce2c0b1d41da16268aaf9481a544c9f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:18:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f3444437ea6286721f330e42832cbc99fce2c0b1d41da16268aaf9481a544c9f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075669adefa63190d9d3991fb60cde4dd719a6b555968795e26a594d88668306",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:18:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075669adefa63190d9d3991fb60cde4dd719a6b555968795e26a594d88668306",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19d5f0bd26647c204c674e4d88c4e42735bdb98aa7868b77faddf166aa170e47",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:20:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19d5f0bd26647c204c674e4d88c4e42735bdb98aa7868b77faddf166aa170e47",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -157,6 +211,111 @@
           "hash": "rvw1:sha256:2bf5b5f16ff4341b81f3176217a2d8d5792bef8ea740804170b600e5ee9f71b9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T17:37:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62b5fc69b4099afafc192b857699f256739992aa6abf06aeff5dff69d03bd2e0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T17:43:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62b5fc69b4099afafc192b857699f256739992aa6abf06aeff5dff69d03bd2e0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T19:17:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:135412f6ee14f0920e38e2370875a6ee3e21d40d67ebd512e683e164bc9663e7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T19:23:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:135412f6ee14f0920e38e2370875a6ee3e21d40d67ebd512e683e164bc9663e7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T20:48:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bded419769a25acf73da43880a929f83bae5506b672c884d15834f514b991a9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T20:51:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bded419769a25acf73da43880a929f83bae5506b672c884d15834f514b991a9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:41Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 201,
+              "message": "`save` performs a check-then-use symlink validation, then calls `std::fs::write`, which follows a symlink if the cache path is replaced between the check and write. A local race can redirect cache contents outside `items_dir`; use descriptor-pinned no-follow writing as in the fulfillment cache codec.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:89b2a603a827909f958951fd0bf795356deb6432790734d026f8d3f27c4c11b5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:02:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5476ffa077feb0f366da0491832476c4d6ccba318df7c1140107ee7ccc082dc6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:25:55Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 200,
+              "message": "`未宣言の前提への依存`: `save` now routes every waiver-cache write through `open_fulfillment_cache_for_write_guarded`, whose non-Unix branch unconditionally returns `Unsupported`. This regresses the previous `std::fs::write` behavior on Windows, while neither the track spec nor `environment-assumptions.md` declares waiver-cache persistence Unix-only. Provide a descriptor-pinned writer for supported non-Unix targets, or formally declare and enforce this adapter's platform boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5476ffa077feb0f366da0491832476c4d6ccba318df7c1140107ee7ccc082dc6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:41:56Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 248,
+              "message": "The new Windows writer remains check-then-use: `create_dir_all(parent)` mutates by pathname, then `reject_symlinks_below` checks the path, and `.open(path)` resolves the full pathname again. `FILE_FLAG_OPEN_REPARSE_POINT` protects only the final component; it does not pin intermediate directories. A junction can replace an ancestor around either check, causing directory creation or the later truncate/write outside `trusted_root`. Use component-by-component handle-relative traversal like the Unix writer, or formally make this adapter fail closed on Windows.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:81d6682541b373f4c4680bbb6add6725a08146c9479d371ba20715a15d7ed4e6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:58:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5476ffa077feb0f366da0491832476c4d6ccba318df7c1140107ee7ccc082dc6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -187,6 +346,35 @@
           "at": "2026-09-11T16:05:05Z",
           "findings": [],
           "hash": "rvw1:sha256:37b8922cf3bc40e936b78adbc240de52043da09c6c6075e5efd4eb258713af4b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T20:50:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8f9238709f4958707d38404253dca3019ab03ea38bf23f7d35e3fc3bc6e9c552",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:01:44Z",
+          "findings": [
+            {
+              "category": "test-evidence integrity",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/test-bindings.json",
+              "line": 796,
+              "message": "Three edges have conflicting outcomes: `ObligationResponsibilityHash × CN-01` and `SpecElementHash × {CN-01, AC-03}` are declared first as voluntary bindings (lines 162, 201, and 218) and again here as waivers. Waiver precedence silently suppresses the cited tests, leaving misleading dead test evidence instead of one honest edge outcome. Remove the shadowed voluntary bindings, or replace the waivers only if entry-local tests genuinely fulfill those edges.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8f9238709f4958707d38404253dca3019ab03ea38bf23f7d35e3fc3bc6e9c552",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:07:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c34979813a2f698046ef0f3a46cf5485199ce35abc4d90ad05164dba3be4165",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -303,6 +491,24 @@
           "at": "2026-09-11T15:53:41Z",
           "findings": [],
           "hash": "rvw1:sha256:043062b196a6b94019c07febb96d916cb458207949ec053d4e530f32d885d712",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:771d22d21d0f9ee9bad4e484db533a84533f1ef23d45b99dab3cfab28a88cab6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:771d22d21d0f9ee9bad4e484db533a84533f1ef23d45b99dab3cfab28a88cab6",
           "type": "final",
           "verdict": "zero_findings"
         }

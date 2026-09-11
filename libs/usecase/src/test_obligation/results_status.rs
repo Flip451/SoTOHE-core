@@ -6,8 +6,12 @@ use domain::SpecDocumentLoaderPort;
 use domain::TrackId;
 use domain::tddd::test_obligation::binding::{TestBindingsDocument, TestLocation};
 use domain::tddd::test_obligation::errors::ObligationResultsError;
-use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
-use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId, WaivedReason};
+use domain::tddd::test_obligation::hashes::{
+    ObligationResponsibilityHash, SpecElementHash, VerifierPromptFingerprint,
+};
+use domain::tddd::test_obligation::ids::{
+    TestObligationBrief, TestObligationEdgeId, TestObligationId, WaivedReason,
+};
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::TestSourceScannerPort;
 use domain::tddd::test_obligation::verdict::{
@@ -173,6 +177,7 @@ fn collect_obligation_findings(
                         .unwrap_or_default(),
                     obligation.id().item_identifier().as_str(),
                 ),
+                obligation.brief(),
                 &target,
                 spec_texts,
                 waiver,
@@ -190,6 +195,7 @@ fn collect_obligation_findings(
                     obligation.id(),
                     obligation.brief(),
                 ),
+                obligation.brief(),
                 &target,
                 spec_texts,
                 fulfillment,
@@ -208,6 +214,7 @@ fn collect_obligation_findings(
                     obligation.id(),
                     obligation.brief(),
                 ),
+                obligation.brief(),
                 &target,
                 spec_texts,
                 fulfillment,
@@ -250,6 +257,7 @@ fn collect_direct_edge_findings(
             &synthetic_id,
             &reason,
             declaration_with_obligation_item(&declaration, synthetic_id.item_identifier().as_str()),
+            &synthetic_brief,
             &target,
             spec_texts,
             waiver,
@@ -262,6 +270,7 @@ fn collect_direct_edge_findings(
             &synthetic_id,
             tests,
             declaration_with_obligation_context(&declaration, &synthetic_id, &synthetic_brief),
+            &synthetic_brief,
             &target,
             spec_texts,
             fulfillment,
@@ -281,6 +290,7 @@ fn inspect_fulfillment(
     obligation_id: &TestObligationId,
     tests: &[TestLocation],
     declaration: String,
+    obligation_brief: &TestObligationBrief,
     target: &StatusLaneTarget,
     spec_texts: &[(String, String)],
     cache: &ObligationFulfillmentCacheDocument,
@@ -314,11 +324,13 @@ fn inspect_fulfillment(
     }
     let current_bound = sha256_content_hash(source.as_bytes());
     let current_decl = sha256_content_hash(declaration.as_bytes());
-    let current_anchor = sha256_content_hash(anchor_text(spec_texts, edge.anchor_id()).as_bytes());
+    let current_spec_element = spec_element_hash(spec_texts, edge);
+    let current_responsibility = responsibility_hash(obligation_id, obligation_brief);
     let key = entry.key();
     if key.bound_tests_set_hash().as_hash() != &current_bound
         || key.declaration_hash().as_hash() != &current_decl
-        || key.anchor_text_hash().as_hash() != &current_anchor
+        || key.spec_element_hash() != &current_spec_element
+        || key.responsibility_hash() != &current_responsibility
     {
         findings.push(stale(target.clone()));
     } else if !matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }) {
@@ -333,6 +345,7 @@ fn inspect_waiver(
     obligation_id: &TestObligationId,
     reason: &WaivedReason,
     declaration: String,
+    obligation_brief: &TestObligationBrief,
     target: &StatusLaneTarget,
     spec_texts: &[(String, String)],
     cache: &WaiverCacheDocument,
@@ -353,16 +366,44 @@ fn inspect_waiver(
     }
     let current_reason = sha256_content_hash(reason.as_str().as_bytes());
     let current_decl = sha256_content_hash(declaration.as_bytes());
-    let current_anchor = sha256_content_hash(anchor_text(spec_texts, edge.anchor_id()).as_bytes());
+    let current_spec_element = spec_element_hash(spec_texts, edge);
+    let current_responsibility = responsibility_hash(obligation_id, obligation_brief);
     let key = entry.key();
     if key.waived_reason_hash().as_hash() != &current_reason
         || key.declaration_hash().as_hash() != &current_decl
-        || key.anchor_text_hash().as_hash() != &current_anchor
+        || key.spec_element_hash() != &current_spec_element
+        || key.responsibility_hash() != &current_responsibility
     {
         findings.push(stale(target.clone()));
     } else if !matches!(entry.verdict(), WaiverVerdict::Waived { .. }) {
         findings.push(verdict_absent(target.clone()));
     }
+}
+
+fn spec_element_hash(
+    spec_texts: &[(String, String)],
+    edge: &TestObligationEdgeId,
+) -> SpecElementHash {
+    let text = anchor_text(spec_texts, edge.anchor_id());
+    SpecElementHash::new(sha256_content_hash(
+        format!("element_id={}\ntext_label={}", edge.anchor_id().element_id(), text).as_bytes(),
+    ))
+}
+
+fn responsibility_hash(
+    obligation_id: &TestObligationId,
+    obligation_brief: &TestObligationBrief,
+) -> ObligationResponsibilityHash {
+    ObligationResponsibilityHash::new(sha256_content_hash(
+        format!(
+            "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
+            obligation_id.entry_key().as_str(),
+            obligation_id.obligation_kind().as_kebab(),
+            obligation_id.item_identifier().as_str(),
+            obligation_brief.as_str(),
+        )
+        .as_bytes(),
+    ))
 }
 
 fn load_catalogues(

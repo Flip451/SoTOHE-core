@@ -346,12 +346,15 @@ mod tests {
     use cli_driver::test_obligation::results::TestObligationResultsInput;
     use domain::tddd::catalogue_v2::CatalogueEntryKey;
     use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort;
+    use domain::tddd::semantic_verify::{SpecElementRef, SpecSectionKind};
     use domain::tddd::test_obligation::ids::{
-        TestObligationBrief, TestObligationId, TestObligationItemIdentifier,
+        TestObligationBrief, TestObligationId, TestObligationItemIdentifier, WaivedReason,
     };
-    use domain::tddd::test_obligation::pair::{AnchorText, EntryDeclaration, TestsSource};
+    use domain::tddd::test_obligation::pair::{
+        EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
+    };
     use domain::tddd::test_obligation::vocab::TestObligationKind;
-    use domain::{ModelTier, TrackStatus};
+    use domain::{ModelTier, SpecElementId, TrackStatus};
     use infrastructure::agent_profiles::{ResolvedExecution, RoundType};
     use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
     use usecase::dry_write_driver::CapabilityName;
@@ -362,7 +365,29 @@ mod tests {
         ObligationFulfillmentPair::new(
             TestsSource::try_new("assert!(covered)".to_owned()).unwrap(),
             EntryDeclaration::try_new("entry".to_owned()).unwrap(),
-            AnchorText::try_new("anchor".to_owned()).unwrap(),
+            SpecElementRef::new(
+                SpecSectionKind::InScope,
+                SpecElementId::try_new("IN-01".to_owned()).unwrap(),
+                "anchor".to_owned(),
+            ),
+            TestObligationId::new(
+                CatalogueEntryKey::try_new("Entry".to_owned()).unwrap(),
+                TestObligationKind::Contract,
+                TestObligationItemIdentifier::try_new("trait_method:verify".to_owned()).unwrap(),
+            ),
+            TestObligationBrief::try_new("verify the entry-local contract".to_owned()).unwrap(),
+        )
+    }
+
+    fn waiver_pair() -> WaiverPair {
+        WaiverPair::new(
+            WaivedReason::try_new("reason".to_owned()).unwrap(),
+            EntryDeclaration::try_new("entry".to_owned()).unwrap(),
+            SpecElementRef::new(
+                SpecSectionKind::InScope,
+                SpecElementId::try_new("IN-01".to_owned()).unwrap(),
+                "anchor".to_owned(),
+            ),
             TestObligationId::new(
                 CatalogueEntryKey::try_new("Entry".to_owned()).unwrap(),
                 TestObligationKind::Contract,
@@ -957,10 +982,8 @@ mod tests {
             .fulfillment_verifier()
             .verify_pair(&fulfillment_pair(), ModelTier::Fast)
             .unwrap_err();
-        let waiver_error = root
-            .waiver_verifier()
-            .verify_pair("reason", "entry", "anchor", ModelTier::Fast)
-            .unwrap_err();
+        let waiver_error =
+            root.waiver_verifier().verify_pair(&waiver_pair(), ModelTier::Fast).unwrap_err();
 
         assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));
         assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));
@@ -1005,10 +1028,8 @@ mod tests {
             .fulfillment_verifier()
             .verify_pair(&fulfillment_pair(), ModelTier::Fast)
             .unwrap_err();
-        let waiver_error = root
-            .waiver_verifier()
-            .verify_pair("reason", "entry", "anchor", ModelTier::Fast)
-            .unwrap_err();
+        let waiver_error =
+            root.waiver_verifier().verify_pair(&waiver_pair(), ModelTier::Fast).unwrap_err();
 
         assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));
         assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));

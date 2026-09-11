@@ -1,4 +1,1492 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "WaiverVerifierPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "751a68a529fd9f0bbf5869b3f9cb026f277ebb995b0e4bd45c7ed651fad08431",
+        "declaration_hash": "978716617ab1301fca94f2bff2e1542c930410746d08b201b7bf91c71e7781d9",
+        "responsibility_hash": "54f00ec8e710cde61209745a1dff6a84c7e18084f74e7a10556b4850b2b340b0",
+        "spec_element_hash": "a2a5793031e519cd9d00c4357957a0e9533f305a1012582680f5ff314222323d"
+      },
+      "obligation_id": {
+        "entry_key": "WaiverVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            payload,\n            \"entry_key: Entry\\nobligation_kind: contract\\n\\\nitem_identifier: trait_method:verify\\n\\n\\\n## Obligation brief\\nverify the entry-local contract\\n\\n\\\n## Entry declaration\\nstruct Entry\\n\\n\\\n## Specification element\\nsection: goal\\nelement_id: GO-01\\n\\\ntext: the design goal explains the purpose\\n\\n\\\n## Waiver reason\\nthis design goal has no independently observable behaviour\\n\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "WaiverVerifierPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "751a68a529fd9f0bbf5869b3f9cb026f277ebb995b0e4bd45c7ed651fad08431",
+        "declaration_hash": "978716617ab1301fca94f2bff2e1542c930410746d08b201b7bf91c71e7781d9",
+        "responsibility_hash": "54f00ec8e710cde61209745a1dff6a84c7e18084f74e7a10556b4850b2b340b0",
+        "spec_element_hash": "e73c787a58aa9db242a71ea49a014c4971d10f7006bc246b9a734a781adab1ff"
+      },
+      "obligation_id": {
+        "entry_key": "WaiverVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "for marker in [\n            \"An out-of-scope element marks a boundary and does not become an affirmative implementation requirement.\",\n            \"Do not blanket-exclude or automatically waive a reference merely because it is out of scope;\",\n            \"For a declaration that handles one already-selected input, do not demand caller-side selection or configuration loading;\",\n            \"This adapter delegates semantic comparison to the configured provider;\",\n            \"verdicts and provider errors are preserved.\",\n            \"If the reason does not directly address the target-owned promise, return fail;\",\n            \"if required comparison material is actually missing, return pending.\",\n        ] {\n            assert!(prompt.contains(marker), \"missing forwarded waiver input: {marker}\");\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "WaiverVerifierPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "751a68a529fd9f0bbf5869b3f9cb026f277ebb995b0e4bd45c7ed651fad08431",
+        "declaration_hash": "978716617ab1301fca94f2bff2e1542c930410746d08b201b7bf91c71e7781d9",
+        "responsibility_hash": "54f00ec8e710cde61209745a1dff6a84c7e18084f74e7a10556b4850b2b340b0",
+        "spec_element_hash": "8a2759591bb77fc08a9e386605f0286282b6806da855d5841cacf925a950a360"
+      },
+      "obligation_id": {
+        "entry_key": "WaiverVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            payload,\n            \"entry_key: Entry\\nobligation_kind: contract\\n\\\\\nitem_identifier: trait_method:verify\\n\\n\\\\\n## Obligation brief\\nverify the entry-local contract\\n\\n\\\\\n## Entry declaration\\nstruct Entry\\n\\n\\\\\n## Specification element\\nsection: goal\\nelement_id: GO-01\\n\\\\\ntext: the design goal explains the purpose\\n\\n\\\\\n## Waiver reason\\nthis design goal has no independently observable behaviour\\n\"\n        );\n        for marker in [\n            \"An out-of-scope element marks a boundary and does not become an affirmative implementation requirement.\",\n            \"Do not blanket-exclude or automatically waive a reference merely because it is out of scope;\",\n            \"For a declaration that handles one already-selected input, do not demand caller-side selection or configuration loading;\",\n            \"This adapter delegates semantic comparison to the configured provider;\",\n            \"verdicts and provider errors are preserved.\",\n            \"If the reason does not directly address the target-owned promise, return fail;\",\n            \"if required comparison material is actually missing, return pending.\"\n        ] {\n            assert!(prompt.contains(marker), \"missing forwarded waiver input: {marker}\");\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_verifier_fingerprint_hashes_prompt_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint"
+      },
+      "key": {
+        "bound_tests_set_hash": "d7fddeda641bab111cdf0f5dfa3eb3cf54c9ece47c76156344cf3996d5d7c5c5",
+        "declaration_hash": "0df157de0824e805d8e753a75c642c435e5136a233f55a42ffc9d446971fc851",
+        "responsibility_hash": "4f7bf41a79503a94f87edf7f2408f76515c5811a91fce97ea9794039c2d2adcc",
+        "spec_element_hash": "9c1015ed81e7df741000233b6ec864836bd7cedd3754f075f87d00e8ec94ac93"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected_material = format!(\n            \"verifier_format_version={FULFILLMENT_PROMPT_FORMAT_VERSION}\\n\\\n             preamble:\\n{FULFILLMENT_PROMPT_PREAMBLE}\\n\\\n             input_layout:\\n{FULFILLMENT_PROMPT_INPUT_LAYOUT}\\n\"\n        );\n        let expected = Sha256ContentHasher::new().sha256(expected_material.as_bytes());\n\n        assert_eq!(fingerprint.as_hash(), &expected);\n        assert_ne!(\n            fingerprint.as_hash(),\n            &Sha256ContentHasher::new().sha256(FULFILLMENT_PROMPT_PREAMBLE.as_bytes())\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_verifier_fingerprint_hashes_prompt_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint"
+      },
+      "key": {
+        "bound_tests_set_hash": "d7fddeda641bab111cdf0f5dfa3eb3cf54c9ece47c76156344cf3996d5d7c5c5",
+        "declaration_hash": "0df157de0824e805d8e753a75c642c435e5136a233f55a42ffc9d446971fc851",
+        "responsibility_hash": "4f7bf41a79503a94f87edf7f2408f76515c5811a91fce97ea9794039c2d2adcc",
+        "spec_element_hash": "a513f1e0d635518656e19a1177642097efd759d4f1bf4ab5117865f33de50c8d"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected_material = format!(\n            \"verifier_format_version={FULFILLMENT_PROMPT_FORMAT_VERSION}\\n\\\n             preamble:\\n{FULFILLMENT_PROMPT_PREAMBLE}\\n\\\n             input_layout:\\n{FULFILLMENT_PROMPT_INPUT_LAYOUT}\\n\"\n        );\n        let expected = Sha256ContentHasher::new().sha256(expected_material.as_bytes());\n\n        assert_eq!(fingerprint.as_hash(), &expected);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_verifier_fingerprint_hashes_prompt_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint"
+      },
+      "key": {
+        "bound_tests_set_hash": "d7fddeda641bab111cdf0f5dfa3eb3cf54c9ece47c76156344cf3996d5d7c5c5",
+        "declaration_hash": "0df157de0824e805d8e753a75c642c435e5136a233f55a42ffc9d446971fc851",
+        "responsibility_hash": "4f7bf41a79503a94f87edf7f2408f76515c5811a91fce97ea9794039c2d2adcc",
+        "spec_element_hash": "519f1cb17c4cb4407784aacb31fb1f2c1ecec6732ca451dc280e2c525f6a8195"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected_material = format!(\n            \"verifier_format_version={FULFILLMENT_PROMPT_FORMAT_VERSION}\\n\\\n             preamble:\\n{FULFILLMENT_PROMPT_PREAMBLE}\\n\\\n             input_layout:\\n{FULFILLMENT_PROMPT_INPUT_LAYOUT}\\n\"\n        );\n        let expected = Sha256ContentHasher::new().sha256(expected_material.as_bytes());\n\n        assert_eq!(fingerprint.as_hash(), &expected);\n        assert_ne!(\n            fingerprint.as_hash(),\n            &Sha256ContentHasher::new().sha256(FULFILLMENT_PROMPT_PREAMBLE.as_bytes())\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_verifier_fingerprint_hashes_prompt_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint"
+      },
+      "key": {
+        "bound_tests_set_hash": "d7fddeda641bab111cdf0f5dfa3eb3cf54c9ece47c76156344cf3996d5d7c5c5",
+        "declaration_hash": "0df157de0824e805d8e753a75c642c435e5136a233f55a42ffc9d446971fc851",
+        "responsibility_hash": "4f7bf41a79503a94f87edf7f2408f76515c5811a91fce97ea9794039c2d2adcc",
+        "spec_element_hash": "e601b1bade55c14e0a488396313fe01d92cf88f65f52d606e0d4f183b5dc7b96"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected_material = format!(\n            \"verifier_format_version={FULFILLMENT_PROMPT_FORMAT_VERSION}\\n\\\n             preamble:\\n{FULFILLMENT_PROMPT_PREAMBLE}\\n\\\n             input_layout:\\n{FULFILLMENT_PROMPT_INPUT_LAYOUT}\\n\"\n        );\n        let expected = Sha256ContentHasher::new().sha256(expected_material.as_bytes());\n\n        assert_eq!(fingerprint.as_hash(), &expected);\n        assert_ne!(\n            fingerprint.as_hash(),\n            &Sha256ContentHasher::new().sha256(FULFILLMENT_PROMPT_PREAMBLE.as_bytes())\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_verifier_fingerprint_hashes_contract_without_provider_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+      },
+      "key": {
+        "bound_tests_set_hash": "734a9cf4eeb4b0ee637724e75d3b7254064751cdec20d3e0fbe8faa6909b5ea0",
+        "declaration_hash": "a05134fed5771725bcbae415d9b379128bac029cd38bfc2fcd0168d40b314d81",
+        "responsibility_hash": "7fda6a0cdcf7509c4d517b022c7ce6d0a17af04e404b9f15e3eda1181c6d05f5",
+        "spec_element_hash": "9c1015ed81e7df741000233b6ec864836bd7cedd3754f075f87d00e8ec94ac93"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected_material = format!(\n            \"verifier_format_version={WAIVER_PROMPT_FORMAT_VERSION}\\n\\\n             preamble:\\n{WAIVER_PROMPT_PREAMBLE}\\n\\\n             input_layout:\\n{WAIVER_PROMPT_INPUT_LAYOUT}\\n\"\n        );\n        let expected = Sha256ContentHasher::new().sha256(expected_material.as_bytes());\n\n        assert_eq!(fingerprint.as_hash(), &expected);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_verifier_fingerprint_hashes_contract_without_provider_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+      },
+      "key": {
+        "bound_tests_set_hash": "734a9cf4eeb4b0ee637724e75d3b7254064751cdec20d3e0fbe8faa6909b5ea0",
+        "declaration_hash": "a05134fed5771725bcbae415d9b379128bac029cd38bfc2fcd0168d40b314d81",
+        "responsibility_hash": "7fda6a0cdcf7509c4d517b022c7ce6d0a17af04e404b9f15e3eda1181c6d05f5",
+        "spec_element_hash": "519f1cb17c4cb4407784aacb31fb1f2c1ecec6732ca451dc280e2c525f6a8195"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected_material = format!(\n            \"verifier_format_version={WAIVER_PROMPT_FORMAT_VERSION}\\n\\\n             preamble:\\n{WAIVER_PROMPT_PREAMBLE}\\n\\\n             input_layout:\\n{WAIVER_PROMPT_INPUT_LAYOUT}\\n\"\n        );\n        let expected = Sha256ContentHasher::new().sha256(expected_material.as_bytes());\n\n        assert_eq!(fingerprint.as_hash(), &expected);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_verifier_fingerprint_hashes_contract_without_provider_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+      },
+      "key": {
+        "bound_tests_set_hash": "734a9cf4eeb4b0ee637724e75d3b7254064751cdec20d3e0fbe8faa6909b5ea0",
+        "declaration_hash": "a05134fed5771725bcbae415d9b379128bac029cd38bfc2fcd0168d40b314d81",
+        "responsibility_hash": "7fda6a0cdcf7509c4d517b022c7ce6d0a17af04e404b9f15e3eda1181c6d05f5",
+        "spec_element_hash": "e601b1bade55c14e0a488396313fe01d92cf88f65f52d606e0d4f183b5dc7b96"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let expected_material = format!(\n            \"verifier_format_version={WAIVER_PROMPT_FORMAT_VERSION}\\n\\\n             preamble:\\n{WAIVER_PROMPT_PREAMBLE}\\n\\\n             input_layout:\\n{WAIVER_PROMPT_INPUT_LAYOUT}\\n\"\n        );\n        let expected = Sha256ContentHasher::new().sha256(expected_material.as_bytes());\n\n        assert_eq!(fingerprint.as_hash(), &expected);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e40fd09df8104600ae13941f9c5de186de0dddd5ec7bf6f128724547dc7887d",
+        "declaration_hash": "96b1a80afa49e35aa761c0a2781f3e675d3e59c19564b4b9a2ee98edb8019fb3",
+        "responsibility_hash": "4e2ad99dd004f72da17e9a5095e95b5f76ed1683ab71d48882038c8b34564959",
+        "spec_element_hash": "e73c787a58aa9db242a71ea49a014c4971d10f7006bc246b9a734a781adab1ff"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(payload, \"entry_key: Entry\\nobligation_kind: contract\\nitem_identifier: trait_method:verify\\n\\n## Obligation brief\\nverify the entry-local contract\\n\\n## Entry declaration\\nstruct Entry\\n\\n## Specification element\\nsection: in_scope\\nelement_id: IN-01\\ntext: the operation returns the expected value\\n\\n## Bound test source\\nassert_eq!(actual, expected);\\n\")",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "99c9622a7f6c537c1a1e95c3c349cff06c756bca44f89efa839ddc72ab2698d2",
+        "declaration_hash": "2e86535b8540f32fb5f82d2c383f6f04918da28ae874d0a8cea82a03310539fe",
+        "responsibility_hash": "81190b74cf743bf220aeff5122bf465d34cbcf33d59d36ea5e6adfbcff9c9d6a",
+        "spec_element_hash": "a2a5793031e519cd9d00c4357957a0e9533f305a1012582680f5ff314222323d"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            payload,\n            \"entry_key: Entry\\nobligation_kind: contract\\n\\\nitem_identifier: trait_method:verify\\n\\n\\\n## Obligation brief\\nverify the entry-local contract\\n\\n\\\n## Entry declaration\\nstruct Entry\\n\\n\\\n## Specification element\\nsection: goal\\nelement_id: GO-01\\n\\\ntext: the design goal explains the purpose\\n\\n\\\n## Waiver reason\\nthis design goal has no independently observable behaviour\\n\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "99c9622a7f6c537c1a1e95c3c349cff06c756bca44f89efa839ddc72ab2698d2",
+        "declaration_hash": "2e86535b8540f32fb5f82d2c383f6f04918da28ae874d0a8cea82a03310539fe",
+        "responsibility_hash": "81190b74cf743bf220aeff5122bf465d34cbcf33d59d36ea5e6adfbcff9c9d6a",
+        "spec_element_hash": "e73c787a58aa9db242a71ea49a014c4971d10f7006bc246b9a734a781adab1ff"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            payload,\n            \"entry_key: Entry\\nobligation_kind: contract\\n\\\\\nitem_identifier: trait_method:verify\\n\\n\\\\\n## Obligation brief\\nverify the entry-local contract\\n\\\\\n## Entry declaration\\nstruct Entry\\n\\n\\\\\n## Specification element\\nsection: goal\\nelement_id: GO-01\\n\\\\\ntext: the design goal explains the purpose\\n\\n\\\\\n## Waiver reason\\nthis design goal has no independently observable behaviour\\n\"\n        );\n        for marker in [\n            \"An out-of-scope element marks a boundary and does not become an affirmative implementation requirement.\",\n            \"Do not blanket-exclude or automatically waive a reference merely because it is out of scope;\",\n            \"For a declaration that handles one already-selected input, do not demand caller-side selection or configuration loading;\",\n            \"This adapter delegates semantic comparison to the configured provider;\",\n            \"verdicts and provider errors are preserved.\",\n            \"If the reason does not directly address the target-owned promise, return fail;\",\n            \"if required comparison material is actually missing, return pending.\"\n        ]",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "99c9622a7f6c537c1a1e95c3c349cff06c756bca44f89efa839ddc72ab2698d2",
+        "declaration_hash": "2e86535b8540f32fb5f82d2c383f6f04918da28ae874d0a8cea82a03310539fe",
+        "responsibility_hash": "81190b74cf743bf220aeff5122bf465d34cbcf33d59d36ea5e6adfbcff9c9d6a",
+        "spec_element_hash": "8a2759591bb77fc08a9e386605f0286282b6806da855d5841cacf925a950a360"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            payload,\n            \"entry_key: Entry\\nobligation_kind: contract\\n\\\\\nitem_identifier: trait_method:verify\\n\\n\\\\\n## Obligation brief\\nverify the entry-local contract\\n\\n\\\\\n## Entry declaration\\nstruct Entry\\n\\n\\\\\n## Specification element\\nsection: goal\\nelement_id: GO-01\\n\\\\\ntext: the design goal explains the purpose\\n\\n\\\\\n## Waiver reason\\nthis design goal has no independently observable behaviour\\n\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::hashes::tests",
+          "test_name": "test_obligation_responsibility_hash_round_trips"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "ObligationResponsibilityHash"
+      },
+      "key": {
+        "bound_tests_set_hash": "a23f9355be35e6b5c90beb3212c313f315e2913986dabd5e173fad9a922583ea",
+        "declaration_hash": "086a241d1d321b34b958219e66badb80791c049d25d964b8cace13f295bdf791",
+        "responsibility_hash": "d644be1137a19a88300b7d27496ee1cd67bf5f73852bb06f81592ef7e9d8ae73",
+        "spec_element_hash": "9c1015ed81e7df741000233b6ec864836bd7cedd3754f075f87d00e8ec94ac93"
+      },
+      "obligation_id": {
+        "entry_key": "ObligationResponsibilityHash",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let hash = sample_hash();\n        let wrapped = ObligationResponsibilityHash::new(hash.clone());\n        assert_eq!(wrapped.as_hash(), &hash);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::hashes::tests",
+          "test_name": "test_spec_element_hash_round_trips"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::hashes::tests",
+          "test_name": "test_spec_element_hash_distinguishes_revised_specification_inputs"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "SpecElementHash"
+      },
+      "key": {
+        "bound_tests_set_hash": "02aa8fe9e02b6e1fad677542144a847f828b72691dd63061e8ad79c21c15ee16",
+        "declaration_hash": "07e1d3cd11ff39412c68e768e5dbaca9b356995c13154039ba1a5105078d8239",
+        "responsibility_hash": "75abd1e7ee23715663d9c15ea879b4cd2936b366df216edbc62be149091a91e5",
+        "spec_element_hash": "9c1015ed81e7df741000233b6ec864836bd7cedd3754f075f87d00e8ec94ac93"
+      },
+      "obligation_id": {
+        "entry_key": "SpecElementHash",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let original_hash = ContentHash::from_bytes([1u8; 32]);\n        let revised_hash = ContentHash::from_bytes([2u8; 32]);\n        let original = SpecElementHash::new(original_hash);\n        let revised = SpecElementHash::new(revised_hash.clone());\n\n        assert_ne!(original, revised);\n        assert_eq!(revised.as_hash(), &revised_hash);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+      },
+      "key": {
+        "bound_tests_set_hash": "256a41d4d7788e695f3a51a5f41e79bc9b4d5ea4e48925291967ddb3f44f0042",
+        "declaration_hash": "3b5bc41c53f4f5fc1c1d9b59a54482ff70ca64ad8fea9221aa1ef76c36317c31",
+        "responsibility_hash": "94babc94ff2b14598068d1e4a00abc35fb5b2edf941d3af7156f287c955d4bee",
+        "spec_element_hash": "a2a5793031e519cd9d00c4357957a0e9533f305a1012582680f5ff314222323d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(pair.spec_element(), &spec_element());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+      },
+      "key": {
+        "bound_tests_set_hash": "256a41d4d7788e695f3a51a5f41e79bc9b4d5ea4e48925291967ddb3f44f0042",
+        "declaration_hash": "42cff7a9af1b34949d4475a30923d4f5dcd63bd64e73030415a373a01211061a",
+        "responsibility_hash": "cb30b6d4b05aefba54ffee5c80b4fcbacc1e69123eb8993cb5070d9526249d05",
+        "spec_element_hash": "e73c787a58aa9db242a71ea49a014c4971d10f7006bc246b9a734a781adab1ff"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(pair.tests_source().as_str(), \"tests\");\n        assert_eq!(pair.entry_declaration().as_str(), \"decl\");\n        assert_eq!(pair.spec_element(), &spec_element());\n        assert_eq!(pair.obligation_id(), &obligation_id());\n        assert_eq!(pair.obligation_brief(), &obligation_brief());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "fulfillment_pair_exposes_components_in_order"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+      },
+      "key": {
+        "bound_tests_set_hash": "256a41d4d7788e695f3a51a5f41e79bc9b4d5ea4e48925291967ddb3f44f0042",
+        "declaration_hash": "33212e89de3de88ac4c80f9a597d0a51b01aaab00feb5debc621ad65baf47c39",
+        "responsibility_hash": "424c8a80d848ac01bde5156e16b571d16459a4ee29952d6dffb27f9bec9cb6e9",
+        "spec_element_hash": "8a2759591bb77fc08a9e386605f0286282b6806da855d5841cacf925a950a360"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let pair = ObligationFulfillmentPair::new(\n            TestsSource::try_new(\"tests\".to_owned()).unwrap(),\n            EntryDeclaration::try_new(\"decl\".to_owned()).unwrap(),\n            spec_element(),\n            obligation_id(),\n            obligation_brief(),\n        );\n        assert_eq!(pair.tests_source().as_str(), \"tests\");\n        assert_eq!(pair.entry_declaration().as_str(), \"decl\");\n        assert_eq!(pair.spec_element(), &spec_element());\n        assert_eq!(pair.obligation_id(), &obligation_id());\n        assert_eq!(pair.obligation_brief(), &obligation_brief());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "waiver_pair_exposes_components_in_order"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair"
+      },
+      "key": {
+        "bound_tests_set_hash": "202a2988fae04421eac5bf94b16dd78c59e8dc94f19e9d2f507acb958be70b38",
+        "declaration_hash": "17bf679cd3300fec420e13d630b660d4041372ff9400f24c44ca465b849f248c",
+        "responsibility_hash": "6b0cb106a2c1815ededc55bb35bbe35c9783c4a8f18a21119baeb7f8a070834f",
+        "spec_element_hash": "a2a5793031e519cd9d00c4357957a0e9533f305a1012582680f5ff314222323d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(pair.spec_element(), &spec_element());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "waiver_pair_exposes_components_in_order"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair"
+      },
+      "key": {
+        "bound_tests_set_hash": "202a2988fae04421eac5bf94b16dd78c59e8dc94f19e9d2f507acb958be70b38",
+        "declaration_hash": "60ab1c91eb1d1b4564b74b5d57649a0ccfc873b3f1fa241b4ef112ac976e6ce9",
+        "responsibility_hash": "4f626be7c74e2c6617a64baaadb9ec702bbdcf095430d867d62863e382479182",
+        "spec_element_hash": "e73c787a58aa9db242a71ea49a014c4971d10f7006bc246b9a734a781adab1ff"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let pair = WaiverPair::new(\n            WaivedReason::try_new(\"reason\".to_owned()).unwrap(),\n            EntryDeclaration::try_new(\"decl\".to_owned()).unwrap(),\n            spec_element(),\n            obligation_id(),\n            obligation_brief(),\n        );\n        assert_eq!(pair.waived_reason().as_str(), \"reason\");\n        assert_eq!(pair.entry_declaration().as_str(), \"decl\");\n        assert_eq!(pair.spec_element(), &spec_element());\n        assert_eq!(pair.obligation_id(), &obligation_id());\n        assert_eq!(pair.obligation_brief(), &obligation_brief());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::pair::tests",
+          "test_name": "waiver_pair_exposes_components_in_order"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair"
+      },
+      "key": {
+        "bound_tests_set_hash": "202a2988fae04421eac5bf94b16dd78c59e8dc94f19e9d2f507acb958be70b38",
+        "declaration_hash": "cff318a6959ce8dce67ea7b56ba90263c912005801f135f80fe989c47080e731",
+        "responsibility_hash": "e3e045675cf83f3a65662ff69d7140355e3674e9830e152db9f20efbc52aee68",
+        "spec_element_hash": "8a2759591bb77fc08a9e386605f0286282b6806da855d5841cacf925a950a360"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(pair.waived_reason().as_str(), \"reason\");\n        assert_eq!(pair.entry_declaration().as_str(), \"decl\");\n        assert_eq!(pair.spec_element(), &spec_element());\n        assert_eq!(pair.obligation_id(), &obligation_id());\n        assert_eq!(pair.obligation_brief(), &obligation_brief());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_key_changes_with_any_component"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey"
+      },
+      "key": {
+        "bound_tests_set_hash": "e83c4d6411bdaa9c630dfb4b0bb81b8b1f7a00e23b1547ebdd336e12198e1561",
+        "declaration_hash": "21818f5193e67acbbd56a9b9d68159b7a081be34f55b16ba26bf4a2f2f2dd12d",
+        "responsibility_hash": "4a21ff7ed16b7cb71a039ab655d51ce2be1dab6585409cbe46f187159d4b6bd2",
+        "spec_element_hash": "9c1015ed81e7df741000233b6ec864836bd7cedd3754f075f87d00e8ec94ac93"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(base, different_tests);\n        assert_ne!(base, different_declaration);\n        assert_ne!(base, different_anchor);\n        assert_ne!(base, different_responsibility);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_key_changes_with_any_component"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey"
+      },
+      "key": {
+        "bound_tests_set_hash": "e83c4d6411bdaa9c630dfb4b0bb81b8b1f7a00e23b1547ebdd336e12198e1561",
+        "declaration_hash": "778855a9ab9566f8cbc7be4450e52591c80f33a17b084fa25a221eb67c7df4a9",
+        "responsibility_hash": "9cd4de3284d5b995f4ea8bc499dec51d284816f26d57bd244b26607629c2c92d",
+        "spec_element_hash": "a513f1e0d635518656e19a1177642097efd759d4f1bf4ab5117865f33de50c8d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let different_tests = ObligationFulfillmentCacheKey::new(\n            BoundTestsSetHash::new(ContentHash::from_bytes([9u8; 32])),\n            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),\n            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),\n            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),\n        );\n        let different_declaration = ObligationFulfillmentCacheKey::new(\n            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),\n            DeclarationHash::new(ContentHash::from_bytes([8u8; 32])),\n            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),\n            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),\n        );\n        let different_anchor = ObligationFulfillmentCacheKey::new(\n            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),\n            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),\n            SpecElementHash::new(ContentHash::from_bytes([7u8; 32])),\n            ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),\n        );\n        let different_responsibility = ObligationFulfillmentCacheKey::new(\n            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),\n            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),\n            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),\n            ObligationResponsibilityHash::new(ContentHash::from_bytes([8u8; 32])),\n        );\n        assert_ne!(base, different_tests);\n        assert_ne!(base, different_declaration);\n        assert_ne!(base, different_anchor);\n        assert_ne!(base, different_responsibility);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_key_changes_with_any_component"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey"
+      },
+      "key": {
+        "bound_tests_set_hash": "e83c4d6411bdaa9c630dfb4b0bb81b8b1f7a00e23b1547ebdd336e12198e1561",
+        "declaration_hash": "11f07b78c8dc64bdab24fe1b02b0ee2affcd4d4041d9bd58c6f92433f25529f0",
+        "responsibility_hash": "1a91ca62ad8ddab6c9241ff10eb48ea4a4079758c0295a5f241a46c7749ab94f",
+        "spec_element_hash": "519f1cb17c4cb4407784aacb31fb1f2c1ecec6732ca451dc280e2c525f6a8195"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(base, different_tests);\n        assert_ne!(base, different_declaration);\n        assert_ne!(base, different_anchor);\n        assert_ne!(base, different_responsibility);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_key_changes_with_any_component"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey"
+      },
+      "key": {
+        "bound_tests_set_hash": "ee1463728e1d364a08dca3e3916fb5beed6ba5e8efbb69107ca969268676aaf1",
+        "declaration_hash": "2c897c9d219c0ba3907726bb73e43e4641944ce64eebcb1190f2b0cb87d46430",
+        "responsibility_hash": "3172a710ed33a40bd45258671de56033925a41d96c23efbc84728adeb6d91b8e",
+        "spec_element_hash": "9c1015ed81e7df741000233b6ec864836bd7cedd3754f075f87d00e8ec94ac93"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(base, different_reason); assert_ne!(base, different_declaration); assert_ne!(base, different_anchor); assert_ne!(base, different_responsibility);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_key_changes_with_any_component"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey"
+      },
+      "key": {
+        "bound_tests_set_hash": "ee1463728e1d364a08dca3e3916fb5beed6ba5e8efbb69107ca969268676aaf1",
+        "declaration_hash": "2e09b5e147b684c3418cd92050bb02ff40616ac6c2274fa321c548e02d3c4d6b",
+        "responsibility_hash": "141088cd3c141e5a90cd2eb09f6bc3a9e01bd073a0aeb958d7722de4ef28096b",
+        "spec_element_hash": "a513f1e0d635518656e19a1177642097efd759d4f1bf4ab5117865f33de50c8d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(base, different_reason);\n        assert_ne!(base, different_declaration);\n        assert_ne!(base, different_anchor);\n        assert_ne!(base, different_responsibility);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_key_changes_with_any_component"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey"
+      },
+      "key": {
+        "bound_tests_set_hash": "ee1463728e1d364a08dca3e3916fb5beed6ba5e8efbb69107ca969268676aaf1",
+        "declaration_hash": "534f99b2bd802eb89d9c9050ae115cd82c9933f188dcd9284e443dc1e42a221c",
+        "responsibility_hash": "ecbcd38b417bc3cf1a2e165b1174c2d1a855bc80ea961e2db6075ea49fd41e56",
+        "spec_element_hash": "519f1cb17c4cb4407784aacb31fb1f2c1ecec6732ca451dc280e2c525f6a8195"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(base, different_reason);\n        assert_ne!(base, different_declaration);\n        assert_ne!(base, different_anchor);\n        assert_ne!(base, different_responsibility);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_carries_target_identity_and_brief_with_payload"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "10cc8865cbc7ab50788e197d91068fac382ff6d407608c6c87e1ab62e9ee0e9e",
+        "declaration_hash": "53433f41e8db0a31b3bde008078d60f67a823a8c1b7047190c5265d67aff7d3b",
+        "responsibility_hash": "30c8a058d32464ba05bdf16cef8b83dc45e2f5eb88800a0c3e2e6f18b7dd640a",
+        "spec_element_hash": "a2a5793031e519cd9d00c4357957a0e9533f305a1012582680f5ff314222323d"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(prompt.contains(\n            \"## Specification element\\nsection: out_of_scope\\nelement_id: IN-01\\ntext: same specification text\\n\"\n        ));\n        assert!(prompt.contains(\n            \"The specification element's section, identifier, and verbatim text are authoritative; do not infer its section from the identifier or text.\"\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_preserves_fail_categories_and_pending_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_embeds_the_structured_specification_element"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_keeps_same_text_in_distinct_spec_sections_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dece8af8288cc8df7a509ea0d024b0a96742a5bfac926a177f8173edc633edc",
+        "declaration_hash": "048d74858f89e9c3a3c0b81cefc864e80b279f3717ad9035db99121680f22868",
+        "responsibility_hash": "1ab8a46f882725849c79c1ece3b7b00f1fe75da9a38c528a0bcfebfbae6a9398",
+        "spec_element_hash": "1a0f0da268c9365a27e7a9bb453bc345058886dfaff60e6fa92fa0c578966fc7"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"for marker in [\\n            \\\"An out-of-scope element marks a boundary and does not become an affirmative implementation requirement.\\\",\\n            \\\"Do not blanket-exclude or automatically waive a reference merely because it is out of scope; inspect whether the target-owned edge is affected.\\\",\\n            \\\"Do not turn a non-guarantee into a prohibition; judge an explicit prohibition only when it belongs to the target responsibility.\\\",\\n            \\\"if required comparison material is actually missing, return pending.\\\"\\n        ] {\\n            assert!(prompt.contains(marker), \\\"missing ownership guidance: {marker}\\\");\\n        }\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_carries_target_identity_and_brief_with_payload"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_preserves_fail_categories_and_pending_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "fbab358ee869a938bc623446d8785ec5d2424e9eae29112b7b5ecb7c6b2f32c3",
+        "declaration_hash": "d5eb9822004f61efca47537d90ed6465be783f58ba87058f4877395b92164203",
+        "responsibility_hash": "619192618e750442a43027d949ee4e81408163c2d9234b9f163dae8e9538fd7f",
+        "spec_element_hash": "8a2759591bb77fc08a9e386605f0286282b6806da855d5841cacf925a950a360"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(payload, \"entry_key: Entry\\nobligation_kind: contract\\nitem_identifier: trait_method:verify\\n\\n## Obligation brief\\nverify the entry-local contract\\n\\n## Entry declaration\\nstruct Entry\\n\\n## Specification element\\nsection: in_scope\\nelement_id: IN-01\\ntext: the operation returns the expected value\\n\\n## Bound test source\\nassert_eq!(actual, expected);\\n\"); ... assert_eq!(message.as_str(), \"configured provider failed\"); ... let cases = [ ... (\"memory-positive\", ... true), (\"memory-dropped-input-negative\", ... false), ... (\"persistence-positive\", ... true), (\"persistence-false-success-negative\", ... false), ];",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_preserves_fail_categories_and_pending_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_embeds_the_structured_specification_element"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_keeps_same_text_in_distinct_spec_sections_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_every_specification_section"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "f284eff3face7c506bf5426d6d8d7eb67a2052a34d6c6645471ee30b566d588e",
+        "declaration_hash": "d08b8e70a58240420c580d1c088fbadb5989384205b0d48eae8e6d481da0ebb0",
+        "responsibility_hash": "2384554fb16da338673ec20b42b93f4330884047a6502f088b8817fd68872cec",
+        "spec_element_hash": "0c4c19da5d296d770a801e9fbe6a4c76ca488684e5d0bcda0b1a799d66b23e41"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(payload, \"entry_key: Entry\\nobligation_kind: contract\\nitem_identifier: trait_method:verify\\n\\n## Obligation brief\\nverify the entry-local contract\\n\\n## Entry declaration\\nstruct Entry\\n\\n## Specification element\\nsection: in_scope\\nelement_id: IN-01\\ntext: the operation returns the expected value\\n\\n## Bound test source\\nassert_eq!(actual, expected);\\n\");\n\nfor marker in [\n    \"An out-of-scope element marks a boundary and does not become an affirmative implementation requirement.\",\n    \"Do not blanket-exclude or automatically waive a reference merely because it is out of scope;\",\n    \"Do not turn a non-guarantee into a prohibition; judge an explicit prohibition only when it belongs to the target responsibility.\",\n    \"For a declaration that handles one already-selected input, do not demand caller-side selection or configuration loading;\",\n    \"This adapter delegates semantic comparison to the configured provider;\",\n    \"verdicts and provider errors are preserved.\",\n    \"If the target-owned promise lacks direct evidence, return fail with central_unverified;\",\n] {\n    assert!(prompt.contains(marker), \"missing forwarded verifier input: {marker}\");\n}",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_carries_target_identity_and_brief_with_payload"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "render_prompt_keeps_single_input_and_selection_responsibilities_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_configured_provider_distinguishes_memory_and_persistence_ownership"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "cce6ad70d90879386700c8168aefab6ab6f4d1a44aa692ffbc57c94cb0f25a8d",
+        "declaration_hash": "f5f541b64bc03fdd0ebaf7e29970a789345c5dbe294eb33697c23cb668ba62b9",
+        "responsibility_hash": "1375c4625ef21e885fb3858889bfae0f40f8fde5d8804d65f2312d38f0ed9757",
+        "spec_element_hash": "10f45e54976b11c01b18fed0eaedf57fb19738d580e0d162032451105e8871d4"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"let cases = [\\n            Case {\\n                name: \\\"selected-input-responsibility\\\",\\n                tests_source: r#\\\"\\n                    #[test]\\n                    fn decoder_parses_the_input_already_selected_by_its_caller() {\\n                        let selected = CapturedInput::from_bytes(b\\\"{\\\\\\\"id\\\\\\\": 7}\\\");\\n                        let decoder = SelectedInputDecoder::new(selected);\\n\\n                        assert_eq!(decoder.decode().unwrap().id, 7);\\n                    }\\n                \\\"#,\\n                ...\\n                expect_pass: true,\\n            },\\n            Case {\\n                name: \\\"selection-owned-fallback\\\",\\n                tests_source: r#\\\"\\n                    #[test]\\n                    fn selector_falls_back_to_stdout_for_an_invalid_configured_input() {\\n                        ...\\n                        assert_eq!(selected, streams.stdout);\\n                    }\\n                \\\"#,\\n                ...\\n                expect_pass: false,\\n            },\\n        ];\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_distinguishes_specification_sections_with_identical_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "5a3d91daf4266a3f93d77a9777e6da5275544904b3873357ccd6b5397b78630f",
+        "declaration_hash": "9b12ecaefa6136e0d6ba5bb3e19822c927a4dc4474165ee09aa6f580cf0fb7c6",
+        "responsibility_hash": "ab8f088775515879e0f053b66df6fa0be567be660299135d0df2e3f96ad1dd04",
+        "spec_element_hash": "1a0f0da268c9365a27e7a9bb453bc345058886dfaff60e6fa92fa0c578966fc7"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"for marker in [\\n            \\\"An out-of-scope element marks a boundary and does not become an affirmative implementation requirement.\\\",\\n            \\\"Do not blanket-exclude or automatically waive a reference merely because it is out of scope;\\\",\\n            \\\"For a declaration that handles one already-selected input, do not demand caller-side selection or configuration loading;\\\",\\n            \\\"This adapter delegates semantic comparison to the configured provider;\\\",\\n            \\\"verdicts and provider errors are preserved.\\\",\\n            \\\"If the reason does not directly address the target-owned promise, return fail;\\\",\\n            \\\"if required comparison material is actually missing, return pending.\\\",\\n        ]\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_propagates_provider_errors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_preserves_fail_and_pending_verdicts_from_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_complete_waiver_pair"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_distinguishes_specification_sections_with_identical_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_every_specification_section"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_authoritative_section_even_when_identifier_disagrees"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "44eb41e17ca42a50025c64cdf384dafe1b729e1ad53f4c38ddf0c653bc56076f",
+        "declaration_hash": "1371a5b419a303f5d27e4cd5bab9465a6f955e60620484395ebb068843754adb",
+        "responsibility_hash": "6aaf06be3630e15be9fe8ec7bb247e82780d2c91433893747f161d63cecebc56",
+        "spec_element_hash": "0c4c19da5d296d770a801e9fbe6a4c76ca488684e5d0bcda0b1a799d66b23e41"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(prompt.contains(&expected), \"missing structured specification input: {expected}\"); ... assert_ne!(in_scope, out_of_scope); ... assert!(prompt.contains(\"The specification element's section, identifier, and verbatim text are authoritative; do not infer its section from the identifier or text.\")); ... assert!(prompt.contains(marker), \"missing ownership guidance: {marker}\"); ... assert_eq!(matches!(verdict, WaiverVerdict::Waived { .. }), expect_waived, \"unexpected {name} verdict: {verdict:?}\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_configured_provider_calibrates_waiver_section_and_ownership_boundaries"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_waiver_adapter_pair_uses_waiver_capability_and_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_preserves_complete_waiver_pair"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_keeps_single_input_and_selection_responsibilities_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "render_prompt_includes_section_aware_ownership_guidance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+      },
+      "key": {
+        "bound_tests_set_hash": "76c96629d16522384ae712b2944ab6f5abceaf61932aed55133c5ae129bfb737",
+        "declaration_hash": "b4cb4d976af2b4e5a6034b3827a7d0ad69f3b8e9c94609305bd763159ec9f17f",
+        "responsibility_hash": "d53bad1f3f68a467bec6b1e64aca7449e2890737f8b0fbaf85c1cba8d015fda4",
+        "spec_element_hash": "10f45e54976b11c01b18fed0eaedf57fb19738d580e0d162032451105e8871d4"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Case { name: \"selected-input-responsibility\", reason: \"The declaration accepts an already-selected input and has no selection or configuration-loading responsibility, so the caller-owned selection edge does not require a test here.\", entry_key: \"SelectedInputDecoder\", item_identifier: \"method:decode\", brief: \"verify that the decoder does not own input selection\", declaration: \"SelectedInputDecoder { selected_input: CapturedInput }\", section: SpecSectionKind::InScope, element_id: \"IN-02\", spec_text: \"Caller-side input selection and configuration loading are outside this decoder's responsibility; this declaration receives one already-selected input.\", expect_waived: true, },\nCase { name: \"selection-owned-waiver\", reason: \"Input selection belongs to the caller, so this selector has no selection responsibility and needs no test.\", entry_key: \"InputSelector\", item_identifier: \"method:select\", brief: \"verify that the selector uses the configured input and does not fall back\", declaration: \"InputSelector { configuration: InputConfiguration, streams: Streams }\", section: SpecSectionKind::InScope, element_id: \"IN-02\", spec_text: \"The input selector owns choosing the configured input and must reject an invalid configured input rather than fall back to another stream.\", expect_waived: false, }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    }
+  ],
   "track_id": "2026-09-11-test-obligation-verifier-context-integrity"
 }

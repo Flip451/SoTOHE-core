@@ -408,8 +408,17 @@ fn derive_trait_impl_obligations(
             entry_key.clone(),
         );
         let role_kind = TargetEntryRoleKind::TraitImpl(role);
-        let declaration =
-            super::trait_impl_pair_declaration_text(impl_decl, &trait_entry.declaration_text);
+        let implementing_type = catalogue.types().get(&entry_key).ok_or_else(|| {
+            diag(&format!(
+                "catalogue type declaration '{}' disappeared while resolving trait-impl carrier",
+                entry_key.as_str()
+            ))
+        })?;
+        let declaration = super::trait_impl_pair_declaration_text(
+            impl_decl,
+            implementing_type,
+            &trait_entry.declaration_text,
+        );
         let decl_hash = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
         for rule in role_rules.obligations() {
             let Some(item_ids) = projector.trait_impl_items(impl_decl.trait_ref(), rule.per_axis())
