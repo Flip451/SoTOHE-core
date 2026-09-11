@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-09-11-test-obligation-verifier-context-integrity",
+  "title": "テスト義務検証の仕様区分・対象責務・鮮度の整合性修復",
+  "branch": "track/2026-09-11-test-obligation-verifier-context-integrity",
+  "created_at": "2026-09-11T13:23:35Z",
+  "updated_at": "2026-09-11T13:23:35Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

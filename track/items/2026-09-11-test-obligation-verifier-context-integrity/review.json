@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-11T13:26:19Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md",
+              "line": 56,
+              "message": "D4 commits to reflecting every change in any variable semantic input in freshness, but does not resolve the open-ended set of such inputs. Record whether this is delegated to an existing authority, handled by conservative over-approximation, or enforced strictly with an acknowledged depth estimate; delegating only the normalization/hash implementation to downstream design is insufficient.",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:b8f989ba628efc29f6f3072be213c51e169461c94bac43cb84b9de8838a3a60f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T13:32:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:398e881c57fa716f05bc111395f7b47235be79c192957c33ee7e03d5f4a7114e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T13:35:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:398e881c57fa716f05bc111395f7b47235be79c192957c33ee7e03d5f4a7114e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T14:00:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a90655628a4852c154e6fd6ddff9955f4f2b2e002cb2553cf49610831e3aebb5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T14:04:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a90655628a4852c154e6fd6ddff9955f4f2b2e002cb2553cf49610831e3aebb5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-11T13:29:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:abcfce41893ecbfffb8d3fc45fbec3a127a2e4923b220b05d2eae0c834d2b470",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T13:34:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:abcfce41893ecbfffb8d3fc45fbec3a127a2e4923b220b05d2eae0c834d2b470",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
