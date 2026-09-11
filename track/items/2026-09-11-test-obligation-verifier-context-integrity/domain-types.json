@@ -1,0 +1,1023 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SpecElementHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SpecElementHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SpecElementHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SpecElementHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SpecElementRef",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SpecElementRef",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SpecElementRef",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SpecElementRef",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "delete",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ObligationResponsibilityHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ObligationResponsibilityHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ObligationResponsibilityHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ObligationResponsibilityHash",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "ObligationFulfillmentVerifierPort": {
+      "action": "reference",
+      "docs": "Existing secondary port for fulfillment semantic judgment; retained unchanged so the adapter-to-port edge remains visible.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_pair",
+          "params": [
+            {
+              "name": "pair",
+              "ty": "&ObligationFulfillmentPair"
+            },
+            {
+              "name": "tier",
+              "ty": "ModelTier"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ObligationFulfillmentVerdict, SemanticVerifierError>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "WaiverVerifierPort": {
+      "action": "modify",
+      "docs": "Synchronous secondary port for waiver semantic judgment; provider calls remain offloaded by the existing WaiverEscalationDriver SpawnBlocking boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_pair",
+          "params": [
+            {
+              "name": "pair",
+              "ty": "&WaiverPair"
+            },
+            {
+              "name": "tier",
+              "ty": "ModelTier"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<WaiverVerdict, SemanticVerifierError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-02",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "ObligationResponsibilityHash": {
+      "action": "add",
+      "docs": "Value-equivalent domain wrapper for the hash of typed obligation identity and responsibility context.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "SpecElementHash": {
+      "action": "add",
+      "docs": "Value-equivalent domain wrapper for the hash of one normalized specification element.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::semantic_verify::SpecElementRef": {
+      "action": "reference",
+      "docs": "Baseline-identical value object reused as the verifier's structured specification element: section and validated element_id preserve semantic identity, while text_label is intentionally opaque verbatim requirement text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "section",
+              "ty": "SpecSectionKind"
+            },
+            {
+              "name": "element_id",
+              "ty": "SpecElementId"
+            },
+            {
+              "name": "text_label",
+              "ty": "String"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "section",
+              "ty": "SpecSectionKind"
+            },
+            {
+              "name": "element_id",
+              "ty": "SpecElementId"
+            },
+            {
+              "name": "text_label",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::semantic_verify",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::hashes::AnchorTextHash": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "tddd::test_obligation::hashes",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::pair::AnchorText": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "tddd::test_obligation::pair",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::pair::ObligationFulfillmentPair": {
+      "action": "modify",
+      "docs": "Read-only domain value object for one normalized fulfillment-verifier request.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "tests_source",
+              "ty": "TestsSource"
+            },
+            {
+              "name": "entry_declaration",
+              "ty": "EntryDeclaration"
+            },
+            {
+              "name": "spec_element",
+              "ty": "SpecElementRef"
+            },
+            {
+              "name": "obligation_id",
+              "ty": "TestObligationId"
+            },
+            {
+              "name": "obligation_brief",
+              "ty": "TestObligationBrief"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-02",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "tests_source",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestsSource"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_declaration",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&EntryDeclaration"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_element",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&SpecElementRef",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationId"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_brief",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationBrief"
+        }
+      ],
+      "module_path": "tddd::test_obligation::pair",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::pair::WaiverPair": {
+      "action": "modify",
+      "docs": "Read-only domain value object for one normalized waiver-verifier request.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "waived_reason",
+              "ty": "WaivedReason"
+            },
+            {
+              "name": "entry_declaration",
+              "ty": "EntryDeclaration"
+            },
+            {
+              "name": "spec_element",
+              "ty": "SpecElementRef"
+            },
+            {
+              "name": "obligation_id",
+              "ty": "TestObligationId"
+            },
+            {
+              "name": "obligation_brief",
+              "ty": "TestObligationBrief"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-02",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "waived_reason",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaivedReason"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_declaration",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&EntryDeclaration"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_element",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&SpecElementRef",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationId",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-02",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_brief",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationBrief",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-02",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::test_obligation::pair",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey": {
+      "action": "modify",
+      "docs": "Value-equivalent domain cache-key value object for a fulfillment-verifier request.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "bound_tests_set_hash",
+              "ty": "BoundTestsSetHash"
+            },
+            {
+              "name": "declaration_hash",
+              "ty": "DeclarationHash"
+            },
+            {
+              "name": "spec_element_hash",
+              "ty": "SpecElementHash"
+            },
+            {
+              "name": "responsibility_hash",
+              "ty": "ObligationResponsibilityHash"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "bound_tests_set_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BoundTestsSetHash"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_element_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&SpecElementHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "responsibility_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ObligationResponsibilityHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::verdict::WaiverCacheKey": {
+      "action": "modify",
+      "docs": "Value-equivalent domain cache-key value object for a waiver-verifier request.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "waived_reason_hash",
+              "ty": "WaivedReasonHash"
+            },
+            {
+              "name": "declaration_hash",
+              "ty": "DeclarationHash"
+            },
+            {
+              "name": "spec_element_hash",
+              "ty": "SpecElementHash"
+            },
+            {
+              "name": "responsibility_hash",
+              "ty": "ObligationResponsibilityHash"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "waived_reason_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaivedReasonHash"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_element_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&SpecElementHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "responsibility_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ObligationResponsibilityHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    }
+  }
+}

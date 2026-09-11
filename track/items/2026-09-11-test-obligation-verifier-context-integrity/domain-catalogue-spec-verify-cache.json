@@ -1,0 +1,582 @@
+{
+  "entries": [
+    {
+      "claim_hash": "864122d74f6f4c0a0c6803b75c385157d734748874c473eac3d8537486458299",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ObligationResponsibilityHash",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "88b1fe722f9be17a7c6f3a562af6f1dd97d4bf2c813b21fd782cc2300f6c80c4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "864122d74f6f4c0a0c6803b75c385157d734748874c473eac3d8537486458299",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ObligationResponsibilityHash",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce35203a0f81b62182eb00564b8e676f5caa49bd9b5d4c788ccd7083dc6f4c51",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a184a918927a919f14c5178cf55b31f96efade179e4c25ffbcd0d8b8ad399f5",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SpecElementHash",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "88b1fe722f9be17a7c6f3a562af6f1dd97d4bf2c813b21fd782cc2300f6c80c4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a184a918927a919f14c5178cf55b31f96efade179e4c25ffbcd0d8b8ad399f5",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SpecElementHash",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce35203a0f81b62182eb00564b8e676f5caa49bd9b5d4c788ccd7083dc6f4c51",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a184a918927a919f14c5178cf55b31f96efade179e4c25ffbcd0d8b8ad399f5",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SpecElementHash",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "eae0c5400d555722e43458261d3646fecdd14520fd3d67bb5db2e65e58ef41c8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "004c418d028c176422f8e91138924cf88323bec67209177754ef8f076ff096b0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::semantic_verify::SpecElementRef",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0bbaa3adfbfb359a71187e5badfc28d631f73001ad946c3823283d021749822f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず、対象外の内容を肯定的な実装要求として表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "67e6cdd3b093981246ae1bb6821dbbd1a2f82be0af00c9b63ca168adae4c2b54",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0bbaa3adfbfb359a71187e5badfc28d631f73001ad946c3823283d021749822f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず、対象外の内容を肯定的な実装要求として表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "67e6cdd3b093981246ae1bb6821dbbd1a2f82be0af00c9b63ca168adae4c2b54",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "120e7353f64c70e27bf060941fd9d285fc81ae3cbf5dcf9ce8d08845550e2e7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "67e6cdd3b093981246ae1bb6821dbbd1a2f82be0af00c9b63ca168adae4c2b54",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d31c6f352e255f8e1fa7b27f6b07fca187c245720a78152a9f2d792351f4df74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し、対象宣言の振る舞いが対象責務の約束と矛盾する場合、テスト本文または免除理由が対象責務とは別の振る舞いだけを扱う場合、または対象義務の説明が直接要求する振る舞いに対応する証拠がない場合は不合格とする。対象宣言と義務の同一性、参照先仕様の所属・本文、またはテスト本文・免除理由が判定要求に不足して照合できない場合は保留として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3ffea62ab7cdbab793aa8a854fe4d34744e91e3be2a30c0fc7a154b1d03356cb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0bbaa3adfbfb359a71187e5badfc28d631f73001ad946c3823283d021749822f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず、対象外の内容を肯定的な実装要求として表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3ffea62ab7cdbab793aa8a854fe4d34744e91e3be2a30c0fc7a154b1d03356cb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "120e7353f64c70e27bf060941fd9d285fc81ae3cbf5dcf9ce8d08845550e2e7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3ffea62ab7cdbab793aa8a854fe4d34744e91e3be2a30c0fc7a154b1d03356cb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::WaiverPair",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d31c6f352e255f8e1fa7b27f6b07fca187c245720a78152a9f2d792351f4df74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し、対象宣言の振る舞いが対象責務の約束と矛盾する場合、テスト本文または免除理由が対象責務とは別の振る舞いだけを扱う場合、または対象義務の説明が直接要求する振る舞いに対応する証拠がない場合は不合格とする。対象宣言と義務の同一性、参照先仕様の所属・本文、またはテスト本文・免除理由が判定要求に不足して照合できない場合は保留として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cfb9a2a6b0a59f1f343dfaea0ce579308d628570827ccec135ec8ed2f9e53c64",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "88b1fe722f9be17a7c6f3a562af6f1dd97d4bf2c813b21fd782cc2300f6c80c4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cfb9a2a6b0a59f1f343dfaea0ce579308d628570827ccec135ec8ed2f9e53c64",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce35203a0f81b62182eb00564b8e676f5caa49bd9b5d4c788ccd7083dc6f4c51",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cfb9a2a6b0a59f1f343dfaea0ce579308d628570827ccec135ec8ed2f9e53c64",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "eae0c5400d555722e43458261d3646fecdd14520fd3d67bb5db2e65e58ef41c8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4bc66862aa35aa1337d63b68e93e6b3075752f6d68cd88163c7c396463918767",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "88b1fe722f9be17a7c6f3a562af6f1dd97d4bf2c813b21fd782cc2300f6c80c4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4bc66862aa35aa1337d63b68e93e6b3075752f6d68cd88163c7c396463918767",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce35203a0f81b62182eb00564b8e676f5caa49bd9b5d4c788ccd7083dc6f4c51",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4bc66862aa35aa1337d63b68e93e6b3075752f6d68cd88163c7c396463918767",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheKey",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "eae0c5400d555722e43458261d3646fecdd14520fd3d67bb5db2e65e58ef41c8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bfd1038496d1ebe943ad94823e1ec4e8aafa8d5d24e2ca17bd6d90de24b7c4b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ObligationFulfillmentVerifierPort",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "120e7353f64c70e27bf060941fd9d285fc81ae3cbf5dcf9ce8d08845550e2e7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b70cc049ddc0489bb42d1a6af1b3a697e2e96c0d3637fb8d9b67d47db8c76bc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "WaiverVerifierPort",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0bbaa3adfbfb359a71187e5badfc28d631f73001ad946c3823283d021749822f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず、対象外の内容を肯定的な実装要求として表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b70cc049ddc0489bb42d1a6af1b3a697e2e96c0d3637fb8d9b67d47db8c76bc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "WaiverVerifierPort",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "120e7353f64c70e27bf060941fd9d285fc81ae3cbf5dcf9ce8d08845550e2e7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b70cc049ddc0489bb42d1a6af1b3a697e2e96c0d3637fb8d9b67d47db8c76bc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "WaiverVerifierPort",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d31c6f352e255f8e1fa7b27f6b07fca187c245720a78152a9f2d792351f4df74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し、対象宣言の振る舞いが対象責務の約束と矛盾する場合、テスト本文または免除理由が対象責務とは別の振る舞いだけを扱う場合、または対象義務の説明が直接要求する振る舞いに対応する証拠がない場合は不合格とする。対象宣言と義務の同一性、参照先仕様の所属・本文、またはテスト本文・免除理由が判定要求に不足して照合できない場合は保留として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d3bf14577a7c524e84cc8328a151dbfe1c022dacd44a5cece35bcbf52f5dd5e0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::hashes::AnchorTextHash",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "88b1fe722f9be17a7c6f3a562af6f1dd97d4bf2c813b21fd782cc2300f6c80c4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4dccce1f5740de4677f8539e8201532821a57cf6dca5c289979804c6be81cbd7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::pair::AnchorText",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0bbaa3adfbfb359a71187e5badfc28d631f73001ad946c3823283d021749822f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず、対象外の内容を肯定的な実装要求として表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 1
+}

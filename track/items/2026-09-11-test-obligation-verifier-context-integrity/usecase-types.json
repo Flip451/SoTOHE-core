@@ -1,0 +1,326 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "CheckTestObligationsInteractor",
+      "trait_ref": "CheckTestObligationsApplicationService"
+    },
+    {
+      "action": "modify",
+      "for_type": "EvaluateTestObligationsInteractor",
+      "trait_ref": "EvaluateTestObligationsApplicationService"
+    },
+    {
+      "action": "modify",
+      "for_type": "TestObligationResultsInteractor",
+      "trait_ref": "TestObligationResultsApplicationService"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "usecase::test_obligation::check::CheckTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Interactor modified for read-only test-obligation checking; behavioral requirements are cited in spec_refs.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": { "Interactor": {} },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Interactor modified for test-obligation evaluation; behavioral requirements are cited in spec_refs.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_driver",
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort + Send + Sync>"
+            },
+            {
+              "name": "waiver_driver",
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "config",
+              "ty": "TestObligationEvaluateConfig"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "hasher",
+              "ty": "std::sync::Arc<dyn ContentHasherPort + Send + Sync>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": { "Interactor": {} },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::results::TestObligationResultsInteractor": {
+      "action": "modify",
+      "docs": "Interactor modified for informational test-obligation results; behavioral requirements are cited in spec_refs.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": { "Interactor": {} },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    }
+  }
+}

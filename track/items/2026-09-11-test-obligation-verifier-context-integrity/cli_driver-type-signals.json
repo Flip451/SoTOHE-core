@@ -1,0 +1,17 @@
+{
+  "baseline_hash": "3d7b081b67da778a81b3d89e5529f41cf396138e6929a12db49fd00a7105a0b8",
+  "declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
+  "generated_at": "2026-09-11T16:43:50Z",
+  "head_commit": "d507fef07d667a51c18891b89558e506b2ce6480",
+  "implementation_fingerprint": "01a6b4ab89a46a10b26e7d5b4d38ae0dc04ffd31e8357fb10e47c4858c208326",
+  "resolution_fingerprint": "7244581995b2e34ce6186ea9a8d66ef4b623086270c49939ed37f08e14c7aba5",
+  "rustdoc_execution_identity": {
+    "crate_name": "cli_driver",
+    "expected_json_path": "target/.sotp-rustdoc/956b72acdcb5574d301add7866ae0b8fde066927d69cc3ceb3749294fc69ce94/doc/cli_driver.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/956b72acdcb5574d301add7866ae0b8fde066927d69cc3ceb3749294fc69ce94"
+  },
+  "schema_version": 6,
+  "signals": []
+}

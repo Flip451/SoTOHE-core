@@ -48,6 +48,118 @@
         }
       ]
     },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-11T16:02:08Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/batch-plan.json",
+              "line": 77,
+              "message": "B1 is not independently buildable: T001 changes the pair/cache-key constructors, but the affected check/results callers remain in T003/B2, while cache codecs and CLI composition/driver callers are not owned by any task. Migrate all affected call sites in the same batch/order as the domain change, or declare concrete ownership before B1.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 105,
+              "message": "T006 is not executable as written: its description names only “Test-obligation regression fixtures and bounded calibration path” and “root-host validation”, without a target file or symbol. Name the concrete fixture/test and validation targets.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 6,
+              "message": "Sections S1-S4 restate upstream behavior contracts instead of limiting the plan sections to target, operation, and anchor. Examples include “make the existing structured specification element the normalized verifier input”, “invalidating old Pass and Fail values alike”, and “section-aware exclusion semantics”. Remove the behavioral rationale from these section descriptions; retain concrete targets, operations, and anchors.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 67,
+              "message": "T002-T006 contain upstream contract restatements beyond the permitted target/operation/anchor form, including “retain missing-material pending behavior”, “map stale ... to ... pending”, “exclusions are not affirmative requirements”, “preserve fail-closed configuration diagnostics”, and the extensive regression-behavior list in T006. Cite the targets and anchors without repeating the spec behavior prose; see .harness/policies/no-upstream-restatement.md.",
+              "severity": "P2"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 105,
+              "message": "Before implementation starts, split T006 into independently verifiable units: verifier-lane/spec-section regressions (IN-01/IN-02/AC-01/AC-02), stale Pass/Fail evaluate-check-results freshness (IN-04/IN-05/AC-03), and normal cache-preserving binary/root-host validation (AC-04). Each unit can be tested independently and currently has a single broad task boundary.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:33269ecb95d6bf31d0dbab337a398bfd79d20723958ff0719e24e326188dd967",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T16:14:36Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/task-coverage.json",
+              "line": 8,
+              "message": "`task-coverage.json` maps IN-02 and AC-02 to T004, but T004 only targets check/results freshness checks and focused tests; it does not implement or validate exclusion/non-guarantee semantics or caller-owned input selection. Remove these mappings or assign them to a task whose description owns those verifier behaviors.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:0e6977b5d844ecfeaac838b10fef443bbfb525a30672987e94aa21d228b63981",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T16:17:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6b6ce873e19d7932316fa2047b03769c9e943c78ba485685dc01984bb89843ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:23:14Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/batch-plan.json",
+              "line": 63,
+              "message": "B1 groups T002 and T003 despite overlapping write ownership: both tasks claim `libs/usecase/src/test_obligation/evaluate/{plan.rs,cache.rs,tests.rs}`, and their operations overlap on request/cache-key migration and tests. Reassign those files exclusively—such as making T003 their sole owner—or place the tasks in separate batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/batch-plan.json",
+              "line": 64,
+              "message": "B2 groups T004 and T008 even though both claim `libs/usecase/src/test_obligation/{check_tests.rs,results_tests.rs}` without a symbol-level ownership partition. Give T008 separate regression-test targets, assign those files exclusively to one task, or separate the tasks into different batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 113,
+              "message": "T009 is the only task carrying the normal cache-preserving validation handoff for AC-04, but all three declared commands use the nonexistent `test-obligations` subcommand; `bin/sotp` accepts only singular `test-obligation`. As written, the load-bearing AC-04 validation cannot execute. Correct the evaluate/check/results commands to `bin/sotp test-obligation ...`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:6b6ce873e19d7932316fa2047b03769c9e943c78ba485685dc01984bb89843ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T16:31:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf5b5f16ff4341b81f3176217a2d8d5792bef8ea740804170b600e5ee9f71b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:34:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf5b5f16ff4341b81f3176217a2d8d5792bef8ea740804170b600e5ee9f71b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -61,6 +173,136 @@
           "at": "2026-09-11T13:34:28Z",
           "findings": [],
           "hash": "rvw1:sha256:abcfce41893ecbfffb8d3fc45fbec3a127a2e4923b220b05d2eae0c834d2b470",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:02:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37b8922cf3bc40e936b78adbc240de52043da09c6c6075e5efd4eb258713af4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:05:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37b8922cf3bc40e936b78adbc240de52043da09c6c6075e5efd4eb258713af4b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-11T14:16:33Z",
+          "findings": [
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+              "line": 91,
+              "message": "CN-02 is not concretely testable: “対象自身の矛盾”, “別の振る舞いへのすり替え”, and especially “中心的な約束” have no observable boundary or deterministic classification. Downstream type/implementation planning would have to invent which inputs produce 不合格 versus 保留.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:afa8a1edbe9a25e2ac4806c109a0185fd21790eb523a6c486d1ab72c62369e3b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T14:19:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54fcfa00832daae00bc561512e19eacbe1d699e19d76fff1a87b3168282ab334",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T14:24:03Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+              "line": 19,
+              "message": "GO-01 の仕様区分保持と対象外の意味反転防止には AC coverage が不足している。AC-01 は同一本文の in_scope / out_of_scope 区別と、対象外の名詞句を肯定的な実装要求へ変えないことしか検証しないため、D1 / IN-01 が要求する goal・constraint・acceptance_criteria を含む全区分の識別子・所属・本文保持や、D2 / IN-02 が要求する「非保証から否定要件を作らず、対象責務内の明示禁止は検証する」という区別が壊れても、現在の AC はすべて成立し得る。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:54fcfa00832daae00bc561512e19eacbe1d699e19d76fff1a87b3168282ab334",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T14:27:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc2366f070dcb890d0c600b462216f6e04f20d32515f0ac44c096f692c42800f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-11T15:16:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:232fba67660569057636916dcf08bd1693f1d791661efc70923466606a6dd3d4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T15:28:49Z",
+          "findings": [
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 559,
+              "message": "`domain::tddd::test_obligation::pair::WaiverPair::new` は `WaivedReason`、`EntryDeclaration`、`SpecElementRef` しか保持せず、兄弟の `ObligationFulfillmentPair::new` が保持する `TestObligationId` と `TestObligationBrief` を失っている。唯一の waiver port 入力も `&WaiverPair` なので、IN-03/CN-02 が要求する義務の同一性・説明を型付きデータとして waiver verifier へ渡せず、`EntryDeclaration` 文字列への埋め込みに頼る lossy boundary になる。責務情報を型付き aggregate として WaiverPair と鮮度契約へ追加する必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 208,
+              "message": "`WaiverVerifierPort::verify_pair` は provider-backed semantic verification を表す変更対象 port だが `is_async: false` のままで、entry docs は blocking 実行や既存の spawn-blocking scheduling を意図した選択だと説明していない。同期境界を維持するならその理由を契約に記録し、そうでなければ async surface にする必要がある。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 261,
+              "message": "`.harness/policies/no-upstream-restatement.md` に反し、`SpecElementHash`、`domain::tddd::test_obligation::pair::{ObligationFulfillmentPair,WaiverPair}`、`domain::tddd::test_obligation::verdict::{ObligationFulfillmentCacheKey,WaiverCacheKey}` の docs が、区分移動時の失効、外部探索禁止、両 lane の入力保持、全可変入力の freshness といった upstream behavior を文章で再記述している。型の意味・配置根拠だけを残し、挙動は spec anchor 参照に置き換える必要がある。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/usecase-types.json",
+              "line": 27,
+              "message": "`.harness/policies/no-upstream-restatement.md` に反し、`usecase::test_obligation::{check::CheckTestObligationsInteractor,evaluate::EvaluateTestObligationsInteractor,results::TestObligationResultsInteractor}` の docs が、旧指紋の扱い、完全要求の hash、再評価、三経路の freshness 一致を再記述している。各 entry は変更対象と役割だけを述べ、挙動は IN/AC anchor に委ねる必要がある。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/infrastructure-types.json",
+              "line": 6,
+              "message": "`.harness/policies/no-upstream-restatement.md` に反し、両 `*_verifier_fingerprint` function と `ObligationFulfillmentVerifierAdapter` / `WaiverVerifierAdapter` の docs が、fingerprint の構成・除外、prompt に渡す情報、対象外解釈、fail-closed 条件を upstream contract から再記述している。変更対象と adapter/function の局所的な型目的だけを残し、挙動は spec_refs の anchor で参照する必要がある。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:232fba67660569057636916dcf08bd1693f1d791661efc70923466606a6dd3d4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T15:50:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:043062b196a6b94019c07febb96d916cb458207949ec053d4e530f32d885d712",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T15:53:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:043062b196a6b94019c07febb96d916cb458207949ec053d4e530f32d885d712",
           "type": "final",
           "verdict": "zero_findings"
         }

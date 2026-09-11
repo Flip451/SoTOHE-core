@@ -1,0 +1,31 @@
+{
+  "catalogue_declaration_hash": "f3d9d0773af65c8ffd2ac7e04d960bb90545eb1c7e9b2c189fd02951c6f91b78",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "7dd5be2a45d95f53f9418dae890d926e019fbdec47000fdc6604a2d41838d2de",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+    },
+    {
+      "entry_hash": "f98e922241c0e4132f88ccb49c217f3b228b7b4e969633bbf70af9004e1c4a79",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+    },
+    {
+      "entry_hash": "5ac5b4616c06bb74365721aaf76cab7b5837dfbebb78bd63993947eead1dc511",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+    },
+    {
+      "entry_hash": "37ce4e03208ac155f994cfc75adf60fb212466808c62b3d95fca43a1e27355bc",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint"
+    },
+    {
+      "entry_hash": "bc774f61f9b1733cbed56b9944304bdc92376a30b600c2a085975b180b3cf156",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+    }
+  ]
+}
