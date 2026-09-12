@@ -41,8 +41,7 @@ use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
 use domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace;
 
 use super::{
-    CANONICAL_LAYERS, CoverageVerifyOutcome, PreReviewGateError, PreReviewGateOutcome,
-    PreReviewGateViolation,
+    CoverageVerifyOutcome, PreReviewGateError, PreReviewGateOutcome, PreReviewGateViolation,
 };
 use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 
@@ -379,15 +378,16 @@ pub(super) fn collect_per_layer_violations(
     out
 }
 
-/// Phase 3: any contract entry whose layer is outside the 6 canonical TDDD set.
+/// Phase 3: any contract entry whose layer is outside the enabled TDDD set
+/// loaded from `architecture-rules.json`.
 pub(super) fn collect_non_canonical_layer_violations(
     contract_doc: &domain::task_contract::TaskContractDocument,
+    canonical_layers: &HashSet<String>,
 ) -> Vec<domain::task_contract::CoverageViolation> {
-    let canonical: HashSet<&str> = CANONICAL_LAYERS.iter().copied().collect();
     let mut out = Vec::new();
     for refs in contract_doc.entries().values() {
         for entry in refs {
-            if !canonical.contains(entry.layer().as_ref()) {
+            if !canonical_layers.contains(entry.layer().as_ref()) {
                 out.push(domain::task_contract::CoverageViolation::InvalidEntryRef(
                     entry.clone(),
                     FreeText::new(format!(

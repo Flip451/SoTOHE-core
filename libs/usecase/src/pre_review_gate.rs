@@ -7,18 +7,18 @@
 //! Verifies that all contracted catalogue entries for tasks that are
 //! `in_progress` or `done` have Blue `impl_catalog` signals (D7 status filter).
 //! Attributed entries with no `in_progress` or `done` owner tolerate Yellow; Red
-//! always blocks regardless of task status. Operates per-layer or across all 6
-//! canonical TDDD layers.
+//! always blocks regardless of task status. Operates per-layer or across every `tddd.enabled`
+//! layer from `architecture-rules.json`.
 //! Non-Blue entries produce [`PreReviewGateViolation::NonBlueSignal`].
 //!
-//! When `cmd.layer` is `None`, all 6 canonical TDDD layers are iterated and the
+//! When `cmd.layer` is `None`, every `tddd.enabled` layer is iterated and the
 //! outcomes are combined into a single result. Layers reported missing by the
 //! signal reader are skipped silently — that is "no entries to verify", not an
 //! error — while other signal read or validation failures still propagate.
 //!
 //! ## Attribution-completeness gate (`CoverageVerifyService` / `bin/sotp task-contract coverage`)
 //!
-//! Verifies attribution completeness across all 6 canonical TDDD layers:
+//! Verifies attribution completeness across every `tddd.enabled` TDDD layer:
 //!
 //! 1. **Orphan detection**: every scope-relevant signal entry must be attributed
 //!    to at least one task. Uncovered entries produce [`CoverageViolation::OrphanEntry`].
@@ -64,7 +64,7 @@ use helpers::{
 /// `track_id` identifies the active track whose `task-contract.json` is
 /// evaluated. `layer` is the optional TDDD layer scope:
 /// - `Some(layer_id)` → check only the given layer (per-layer mode).
-/// - `None` → iterate all 6 canonical TDDD layers and combine their outcomes
+/// - `None` → iterate every `tddd.enabled` TDDD layer and combine their outcomes
 ///   (all-layers mode).
 ///
 /// Both fields are domain value objects: `TrackId` enforces non-empty
@@ -74,7 +74,7 @@ use helpers::{
 pub struct PreReviewGateCommand {
     /// The active track whose task-contract.json is evaluated.
     pub track_id: domain::TrackId,
-    /// The TDDD layer to check, or `None` to iterate all 6 canonical layers.
+    /// The TDDD layer to check, or `None` to iterate every `tddd.enabled` layer.
     pub layer: Option<domain::tddd::LayerId>,
 }
 
@@ -366,6 +366,43 @@ impl CoverageVerifyInteractor {
     }
 }
 
+
+/// Resolve the canonical TDDD layer set from `architecture-rules.json`
+/// (`tddd.enabled` layers), via the injected [`TdddLayerBindingsPort`].
+///
+/// Task-contract coverage / liveness must not hardcode consumer-specific
+/// crate names; architecture-customizer renames are expressed only in
+/// `architecture-rules.json`.
+fn load_canonical_layers(
+    layer_bindings: &dyn TdddLayerBindingsPort,
+    workspace_root: &std::path::Path,
+) -> Result<Vec<domain::tddd::LayerId>, PreReviewGateError> {
+    let bindings = layer_bindings.load(workspace_root, None).map_err(|error| {
+        PreReviewGateError::CatalogueReadFailed {
+            layer: domain::tddd::LayerId::try_new("architecture_rules".to_owned()).expect(
+                "architecture_rules is a valid LayerId spelling",
+            ),
+            message: FreeText::new(format!("failed to resolve TDDD layer bindings: {error}")),
+        }
+    })?;
+    let mut layers = Vec::with_capacity(bindings.len());
+    for binding in bindings {
+        let layer = domain::tddd::LayerId::try_new(binding.layer_id.clone()).map_err(|_| {
+            PreReviewGateError::CatalogueReadFailed {
+                layer: domain::tddd::LayerId::try_new("architecture_rules".to_owned()).expect(
+                    "architecture_rules is a valid LayerId spelling",
+                ),
+                message: FreeText::new(format!(
+                    "invalid layer id '{}' in architecture-rules.json",
+                    binding.layer_id
+                )),
+            }
+        })?;
+        layers.push(layer);
+    }
+    Ok(layers)
+}
+
 impl CoverageVerifyService for CoverageVerifyInteractor {
     fn verify_coverage(
         &self,
@@ -386,9 +423,11 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
             Err(e) => return Err(e.into()),
         };
 
+        let canonical_layers = load_canonical_layers(self.layer_bindings.as_ref(), &self.workspace_root)?;
+        let canonical_ids: std::collections::HashSet<String> =
+            canonical_layers.iter().map(|layer| layer.as_ref().to_owned()).collect();
         let mut all_violations: Vec<domain::task_contract::CoverageViolation> = Vec::new();
-        for &layer_str in CANONICAL_LAYERS {
-            let Ok(layer) = domain::tddd::LayerId::try_new(layer_str.to_owned()) else { continue };
+        for layer in canonical_layers {
             let Some(signal_doc) = self
                 .signal_reader
                 .read_optional_signals(&cmd.track_id, &layer)
@@ -417,7 +456,7 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
                 &scope_entries,
             ));
         }
-        all_violations.extend(collect_non_canonical_layer_violations(&contract_doc));
+        all_violations.extend(collect_non_canonical_layer_violations(&contract_doc, &canonical_ids));
         let plan_task_ids = self
             .impl_plan_reader
             .read_task_statuses(&cmd.track_id)
@@ -505,9 +544,6 @@ impl PreReviewGateInteractor {
     }
 }
 
-/// Canonical TDDD layer identifiers iterated in all-layers mode.
-const CANONICAL_LAYERS: &[&str] =
-    &["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"];
 
 impl PreReviewGateInteractor {
     /// Run the liveness gate for a single TDDD layer.
@@ -579,16 +615,14 @@ impl PreReviewGateService for PreReviewGateInteractor {
             None => {
                 // ── All-layers mode ───────────────────────────────────────────
                 //
-                // Iterate all 6 canonical TDDD layers and combine violations.
+                // Iterate every tddd.enabled layer and combine violations.
                 // Layers reported missing by the signal reader are skipped
                 // silently — that is "no entries to verify", not an error.
                 // Other signal read or validation failures still fail closed.
                 let mut all_violations: Vec<PreReviewGateViolation> = Vec::new();
-                for &layer_str in CANONICAL_LAYERS {
-                    let Ok(layer) = domain::tddd::LayerId::try_new(layer_str.to_owned()) else {
-                        // Unreachable: CANONICAL_LAYERS contains only valid identifiers.
-                        continue;
-                    };
+                let canonical_layers =
+                    load_canonical_layers(self.layer_bindings.as_ref(), &self.workspace_root)?;
+                for layer in canonical_layers {
                     match self
                         .signal_reader
                         .read_optional_signals(&cmd.track_id, &layer)
@@ -1131,12 +1165,37 @@ mod tests {
             _workspace_root: &Path,
             layer_filter: Option<&str>,
         ) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> {
-            Ok(vec![TdddLayerBinding {
-                layer_id: layer_filter.unwrap_or("domain").to_owned(),
-                catalogue_file: self.catalogue_file.clone(),
-                baseline_file: "domain-types-baseline.json".to_owned(),
-                targets: vec!["domain".to_owned()],
-            }])
+            // Mirror SoTOHE-core's default architecture-rules.json layer set so
+            // all-layers coverage tests still exercise MissingSignalDocument for
+            // every enabled layer when the mock returns the full roster.
+            const ALL: &[&str] = &[
+                "domain",
+                "usecase",
+                "infrastructure",
+                "cli_driver",
+                "cli",
+                "cli_composition",
+            ];
+            let layer_ids: Vec<&str> = match layer_filter {
+                Some(filter) => vec![filter],
+                None => ALL.to_vec(),
+            };
+            Ok(layer_ids
+                .into_iter()
+                .map(|layer_id| TdddLayerBinding {
+                    layer_id: layer_id.to_owned(),
+                    // Per-layer loads keep the fixture catalogue filename so
+                    // existing unit tests that pin a custom catalogue_file still
+                    // resolve. All-layers loads derive `<layer>-types.json`.
+                    catalogue_file: if layer_filter.is_some() {
+                        self.catalogue_file.clone()
+                    } else {
+                        format!("{layer_id}-types.json")
+                    },
+                    baseline_file: format!("{layer_id}-types-baseline.json"),
+                    targets: vec![layer_id.to_owned()],
+                })
+                .collect())
         }
     }
 
@@ -1152,12 +1211,8 @@ mod tests {
             layer_filter: Option<&str>,
         ) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> {
             self.roots.lock().unwrap().push(workspace_root.to_path_buf());
-            Ok(vec![TdddLayerBinding {
-                layer_id: layer_filter.unwrap_or("domain").to_owned(),
-                catalogue_file: self.catalogue_file.clone(),
-                baseline_file: "domain-types-baseline.json".to_owned(),
-                targets: vec!["domain".to_owned()],
-            }])
+            ConstLayerBindings { catalogue_file: self.catalogue_file.clone() }
+                .load(workspace_root, layer_filter)
         }
     }
 
@@ -1406,7 +1461,15 @@ mod tests {
         );
         let coverage_outcome = coverage.verify_coverage(coverage_cmd("my-track")).unwrap();
         assert!(matches!(coverage_outcome, CoverageVerifyOutcome::Blocked(_)));
-        assert_eq!(coverage_roots.lock().unwrap().as_slice(), [workspace_root()].as_slice());
+        let coverage_root_calls = coverage_roots.lock().unwrap().clone();
+        assert!(
+            !coverage_root_calls.is_empty(),
+            "coverage must resolve layer bindings against the explicit workspace root"
+        );
+        assert!(
+            coverage_root_calls.iter().all(|root| root == &workspace_root()),
+            "every layer-bindings load must use the explicit workspace root, got {coverage_root_calls:?}"
+        );
     }
 
     #[test]
@@ -2247,7 +2310,7 @@ mod tests {
     //
     // When task-contract.json attributes an entry to a layer that is not one of
     // the 6 canonical TDDD layers (e.g. "doman" as a typo for "domain"), the
-    // per-layer CANONICAL_LAYERS iteration never visits it. Without Phase 3, the
+    // per-layer enabled-layer iteration never visits it. Without Phase 3, the
     // entry would silently bypass both orphan detection and referential integrity
     // checks, producing a false-pass result.
     // Phase 3 detects these entries and emits `InvalidEntryRef` for each one.
