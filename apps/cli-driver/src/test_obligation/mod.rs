@@ -40,23 +40,65 @@ pub(crate) fn resolve_track_id(
     TrackId::try_new(raw.to_owned()).map_err(|e| format!("invalid track id from branch: {e}"))
 }
 
-/// Anchors the six TDDD-layer catalogue paths at `workspace_root` so the
+/// Anchors every `tddd.enabled` catalogue path at `workspace_root` so the
 /// resulting inputs work identically regardless of the process cwd (the
 /// composition root discovers the git worktree, so we should never re-derive
 /// the anchor from `PathBuf::from("track")`, which would silently follow cwd).
+///
+/// Catalogue filenames come from `architecture-rules.json` so architecture-
+/// customizer renames stay coherent without hardcoding consumer layer ids.
 pub(crate) fn default_catalogue_paths(workspace_root: &Path, track_id: &TrackId) -> Vec<PathBuf> {
     let dir = workspace_root.join("track").join("items").join(track_id.as_ref());
-    [
-        "domain-types.json",
-        "usecase-types.json",
-        "infrastructure-types.json",
-        "cli_driver-types.json",
-        "cli_composition-types.json",
-        "cli-types.json",
-    ]
-    .into_iter()
-    .map(|name| dir.join(name))
-    .collect()
+    catalogue_files_from_architecture_rules(workspace_root)
+        .unwrap_or_else(|_| {
+            // Tests and tightly-controlled fixtures may omit architecture-rules;
+            // fall back to the SoTOHE-core template layer set.
+            vec![
+                "domain-types.json".to_owned(),
+                "usecase-types.json".to_owned(),
+                "infrastructure-types.json".to_owned(),
+                "cli_driver-types.json".to_owned(),
+                "cli_composition-types.json".to_owned(),
+                "cli-types.json".to_owned(),
+            ]
+        })
+        .into_iter()
+        .map(|name| dir.join(name))
+        .collect()
+}
+
+fn catalogue_files_from_architecture_rules(workspace_root: &Path) -> Result<Vec<String>, String> {
+    let rules_path = workspace_root.join("architecture-rules.json");
+    let raw = std::fs::read_to_string(&rules_path)
+        .map_err(|e| format!("failed to read {}: {e}", rules_path.display()))?;
+    let value: serde_json::Value = serde_json::from_str(&raw)
+        .map_err(|e| format!("failed to parse {}: {e}", rules_path.display()))?;
+    let layers = value
+        .get("layers")
+        .and_then(|v| v.as_array())
+        .ok_or_else(|| format!("{} missing layers array", rules_path.display()))?;
+    let mut files = Vec::new();
+    for layer in layers {
+        let tddd = layer.get("tddd");
+        let enabled = tddd
+            .and_then(|t| t.get("enabled"))
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+        if !enabled {
+            continue;
+        }
+        let Some(file) = tddd.and_then(|t| t.get("catalogue_file")).and_then(|v| v.as_str()) else {
+            continue;
+        };
+        files.push(file.to_owned());
+    }
+    if files.is_empty() {
+        return Err(format!(
+            "no tddd.enabled catalogue_file entries in {}",
+            rules_path.display()
+        ));
+    }
+    Ok(files)
 }
 
 pub(crate) fn catalogue_command_input(
@@ -102,6 +144,33 @@ mod tests {
         assert_eq!(paths.len(), 6);
         assert!(paths.iter().any(|p| p.ends_with("domain-types.json")));
         assert!(paths.iter().any(|p| p.ends_with("cli-types.json")));
+    }
+
+    #[test]
+    fn test_default_catalogue_paths_reads_architecture_rules_when_present() {
+        let tmp = std::env::temp_dir().join(format!(
+            "sotp-test-obligation-arch-rules-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&tmp);
+        std::fs::create_dir_all(&tmp).unwrap();
+        let rules = tmp.join("architecture-rules.json");
+        std::fs::write(
+            &rules,
+            r#"{"version":2,"layers":[
+              {"crate":"entities","path":"libs/entities","tddd":{"enabled":true,"catalogue_file":"entities-types.json"}},
+              {"crate":"web","path":"apps/web","tddd":{"enabled":true,"catalogue_file":"web-types.json"}},
+              {"crate":"skip","path":"libs/skip","tddd":{"enabled":false,"catalogue_file":"skip-types.json"}}
+            ]}"#,
+        )
+        .unwrap();
+        let track_id = TrackId::try_new("example").unwrap();
+        let paths = default_catalogue_paths(&tmp, &track_id);
+        let _ = std::fs::remove_dir_all(&tmp);
+        assert_eq!(paths.len(), 2);
+        assert!(paths.iter().any(|p| p.ends_with("entities-types.json")));
+        assert!(paths.iter().any(|p| p.ends_with("web-types.json")));
+        assert!(paths.iter().all(|p| p.starts_with(tmp.join("track/items/example"))));
     }
 
     #[test]
