@@ -17,7 +17,9 @@
     ],
     "T002": [],
     "T003": [
-      {"layer": "usecase", "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"}
+      {"layer": "usecase", "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"},
+      {"layer": "usecase", "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"},
+      {"layer": "usecase", "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"}
     ],
     "T004": [
       {"layer": "usecase", "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"},

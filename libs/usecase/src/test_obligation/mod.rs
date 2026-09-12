@@ -18,6 +18,7 @@
 mod check_contract;
 mod check_sources;
 mod check_support;
+mod freshness;
 mod results_status;
 mod status_lanes;
 

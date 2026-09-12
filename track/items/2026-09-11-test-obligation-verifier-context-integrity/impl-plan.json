@@ -15,8 +15,8 @@
       },
       {
         "description": [
-          "`libs/usecase/src/test_obligation/evaluate/`: after compatibility closure, update request construction and freshness operations with focused tests. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.",
-          "`libs/usecase/src/test_obligation/{check,check_support,results,results_status}.rs` and focused test modules: after compatibility closure, update shared freshness operations. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04."
+          "`libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,plan_input.rs,cache.rs,tests.rs}` and `libs/usecase/src/test_obligation/{check.rs,check_waiver.rs,check_support.rs,results.rs,results_status.rs,check_tests.rs,results_tests.rs}`: update the canonical section-aware specification/obligation hash material and its evaluate/check/results producers and consumers as one executable unit. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.",
+          "`libs/usecase/src/test_obligation/{check.rs,check_support.rs,results.rs,results_status.rs,check_tests.rs,results_tests.rs}`: after the canonical hash unit, finish the non-hash stale-verdict status projection and result aggregation operations with focused tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04."
         ],
         "id": "S2",
         "task_ids": [
@@ -67,11 +67,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "5bf9f2473ccc5202e3862fc0cb41633d604a1dd9",
       "description": "`libs/domain/src/tddd/test_obligation/{hashes,pair,verdict,ports}.rs` and `libs/domain/src/tddd/semantic_verify/`: add `SpecElementHash` and `ObligationResponsibilityHash`; replace `AnchorText`/`AnchorTextHash` uses with the catalogued `SpecElementRef`; update pair, cache-key, and `WaiverVerifierPort` constructors/accessors; update domain tests. IN-01; IN-03; IN-04; OUT-01; OUT-02; OUT-04; CN-01; CN-02; AC-01; AC-03.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "5bf9f2473ccc5202e3862fc0cb41633d604a1dd9",
       "depends_on": [
         "T001"
       ],
@@ -83,19 +85,20 @@
       "depends_on": [
         "T002"
       ],
-      "description": "After T002's compatibility closure, own the remaining `EvaluateTestObligationsInteractor` request-construction and freshness operations plus focused regressions in `libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,cache.rs,tests.rs}`. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.",
+      "description": "After T002's compatibility closure, own the atomic canonical-hash unit in `libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,plan_input.rs,cache.rs,tests.rs}` and `libs/usecase/src/test_obligation/{check.rs,check_waiver.rs,check_support.rs,results.rs,results_status.rs,check_tests.rs,results_tests.rs}`: define section-aware specification/obligation material once, migrate the evaluate key producer and every check/results consumer, and add focused cross-lane key-compatibility tests. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
-        "T002"
+        "T003"
       ],
-      "description": "After T002's compatibility closure, own `CheckTestObligationsInteractor` and `TestObligationResultsInteractor` freshness operations in `libs/usecase/src/test_obligation/{check.rs,check_support.rs,check_tests.rs,results.rs,results_status.rs,results_tests.rs}` and add focused unit tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.",
+      "description": "After T003's canonical-hash unit, own the remaining non-hash stale-verdict status projection and result aggregation operations in `libs/usecase/src/test_obligation/{check.rs,check_support.rs,check_tests.rs,results.rs,results_status.rs,results_tests.rs}` and add focused unit tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.",
       "id": "T004",
       "status": "todo"
     },
     {
+      "commit_hash": "5bf9f2473ccc5202e3862fc0cb41633d604a1dd9",
       "depends_on": [
         "T001"
       ],
@@ -104,6 +107,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "5bf9f2473ccc5202e3862fc0cb41633d604a1dd9",
       "depends_on": [
         "T001"
       ],
@@ -119,7 +123,7 @@
       ],
       "description": "The `#[cfg(test)]` modules in `libs/infrastructure/src/test_obligation/{fulfillment_verifier.rs,waiver_verifier.rs}`: add table-driven verifier-lane/spec-section and bounded diagnostic/calibration cases using `track/items/2026-09-11-test-obligation-verifier-context-integrity/research/verifier-input-diagnosis.md` only as diagnostic evidence. IN-01; IN-02; IN-03; OUT-01; CN-02; AC-01; AC-02.",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

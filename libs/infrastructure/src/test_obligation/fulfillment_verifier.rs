@@ -934,11 +934,23 @@ text: the operation returns the expected value\n\n\
         let memory_positive = r#"
             #[test]
             fn memory_names_coexist_without_storage() {
-                let mut names = std::collections::BTreeMap::new();
-                names.insert("alpha", 1_u8);
-                names.insert("beta", 2_u8);
-                assert_eq!(names.get("alpha"), Some(&1_u8));
-                assert_eq!(names.get("beta"), Some(&2_u8));
+                struct InMemoryNameIndex {
+                    names: std::collections::BTreeMap<&'static str, u8>,
+                }
+
+                impl InMemoryNameIndex {
+                    fn lookup(&self, name: &str) -> Option<&u8> {
+                        self.names.get(name)
+                    }
+                }
+
+                let mut index = InMemoryNameIndex {
+                    names: std::collections::BTreeMap::new(),
+                };
+                index.names.insert("alpha", 1_u8);
+                index.names.insert("beta", 2_u8);
+                assert_eq!(index.lookup("alpha"), Some(&1_u8));
+                assert_eq!(index.lookup("beta"), Some(&2_u8));
             }
         "#;
         // The second memory probe drops the independently named value that the
@@ -946,9 +958,21 @@ text: the operation returns the expected value\n\n\
         let memory_dropped_input_negative = r#"
             #[test]
             fn memory_one_name_leaves_independent_names_unverified() {
-                let mut names = std::collections::BTreeMap::new();
-                names.insert("alpha", 1_u8);
-                assert_eq!(names.get("alpha"), Some(&1_u8));
+                struct InMemoryNameIndex {
+                    names: std::collections::BTreeMap<&'static str, u8>,
+                }
+
+                impl InMemoryNameIndex {
+                    fn lookup(&self, name: &str) -> Option<&u8> {
+                        self.names.get(name)
+                    }
+                }
+
+                let mut index = InMemoryNameIndex {
+                    names: std::collections::BTreeMap::new(),
+                };
+                index.names.insert("alpha", 1_u8);
+                assert_eq!(index.lookup("alpha"), Some(&1_u8));
             }
         "#;
         let persistence_positive = r#"
@@ -956,15 +980,17 @@ text: the operation returns the expected value\n\n\
             fn persistence_path_is_project_local_and_not_user_global() {
                 use std::path::{Path, PathBuf};
 
-                fn project_local_storage_location(project_root: &Path) -> PathBuf {
-                    project_root.join(".state").join("values.data")
+                struct PersistencePathTarget {
+                    storage_location: PathBuf,
                 }
 
                 let project_root = Path::new("project-root");
                 let user_global_root = Path::new("user-global-root");
-                let location = project_local_storage_location(project_root);
-                assert!(location.starts_with(project_root));
-                assert!(!location.starts_with(user_global_root));
+                let target = PersistencePathTarget {
+                    storage_location: project_root.join(".state").join("values.data"),
+                };
+                assert!(target.storage_location.starts_with(project_root));
+                assert!(!target.storage_location.starts_with(user_global_root));
             }
         "#;
         // The second persistence probe exercises a false-success implementation:
@@ -975,15 +1001,17 @@ text: the operation returns the expected value\n\n\
             fn persistence_path_uses_user_global_location() {
                 use std::path::{Path, PathBuf};
 
-                fn user_global_storage_location(user_global_root: &Path) -> PathBuf {
-                    user_global_root.join("values.data")
+                struct PersistencePathTarget {
+                    storage_location: PathBuf,
                 }
 
                 let project_root = Path::new("project-root");
                 let user_global_root = Path::new("user-global-root");
-                let location = user_global_storage_location(user_global_root);
-                assert!(location.starts_with(user_global_root));
-                assert!(!location.starts_with(project_root));
+                let target = PersistencePathTarget {
+                    storage_location: user_global_root.join("values.data"),
+                };
+                assert!(target.storage_location.starts_with(user_global_root));
+                assert!(!target.storage_location.starts_with(project_root));
             }
         "#;
 

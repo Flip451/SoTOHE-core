@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "f291b829415aa2d1a3dd8bee664a730823cb30aa67f9420512049195c21d8035",
+  "catalogue_declaration_hash": "e64a92286363b78df4756f976540f137d2102a2b686e97922d9a6dffc8812cbd",
   "schema_version": 1,
   "signals": [
     {
@@ -8,7 +8,7 @@
       "type_name": "usecase::test_obligation::check::CheckTestObligationsInteractor"
     },
     {
-      "entry_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "entry_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "signal": "blue",
       "type_name": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
     },

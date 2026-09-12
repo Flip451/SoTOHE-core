@@ -19,12 +19,12 @@
     },
     {
       "task_id": "T003",
-      "scope_estimates": [{"scope": "usecase", "production_lines": 100, "test_lines": 120}],
+      "scope_estimates": [{"scope": "usecase", "production_lines": 180, "test_lines": 290}],
       "oversize_justification": null
     },
     {
       "task_id": "T004",
-      "scope_estimates": [{"scope": "usecase", "production_lines": 150, "test_lines": 170}],
+      "scope_estimates": [{"scope": "usecase", "production_lines": 70, "test_lines": 120}],
       "oversize_justification": null
     },
     {

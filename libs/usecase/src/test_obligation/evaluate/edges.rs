@@ -1,8 +1,7 @@
 //! Edge / obligation lookup and spec-anchor resolution helpers for `evaluate`.
 
 use domain::SpecDocument;
-use domain::SpecElementId;
-use domain::tddd::semantic_verify::{SpecElementRef, SpecSectionKind};
+use domain::tddd::semantic_verify::SpecElementRef;
 use domain::tddd::test_obligation::ids::{
     TestObligationAnchorId, TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
 };
@@ -23,24 +22,7 @@ pub(super) fn resolve_spec_element(
     spec: &SpecDocument,
     element_id: &str,
 ) -> Option<SpecElementRef> {
-    let element_id = SpecElementId::try_new(element_id.to_owned()).ok()?;
-    let sections = [
-        (SpecSectionKind::Goal, spec.goal()),
-        (SpecSectionKind::InScope, spec.scope().in_scope()),
-        (SpecSectionKind::OutOfScope, spec.scope().out_of_scope()),
-        (SpecSectionKind::Constraint, spec.constraints()),
-        (SpecSectionKind::AcceptanceCriteria, spec.acceptance_criteria()),
-    ];
-    for (section_kind, requirements) in sections {
-        if let Some(requirement) = requirements.iter().find(|r| r.id() == &element_id) {
-            return Some(SpecElementRef::new(
-                section_kind,
-                element_id,
-                requirement.text().to_owned(),
-            ));
-        }
-    }
-    None
+    super::super::freshness::resolve_spec_element(spec, element_id)
 }
 
 /// Synthesises an obligation id for a voluntary binding's cache entry (AC-12).

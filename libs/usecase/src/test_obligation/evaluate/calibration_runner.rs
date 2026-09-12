@@ -22,6 +22,7 @@ use domain::tddd::test_obligation::verdict::{
 };
 use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationKind};
 
+use super::super::freshness::{responsibility_material, spec_element_material};
 use super::calibration::{
     CategoryTally, LocalResponsibilityExpectation, calibration_probe_count,
     local_responsibility_probe_shapes, probe_shape_for,
@@ -278,31 +279,4 @@ impl EvaluateTestObligationsInteractor {
                 .map_err(map_verifier_error)
         })
     }
-}
-
-/// Canonical material for the structured specification element carried by a
-/// calibration pair. The section, identifier, and text are all part of the
-/// cache identity so a change in any semantic input cannot reuse a verdict.
-fn spec_element_material(spec_element: &SpecElementRef) -> String {
-    format!(
-        "section={:?}\nelement_id={}\ntext_label={}",
-        spec_element.section,
-        spec_element.element_id.as_ref(),
-        spec_element.text_label,
-    )
-}
-
-/// Canonical material for the entry-local obligation responsibility carried by
-/// a calibration pair.
-fn responsibility_material(
-    obligation_id: &TestObligationId,
-    obligation_brief: &TestObligationBrief,
-) -> String {
-    format!(
-        "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
-        obligation_id.entry_key().as_str(),
-        obligation_id.obligation_kind().as_kebab(),
-        obligation_id.item_identifier().as_str(),
-        obligation_brief.as_str(),
-    )
 }

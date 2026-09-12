@@ -1,7 +1,6 @@
 //! Waiver-edge cache freshness resolution for the `test-obligation check` gate.
 
 use domain::tddd::test_obligation::drift::TestObligationDrift;
-use domain::tddd::test_obligation::hashes::{ObligationResponsibilityHash, SpecElementHash};
 use domain::tddd::test_obligation::ids::{
     TestObligationBrief, TestObligationEdgeId, TestObligationId, WaivedReason,
 };
@@ -10,7 +9,8 @@ use domain::tddd::test_obligation::verdict::{WaiverCacheDocument, WaiverVerdict}
 
 use super::super::LoadedCatalogueDocument;
 use super::super::check_support::synthetic_voluntary_obligation_id;
-use super::super::check_support::{GateState, anchor_text};
+use super::super::check_support::{GateState, SpecElement};
+use super::super::freshness::{responsibility_hash, spec_element_hash};
 use super::super::status_lanes::{StatusLaneFindingKind, StatusLaneTarget};
 use super::super::{
     declaration_with_obligation_item, diag, find_declaration_text_from_loaded,
@@ -28,7 +28,7 @@ impl CheckTestObligationsInteractor {
         reason: &WaivedReason,
         target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
-        spec_texts: &[(String, String)],
+        spec_elements: &[SpecElement],
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
@@ -43,7 +43,7 @@ impl CheckTestObligationsInteractor {
             &declaration,
             obligation.brief(),
             target,
-            spec_texts,
+            spec_elements,
             waiver,
             gate,
         );
@@ -56,7 +56,7 @@ impl CheckTestObligationsInteractor {
         reason: &WaivedReason,
         target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
-        spec_texts: &[(String, String)],
+        spec_elements: &[SpecElement],
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
@@ -80,7 +80,7 @@ impl CheckTestObligationsInteractor {
             &declaration,
             &obligation_brief,
             target,
-            spec_texts,
+            spec_elements,
             waiver,
             gate,
         );
@@ -95,7 +95,7 @@ impl CheckTestObligationsInteractor {
         declaration: &str,
         obligation_brief: &TestObligationBrief,
         target: &StatusLaneTarget,
-        spec_texts: &[(String, String)],
+        spec_elements: &[SpecElement],
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
@@ -113,7 +113,7 @@ impl CheckTestObligationsInteractor {
         }
         let current_reason = sha256_content_hash(reason.as_str().as_bytes());
         let current_decl = sha256_content_hash(declaration.as_bytes());
-        let current_spec_element = spec_element_hash(spec_texts, edge);
+        let current_spec_element = spec_element_hash(spec_elements, edge);
         let current_responsibility = responsibility_hash(obligation_id, obligation_brief);
         let key = entry.key();
         if key.waived_reason_hash().as_hash() != &current_reason {
@@ -158,36 +158,4 @@ impl CheckTestObligationsInteractor {
             gate.verdict_absent(edge.clone(), target.clone());
         }
     }
-}
-
-/// Builds the migration-era specification-element hash from the identifier and
-/// text already available to `check`. T004 extends this same boundary to carry
-/// the structured section discriminant once the shared spec-element projection
-/// is updated.
-pub(super) fn spec_element_hash(
-    spec_texts: &[(String, String)],
-    edge: &TestObligationEdgeId,
-) -> SpecElementHash {
-    let text = anchor_text(spec_texts, edge.anchor_id());
-    SpecElementHash::new(sha256_content_hash(
-        format!("element_id={}\ntext_label={}", edge.anchor_id().element_id(), text).as_bytes(),
-    ))
-}
-
-/// Builds the stable hash of the typed obligation identity and its
-/// entry-local responsibility brief.
-pub(super) fn responsibility_hash(
-    obligation_id: &TestObligationId,
-    obligation_brief: &TestObligationBrief,
-) -> ObligationResponsibilityHash {
-    ObligationResponsibilityHash::new(sha256_content_hash(
-        format!(
-            "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
-            obligation_id.entry_key().as_str(),
-            obligation_id.obligation_kind().as_kebab(),
-            obligation_id.item_identifier().as_str(),
-            obligation_brief.as_str(),
-        )
-        .as_bytes(),
-    ))
 }

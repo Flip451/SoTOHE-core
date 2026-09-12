@@ -1,10 +1,10 @@
 {
   "baseline_hash": "66bb53d89d2c5fab6598bc367f21a7a3406d9f9af5bd29cd1f47aac39fae2ec0",
-  "declaration_hash": "f291b829415aa2d1a3dd8bee664a730823cb30aa67f9420512049195c21d8035",
-  "generated_at": "2026-09-11T22:04:14Z",
-  "head_commit": "0532f22fede3bf5c20b535a03d5301f56045d575",
-  "implementation_fingerprint": "877cbe4e023c1945654bcd9407a2f9e13f3a8acb604d91d0b638edd478d60f8f",
-  "resolution_fingerprint": "7244581995b2e34ce6186ea9a8d66ef4b623086270c49939ed37f08e14c7aba5",
+  "declaration_hash": "e64a92286363b78df4756f976540f137d2102a2b686e97922d9a6dffc8812cbd",
+  "generated_at": "2026-09-12T04:03:37Z",
+  "head_commit": "5bf9f2473ccc5202e3862fc0cb41633d604a1dd9",
+  "implementation_fingerprint": "ca566b8150e57bbe327d2b270397f4c57c5116d51c867abab94f4e4088b71961",
+  "resolution_fingerprint": "cc42c73867d0edbdcfcabe4c33282f314af3e99cc9902ae0323e2b34d5f01af1",
   "rustdoc_execution_identity": {
     "crate_name": "usecase",
     "expected_json_path": "target/.sotp-rustdoc/f855b69b5c9e87ebfe506c211426b5d3c50fd843a7f90d2fa08b3355ddb5fcea/doc/usecase.json",
@@ -31,7 +31,7 @@
       "found_type": true,
       "kind_tag": "interactor",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
     },
     {

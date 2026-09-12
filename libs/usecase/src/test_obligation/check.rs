@@ -42,14 +42,13 @@ mod validation;
 #[path = "check_waiver.rs"]
 mod waiver;
 
-use waiver::{responsibility_hash, spec_element_hash};
-
 use super::check_support::{
-    GateState, active_cited_edges_from_catalogues, anchor_texts, compute_uncited_from,
+    GateState, SpecElement, active_cited_edges_from_catalogues, compute_uncited_from,
     edge_is_derived, edge_is_known, fulfillment_tests, synthetic_edge,
     synthetic_voluntary_obligation_id, voluntary_tests, waived_reason,
 };
 use super::derive::derive_obligations_document;
+use super::freshness::{responsibility_hash, spec_element_hash};
 use super::results::TestObligationStatusLaneSummary;
 use super::status_lanes::{
     StatusLaneFindingKind, StatusLaneTarget, TaskStatusAttributor, tally_findings,
@@ -172,7 +171,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
         }
         let uncited = compute_uncited_from(&catalogues, &elements);
         let cited_edges = active_cited_edges_from_catalogues(&catalogues)?;
-        let spec_texts = anchor_texts(&elements);
+        let spec_elements = elements;
 
         let fulfillment = self
             .fulfillment_cache
@@ -192,7 +191,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             &bindings,
             &cited_edges,
             &catalogues,
-            &spec_texts,
+            &spec_elements,
             &fulfillment,
             &waiver,
             &mut gate,
@@ -320,7 +319,7 @@ impl CheckTestObligationsInteractor {
         bindings: &TestBindingsDocument,
         cited_edges: &[TestObligationEdgeId],
         catalogues: &[LoadedCatalogueDocument],
-        spec_texts: &[(String, String)],
+        spec_elements: &[SpecElement],
         fulfillment: &ObligationFulfillmentCacheDocument,
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
@@ -368,7 +367,14 @@ impl CheckTestObligationsInteractor {
             for edge in edges {
                 if let Some(reason) = waived_reason(bindings, &edge) {
                     self.resolve_waiver_edge(
-                        &edge, obligation, &reason, &target, catalogues, spec_texts, waiver, gate,
+                        &edge,
+                        obligation,
+                        &reason,
+                        &target,
+                        catalogues,
+                        spec_elements,
+                        waiver,
+                        gate,
                     );
                 } else if let Some(tests) = fulfilled {
                     self.resolve_fulfillment_edge(
@@ -377,7 +383,7 @@ impl CheckTestObligationsInteractor {
                         tests,
                         &target,
                         catalogues,
-                        spec_texts,
+                        spec_elements,
                         fulfillment,
                         gate,
                     )?;
@@ -388,7 +394,7 @@ impl CheckTestObligationsInteractor {
                         tests,
                         &target,
                         catalogues,
-                        spec_texts,
+                        spec_elements,
                         fulfillment,
                         gate,
                     )?;
@@ -405,7 +411,13 @@ impl CheckTestObligationsInteractor {
                 .map_err(ObligationCheckError::TaskAttribution)?;
             if let Some(reason) = waived_reason(bindings, edge) {
                 self.resolve_direct_waiver_edge(
-                    edge, &reason, &target, catalogues, spec_texts, waiver, gate,
+                    edge,
+                    &reason,
+                    &target,
+                    catalogues,
+                    spec_elements,
+                    waiver,
+                    gate,
                 );
             } else if let Some(tests) = voluntary_tests(bindings, edge) {
                 self.resolve_direct_fulfillment_edge(
@@ -413,7 +425,7 @@ impl CheckTestObligationsInteractor {
                     tests,
                     &target,
                     catalogues,
-                    spec_texts,
+                    spec_elements,
                     fulfillment,
                     gate,
                 )?;
@@ -432,7 +444,7 @@ impl CheckTestObligationsInteractor {
         tests: &[TestLocation],
         target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
-        spec_texts: &[(String, String)],
+        spec_elements: &[SpecElement],
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
@@ -448,7 +460,7 @@ impl CheckTestObligationsInteractor {
             obligation.brief(),
             tests,
             target,
-            spec_texts,
+            spec_elements,
             fulfillment,
             gate,
         )
@@ -461,7 +473,7 @@ impl CheckTestObligationsInteractor {
         tests: &[TestLocation],
         target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
-        spec_texts: &[(String, String)],
+        spec_elements: &[SpecElement],
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
@@ -484,7 +496,7 @@ impl CheckTestObligationsInteractor {
             &obligation_brief,
             tests,
             target,
-            spec_texts,
+            spec_elements,
             fulfillment,
             gate,
         )
@@ -499,7 +511,7 @@ impl CheckTestObligationsInteractor {
         obligation_brief: &TestObligationBrief,
         tests: &[TestLocation],
         target: &StatusLaneTarget,
-        spec_texts: &[(String, String)],
+        spec_elements: &[SpecElement],
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
@@ -515,7 +527,7 @@ impl CheckTestObligationsInteractor {
         let current_key = ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(current_bound),
             DeclarationHash::new(sha256_content_hash(declaration.as_bytes())),
-            spec_element_hash(spec_texts, edge),
+            spec_element_hash(spec_elements, edge),
             responsibility_hash(obligation_id, obligation_brief),
         );
         let entry = fulfillment

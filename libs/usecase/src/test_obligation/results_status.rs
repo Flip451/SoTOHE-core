@@ -6,9 +6,7 @@ use domain::SpecDocumentLoaderPort;
 use domain::TrackId;
 use domain::tddd::test_obligation::binding::{TestBindingsDocument, TestLocation};
 use domain::tddd::test_obligation::errors::ObligationResultsError;
-use domain::tddd::test_obligation::hashes::{
-    ObligationResponsibilityHash, SpecElementHash, VerifierPromptFingerprint,
-};
+use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::ids::{
     TestObligationBrief, TestObligationEdgeId, TestObligationId, WaivedReason,
 };
@@ -23,10 +21,10 @@ use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 use super::check_support::{
-    active_cited_edges_from_catalogues, anchor_text, anchor_texts, edge_is_derived,
-    fulfillment_tests, spec_elements_from_document, synthetic_voluntary_obligation_id,
-    voluntary_tests, waived_reason,
+    SpecElement, active_cited_edges_from_catalogues, edge_is_derived, fulfillment_tests,
+    spec_elements_from_document, synthetic_voluntary_obligation_id, voluntary_tests, waived_reason,
 };
+use super::freshness::{responsibility_hash, spec_element_hash};
 use super::results::TestObligationStatusLaneSummary;
 use super::status_lanes::{
     StatusLaneFinding, StatusLaneFindingKind, StatusLaneTarget, TaskStatusAttributor,
@@ -67,7 +65,7 @@ pub(super) fn collect_status_lane_summaries(
     let spec = spec_reader
         .load(&spec_path)
         .map_err(|error| malformed(&format!("spec read failed: {error:?}")))?;
-    let spec_texts = anchor_texts(&spec_elements_from_document(&spec));
+    let spec_elements = spec_elements_from_document(&spec);
     let cited_edges = active_cited_edges_from_catalogues(&catalogues)
         .map_err(|error| malformed(&format!("catalogue edge read failed: {error:?}")))?;
     let targets = targets_for_scope(obligations, &cited_edges, &catalogues).map_err(|error| {
@@ -88,7 +86,7 @@ pub(super) fn collect_status_lane_summaries(
             obligation,
             bindings,
             &catalogues,
-            &spec_texts,
+            &spec_elements,
             &fulfillment,
             &waiver,
             source_scanner,
@@ -103,7 +101,7 @@ pub(super) fn collect_status_lane_summaries(
                 edge,
                 bindings,
                 &catalogues,
-                &spec_texts,
+                &spec_elements,
                 &fulfillment,
                 &waiver,
                 source_scanner,
@@ -136,7 +134,7 @@ fn collect_obligation_findings(
     obligation: &TestObligation,
     bindings: &TestBindingsDocument,
     catalogues: &[LoadedCatalogueDocument],
-    spec_texts: &[(String, String)],
+    spec_elements: &[SpecElement],
     fulfillment: &ObligationFulfillmentCacheDocument,
     waiver: &WaiverCacheDocument,
     source_scanner: &dyn TestSourceScannerPort,
@@ -179,7 +177,7 @@ fn collect_obligation_findings(
                 ),
                 obligation.brief(),
                 &target,
-                spec_texts,
+                spec_elements,
                 waiver,
                 waiver_fingerprint,
                 findings,
@@ -197,7 +195,7 @@ fn collect_obligation_findings(
                 ),
                 obligation.brief(),
                 &target,
-                spec_texts,
+                spec_elements,
                 fulfillment,
                 source_scanner,
                 fulfillment_fingerprint,
@@ -216,7 +214,7 @@ fn collect_obligation_findings(
                 ),
                 obligation.brief(),
                 &target,
-                spec_texts,
+                spec_elements,
                 fulfillment,
                 source_scanner,
                 fulfillment_fingerprint,
@@ -234,7 +232,7 @@ fn collect_direct_edge_findings(
     edge: &TestObligationEdgeId,
     bindings: &TestBindingsDocument,
     catalogues: &[LoadedCatalogueDocument],
-    spec_texts: &[(String, String)],
+    spec_elements: &[SpecElement],
     fulfillment: &ObligationFulfillmentCacheDocument,
     waiver: &WaiverCacheDocument,
     source_scanner: &dyn TestSourceScannerPort,
@@ -259,7 +257,7 @@ fn collect_direct_edge_findings(
             declaration_with_obligation_item(&declaration, synthetic_id.item_identifier().as_str()),
             &synthetic_brief,
             &target,
-            spec_texts,
+            spec_elements,
             waiver,
             waiver_fingerprint,
             findings,
@@ -272,7 +270,7 @@ fn collect_direct_edge_findings(
             declaration_with_obligation_context(&declaration, &synthetic_id, &synthetic_brief),
             &synthetic_brief,
             &target,
-            spec_texts,
+            spec_elements,
             fulfillment,
             source_scanner,
             fulfillment_fingerprint,
@@ -292,7 +290,7 @@ fn inspect_fulfillment(
     declaration: String,
     obligation_brief: &TestObligationBrief,
     target: &StatusLaneTarget,
-    spec_texts: &[(String, String)],
+    spec_elements: &[SpecElement],
     cache: &ObligationFulfillmentCacheDocument,
     source_scanner: &dyn TestSourceScannerPort,
     verifier_fingerprint: &VerifierPromptFingerprint,
@@ -324,7 +322,7 @@ fn inspect_fulfillment(
     }
     let current_bound = sha256_content_hash(source.as_bytes());
     let current_decl = sha256_content_hash(declaration.as_bytes());
-    let current_spec_element = spec_element_hash(spec_texts, edge);
+    let current_spec_element = spec_element_hash(spec_elements, edge);
     let current_responsibility = responsibility_hash(obligation_id, obligation_brief);
     let key = entry.key();
     if key.bound_tests_set_hash().as_hash() != &current_bound
@@ -347,7 +345,7 @@ fn inspect_waiver(
     declaration: String,
     obligation_brief: &TestObligationBrief,
     target: &StatusLaneTarget,
-    spec_texts: &[(String, String)],
+    spec_elements: &[SpecElement],
     cache: &WaiverCacheDocument,
     verifier_fingerprint: &VerifierPromptFingerprint,
     findings: &mut Vec<StatusLaneFinding>,
@@ -366,7 +364,7 @@ fn inspect_waiver(
     }
     let current_reason = sha256_content_hash(reason.as_str().as_bytes());
     let current_decl = sha256_content_hash(declaration.as_bytes());
-    let current_spec_element = spec_element_hash(spec_texts, edge);
+    let current_spec_element = spec_element_hash(spec_elements, edge);
     let current_responsibility = responsibility_hash(obligation_id, obligation_brief);
     let key = entry.key();
     if key.waived_reason_hash().as_hash() != &current_reason
@@ -378,32 +376,6 @@ fn inspect_waiver(
     } else if !matches!(entry.verdict(), WaiverVerdict::Waived { .. }) {
         findings.push(verdict_absent(target.clone()));
     }
-}
-
-fn spec_element_hash(
-    spec_texts: &[(String, String)],
-    edge: &TestObligationEdgeId,
-) -> SpecElementHash {
-    let text = anchor_text(spec_texts, edge.anchor_id());
-    SpecElementHash::new(sha256_content_hash(
-        format!("element_id={}\ntext_label={}", edge.anchor_id().element_id(), text).as_bytes(),
-    ))
-}
-
-fn responsibility_hash(
-    obligation_id: &TestObligationId,
-    obligation_brief: &TestObligationBrief,
-) -> ObligationResponsibilityHash {
-    ObligationResponsibilityHash::new(sha256_content_hash(
-        format!(
-            "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
-            obligation_id.entry_key().as_str(),
-            obligation_id.obligation_kind().as_kebab(),
-            obligation_id.item_identifier().as_str(),
-            obligation_brief.as_str(),
-        )
-        .as_bytes(),
-    ))
 }
 
 fn load_catalogues(

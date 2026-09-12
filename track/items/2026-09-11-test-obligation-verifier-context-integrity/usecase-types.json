@@ -163,11 +163,11 @@
             },
             {
               "name": "fulfillment_driver",
-              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort + Send + Sync>"
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
             },
             {
               "name": "waiver_driver",
-              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort + Send + Sync>"
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
             },
             {
               "name": "fulfillment_cache",

@@ -86,7 +86,7 @@
     },
     {
       "brief": "Author a result test covering 'entry' of usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
-      "declaration_hash": "4b80df7966fb03fb244d19d797b699ff548ea737ddb86bc086cd705b16cc152e",
+      "declaration_hash": "5d2f69509bd7323d3f0923f9636363038035022f9fbe5c0305d19b9b7140a3b9",
       "id": {
         "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
         "item_identifier": "entry",

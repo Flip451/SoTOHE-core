@@ -591,6 +591,10 @@ mod tests {
             SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
             ObligationResponsibilityHash::new(ContentHash::from_bytes([8u8; 32])),
         );
+        assert_eq!(base.bound_tests_set_hash().as_hash(), &ContentHash::from_bytes([1u8; 32]));
+        assert_eq!(base.declaration_hash().as_hash(), &ContentHash::from_bytes([2u8; 32]));
+        assert_eq!(base.spec_element_hash().as_hash(), &ContentHash::from_bytes([3u8; 32]));
+        assert_eq!(base.responsibility_hash().as_hash(), &ContentHash::from_bytes([4u8; 32]));
         assert_ne!(base, different_tests);
         assert_ne!(base, different_declaration);
         assert_ne!(base, different_anchor);

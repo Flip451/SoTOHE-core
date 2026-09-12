@@ -1,8 +1,6 @@
 //! Verifier-pair input construction and cache-key material for `evaluate::plan`.
 
-use domain::tddd::semantic_verify::SpecElementRef;
 use domain::tddd::test_obligation::errors::ObligationEvaluateError;
-use domain::tddd::test_obligation::ids::{TestObligationBrief, TestObligationId};
 use domain::tddd::test_obligation::pair::{
     EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
 };
@@ -44,27 +42,4 @@ pub(super) fn build_waiver_pair_input(
     ))
 }
 
-/// Canonical migration-era material for a structured specification element.
-/// The pair retains section membership for the verifier; the shared check and
-/// results lanes currently freeze the identifier and text components here.
-pub(super) fn spec_element_material(spec_element: &SpecElementRef) -> String {
-    format!(
-        "element_id={}\ntext_label={}",
-        spec_element.element_id.as_ref(),
-        spec_element.text_label,
-    )
-}
-
-/// Canonical material for the entry-local obligation responsibility.
-pub(super) fn responsibility_material(
-    obligation_id: &TestObligationId,
-    obligation_brief: &TestObligationBrief,
-) -> String {
-    format!(
-        "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
-        obligation_id.entry_key().as_str(),
-        obligation_id.obligation_kind().as_kebab(),
-        obligation_id.item_identifier().as_str(),
-        obligation_brief.as_str(),
-    )
-}
+pub(super) use super::super::super::freshness::{responsibility_material, spec_element_material};

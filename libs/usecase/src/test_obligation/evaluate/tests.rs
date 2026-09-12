@@ -18,7 +18,8 @@ use domain::tddd::catalogue_v2::{
     TypeKindV2, TypeRef,
 };
 use domain::tddd::semantic_verify::{
-    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier,
+    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecElementRef,
+    SpecSectionKind,
 };
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
@@ -143,6 +144,7 @@ struct ScriptedFulfillment {
     local_responsibility_probe_results: Mutex<Vec<(String, bool)>>,
     tiers: Mutex<Vec<ModelTier>>,
     declarations: Mutex<Vec<String>>,
+    pairs: Mutex<Vec<ObligationFulfillmentPair>>,
 }
 impl
     SemanticEscalationDriverPort<
@@ -159,6 +161,7 @@ impl
         initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
         Box::pin(async move {
+            self.pairs.lock().unwrap().push(pair.clone());
             let source = pair.tests_source().as_str();
             if source.contains("local_responsibility_probe_memory_positive")
                 || source.contains("local_responsibility_probe_persistence_positive")
@@ -227,11 +230,47 @@ impl
     }
 }
 
+/// Scripted driver used only to prove that the evaluator preserves outcomes
+/// supplied by its semantic boundary. It deliberately does not classify the
+/// pair; the configured outcome is keyed by the obligation identity.
+struct ScriptedResponsibilityDriver {
+    outcomes: Vec<(TestObligationId, ObligationFulfillmentVerdict)>,
+    calls: AtomicUsize,
+    pairs: Mutex<Vec<ObligationFulfillmentPair>>,
+}
+
+impl
+    SemanticEscalationDriverPort<
+        ObligationFulfillmentPair,
+        ObligationFulfillmentCacheKey,
+        ObligationFulfillmentVerdict,
+        SemanticVerifierError,
+    > for ScriptedResponsibilityDriver
+{
+    fn evaluate_with_escalation<'a>(
+        &'a self,
+        pair: &'a ObligationFulfillmentPair,
+        _key: &'a ObligationFulfillmentCacheKey,
+        _initial_tier: ModelTier,
+    ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        self.pairs.lock().unwrap().push(pair.clone());
+        let verdict = self
+            .outcomes
+            .iter()
+            .find(|(obligation_id, _)| obligation_id == pair.obligation_id())
+            .map(|(_, verdict)| verdict.clone())
+            .expect("the scripted driver has an outcome for every obligation");
+        Box::pin(async move { Ok(verdict) })
+    }
+}
+
 struct ScriptedWaiver {
     verdict: WaiverVerdict,
     calls: Mutex<usize>,
     tiers: Mutex<Vec<ModelTier>>,
     declarations: Mutex<Vec<String>>,
+    pairs: Mutex<Vec<WaiverPair>>,
 }
 impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, SemanticVerifierError>
     for ScriptedWaiver
@@ -243,6 +282,7 @@ impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, Sem
         initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, WaiverVerdict, SemanticVerifierError> {
         Box::pin(async move {
+            self.pairs.lock().unwrap().push(pair.clone());
             *self.calls.lock().unwrap() += 1;
             self.tiers.lock().unwrap().push(initial_tier);
             self.declarations.lock().unwrap().push(pair.entry_declaration().as_str().to_owned());
@@ -623,6 +663,23 @@ fn waiver_bindings() -> TestBindingsDocument {
     )
 }
 
+fn context_forwarding_bindings() -> TestBindingsDocument {
+    let secondary_edge = TestObligationEdgeId::new(
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+        TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-06".to_owned()).unwrap(),
+    );
+    TestBindingsDocument::new(
+        track(),
+        vec![
+            TestBindingRecord::Fulfillment {
+                obligation_id: obligation().id().clone(),
+                tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+            },
+            TestBindingRecord::Waiver { edge_id: secondary_edge, reason: waiver_reason() },
+        ],
+    )
+}
+
 /// Three waiver records sharing the same edge — the calibration probe
 /// count only depends on the record count, so this yields
 /// `production_pair_count = 3` (one AC-08 category per probe when paired
@@ -687,6 +744,114 @@ fn spec_doc() -> SpecDocument {
         "1.0",
         vec![],
         SpecScope::new(in_scope, vec![]),
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        None,
+    )
+    .unwrap()
+}
+
+const SECTION_MATRIX_ELEMENT_ID: &str = "IN-05";
+const SECTION_MATRIX_TEXT: &str = "the same authoritative specification text";
+
+/// Builds one valid spec per table row. `SpecDocument` rejects duplicate ids
+/// across sections, so the matrix uses separate documents while keeping the
+/// id and text byte-for-byte identical in each authoritative section.
+fn spec_doc_with_element_in_section(section: SpecSectionKind) -> SpecDocument {
+    let requirement = || {
+        SpecRequirement::new(
+            SpecElementId::try_new(SECTION_MATRIX_ELEMENT_ID.to_owned()).unwrap(),
+            SECTION_MATRIX_TEXT,
+            vec![],
+            vec![],
+            vec![],
+        )
+        .unwrap()
+    };
+    match section {
+        SpecSectionKind::Goal => SpecDocument::new(
+            "Test spec",
+            "1.0",
+            vec![requirement()],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+        ),
+        SpecSectionKind::InScope => SpecDocument::new(
+            "Test spec",
+            "1.0",
+            vec![],
+            SpecScope::new(vec![requirement()], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+        ),
+        SpecSectionKind::OutOfScope => SpecDocument::new(
+            "Test spec",
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![requirement()]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+        ),
+        SpecSectionKind::Constraint => SpecDocument::new(
+            "Test spec",
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![requirement()],
+            vec![],
+            vec![],
+            vec![],
+            None,
+        ),
+        SpecSectionKind::AcceptanceCriteria => SpecDocument::new(
+            "Test spec",
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![requirement()],
+            vec![],
+            vec![],
+            None,
+        ),
+    }
+    .unwrap()
+}
+
+fn section_moved_spec_doc() -> SpecDocument {
+    let in_scope = SpecRequirement::new(
+        SpecElementId::try_new("IN-06").unwrap(),
+        "Money conversions must be lossless.",
+        vec![],
+        vec![],
+        vec![],
+    )
+    .unwrap();
+    let moved = SpecRequirement::new(
+        SpecElementId::try_new("IN-05").unwrap(),
+        anchor_text(),
+        vec![],
+        vec![],
+        vec![],
+    )
+    .unwrap();
+    SpecDocument::new(
+        "Test spec",
+        "1.0",
+        vec![],
+        SpecScope::new(vec![in_scope], vec![moved]),
         vec![],
         vec![],
         vec![],
@@ -968,6 +1133,151 @@ fn type_entry(kind: TypeKindV2, role: DataRole) -> TypeEntry {
     )
 }
 
+fn responsibility_method(name: &str) -> MethodDeclaration {
+    MethodDeclaration::new(
+        MethodName::new(name).unwrap(),
+        Some(SelfReceiver::SharedRef),
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        false,
+        vec![],
+        vec![],
+        vec![],
+        ItemAction::Add,
+        None,
+    )
+}
+
+fn responsibility_catalogue() -> CatalogueDocument {
+    catalogue_with_type_entries(
+        "domain",
+        "domain",
+        vec![
+            (
+                "SingleInputInteractor",
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::Interactor,
+                    TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                    vec![responsibility_method("handle_selected_input")],
+                    vec![],
+                    vec![],
+                    Some(ModulePath::root()),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            ),
+            (
+                "SelectingInteractor",
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::Interactor,
+                    TypeKindV2::Enum { variants: vec![] },
+                    vec![responsibility_method("select_input")],
+                    vec![],
+                    vec![],
+                    Some(ModulePath::root()),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            ),
+        ],
+    )
+}
+
+fn responsibility_anchor(element_id: &str) -> TestObligationAnchorId {
+    TestObligationAnchorId::try_new("spec.json".to_owned(), element_id.to_owned()).unwrap()
+}
+
+fn responsibility_obligation(
+    entry_key: &str,
+    item_identifier: &str,
+    brief: &str,
+    element_id: &str,
+    declaration_byte: u8,
+) -> TestObligation {
+    let entry_key = CatalogueEntryKey::try_new(entry_key.to_owned()).unwrap();
+    TestObligation::new(
+        TestObligationId::new(
+            entry_key.clone(),
+            TestObligationKind::Boundary,
+            TestObligationItemIdentifier::try_new(item_identifier.to_owned()).unwrap(),
+        ),
+        CatalogueEntryRef::new(
+            "domain-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            entry_key,
+        ),
+        TargetEntryRoleKind::DataRole(DataRole::Interactor),
+        TestObligationBrief::try_new(brief.to_owned()).unwrap(),
+        DeclarationHash::new(ContentHash::from_bytes([declaration_byte; 32])),
+        vec![responsibility_anchor(element_id)],
+    )
+}
+
+fn responsibility_spec_doc() -> SpecDocument {
+    let selected = SpecRequirement::new(
+        SpecElementId::try_new("IN-05".to_owned()).unwrap(),
+        "handles one caller-selected input without selecting or loading configuration",
+        vec![],
+        vec![],
+        vec![],
+    )
+    .unwrap();
+    let selecting = SpecRequirement::new(
+        SpecElementId::try_new("IN-06".to_owned()).unwrap(),
+        "selects the input before evaluating it",
+        vec![],
+        vec![],
+        vec![],
+    )
+    .unwrap();
+    SpecDocument::new(
+        "Responsibility boundary spec",
+        "1.0",
+        vec![],
+        SpecScope::new(vec![selected, selecting], vec![]),
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        None,
+    )
+    .unwrap()
+}
+
+fn responsibility_location(test_name: &str) -> TestLocation {
+    TestLocation::new(
+        LayerId::try_new("usecase".to_owned()).unwrap(),
+        TestModulePath::try_new("usecase::test_obligation::responsibility_tests".to_owned())
+            .unwrap(),
+        TestFunctionName::try_new(test_name.to_owned()).unwrap(),
+    )
+}
+
+struct ResponsibilityScanner;
+
+impl TestSourceScannerPort for ResponsibilityScanner {
+    fn scan_test_body(
+        &self,
+        location: &TestLocation,
+    ) -> Result<Option<String>, TestSourceScanError> {
+        let source = match location.test_name().as_str() {
+            "test_handles_selected_input" => "assert_eq!(selected_input.id(), expected_id);",
+            "test_selects_input" => "assert_eq!(selector.select(input), expected_input);",
+            other => panic!("unexpected responsibility test location: {other}"),
+        };
+        Ok(Some(source.to_owned()))
+    }
+
+    fn hash_test_body(&self, source: &str) -> TestBodySpanHash {
+        TestBodySpanHash::new(crate::test_obligation::sha256_content_hash(source.as_bytes()))
+    }
+}
+
 fn catalogue_with_type_entries(
     crate_name: &str,
     layer: &str,
@@ -1143,12 +1453,14 @@ fn harness_with_read_models_and_config_impl(
         local_responsibility_probe_results: Mutex::new(Vec::new()),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
+        pairs: Mutex::new(Vec::new()),
     });
     let waiver_driver = Arc::new(ScriptedWaiver {
         verdict: waiver,
         calls: Mutex::new(0),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
+        pairs: Mutex::new(Vec::new()),
     });
     let fulfillment_cache = Arc::new(CapFulfillmentCache {
         loaded: Mutex::new(existing_fulfillment),
@@ -1269,8 +1581,13 @@ fn sum_hash(bytes: &[u8]) -> ContentHash {
 }
 
 fn spec_element_hash_for(edge: &TestObligationEdgeId, text: &str) -> SpecElementHash {
+    let element = SpecElementRef::new(
+        SpecSectionKind::InScope,
+        SpecElementId::try_new(edge.anchor_id().element_id().to_owned()).unwrap(),
+        text.to_owned(),
+    );
     SpecElementHash::new(sum_hash(
-        format!("element_id={}\ntext_label={}", edge.anchor_id().element_id(), text).as_bytes(),
+        crate::test_obligation::freshness::spec_element_material(&element).as_bytes(),
     ))
 }
 
@@ -1279,14 +1596,8 @@ fn responsibility_hash_for(
     obligation_brief: &TestObligationBrief,
 ) -> ObligationResponsibilityHash {
     ObligationResponsibilityHash::new(sum_hash(
-        format!(
-            "entry_key={}\nobligation_kind={}\nitem_identifier={}\nobligation_brief={}",
-            obligation_id.entry_key().as_str(),
-            obligation_id.obligation_kind().as_kebab(),
-            obligation_id.item_identifier().as_str(),
-            obligation_brief.as_str(),
-        )
-        .as_bytes(),
+        crate::test_obligation::freshness::responsibility_material(obligation_id, obligation_brief)
+            .as_bytes(),
     ))
 }
 
@@ -1347,7 +1658,7 @@ fn cached_waiver_doc_with_fingerprint(
             edge(),
             Some(obligation().id().clone()),
             key,
-            verdict,
+            verdict.clone(),
             verifier_fingerprint,
         )],
     )
@@ -1535,12 +1846,14 @@ fn test_new_accepts_and_wires_declared_dependencies() {
         local_responsibility_probe_results: Mutex::new(Vec::new()),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
+        pairs: Mutex::new(Vec::new()),
     });
     let waiver_driver = Arc::new(ScriptedWaiver {
         verdict: WaiverVerdict::Pending,
         calls: Mutex::new(0),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
+        pairs: Mutex::new(Vec::new()),
     });
     let fulfillment_cache = Arc::new(CapFulfillmentCache::default());
     let waiver_cache = Arc::new(CapWaiverCache::default());
@@ -1600,12 +1913,14 @@ fn test_voluntary_binding_with_derived_owners_returns_consistency_error() {
         local_responsibility_probe_results: Mutex::new(Vec::new()),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
+        pairs: Mutex::new(Vec::new()),
     });
     let waiver_driver = Arc::new(ScriptedWaiver {
         verdict: WaiverVerdict::Pending,
         calls: Mutex::new(0),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
+        pairs: Mutex::new(Vec::new()),
     });
     let fulfillment_cache = Arc::new(CapFulfillmentCache::default());
     // Both obligations own the Money × IN-05 edge (same entry key, same anchor).
@@ -2010,6 +2325,17 @@ fn test_local_responsibility_calibration_has_executable_positive_and_negative_pa
         );
         assert!(!probe.tests_source.contains("mock"));
         assert!(!probe.tests_source.contains("stub"));
+
+        if probe.entry_key == "InMemoryNameIndex" {
+            assert_eq!(probe.item_identifier, "method:lookup");
+            assert!(probe.tests_source.contains("struct InMemoryNameIndex"));
+            assert!(probe.tests_source.contains("fn lookup"));
+            assert!(probe.tests_source.contains(".lookup("));
+        } else if probe.entry_key == "PersistencePathTarget" {
+            assert_eq!(probe.item_identifier, "field:storage_location");
+            assert!(probe.tests_source.contains("struct PersistencePathTarget"));
+            assert!(probe.tests_source.contains("storage_location"));
+        }
     }
 }
 
@@ -2118,6 +2444,382 @@ fn test_matching_fulfillment_cache_reuses_frozen_verdict() {
     assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());
     let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
     assert!(matches!(saved.entries()[0].verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));
+}
+
+#[test]
+fn test_section_only_spec_move_reverifies_cached_pass_and_fail() {
+    for verdict in [fulfilled(), fulfillment_fail()] {
+        let old_key = cached_fulfillment_doc(verdict.clone()).entries()[0].key().clone();
+        let h = harness_with_read_models_and_config(
+            Some(obligations_doc()),
+            Some(fulfillment_bindings()),
+            verdict.clone(),
+            verdict.clone(),
+            WaiverVerdict::Pending,
+            Arc::new(StubScanner),
+            Some(cached_fulfillment_doc(verdict.clone())),
+            None,
+            section_moved_spec_doc(),
+            money_catalogue(),
+            config_with_rate(0),
+        );
+
+        let result = run(h.interactor.execute(&command()));
+
+        if matches!(&verdict, ObligationFulfillmentVerdict::Fulfilled { .. }) {
+            assert_eq!(result.unwrap().pass_count(), 1);
+        } else {
+            assert!(matches!(
+                result,
+                Err(ObligationEvaluateError::SemanticFailuresConfirmed { .. })
+            ));
+        }
+
+        assert!(
+            !h.fulfillment_driver.tiers.lock().unwrap().is_empty(),
+            "moving an element between sections must not reuse the old cache key"
+        );
+        let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+        assert_ne!(saved.entries()[0].key(), &old_key);
+        assert_eq!(saved.entries()[0].verdict(), &verdict);
+    }
+}
+
+#[test]
+fn test_evaluate_forwards_structured_spec_and_owned_responsibility_to_both_verifiers() {
+    let current = harness_with_read_models_and_config(
+        Some(obligations_doc()),
+        Some(context_forwarding_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("waiver context forwarded".to_owned()).unwrap(),
+        },
+        Arc::new(StubScanner),
+        None,
+        None,
+        spec_doc(),
+        money_catalogue(),
+        config_with_rate(0),
+    );
+    let current_outcome = run(current.interactor.execute(&command())).unwrap();
+    assert_eq!(current_outcome.pass_count(), 2);
+
+    let fulfillment = current
+        .fulfillment_driver
+        .pairs
+        .lock()
+        .unwrap()
+        .iter()
+        .find(|pair| pair.obligation_id() == obligation().id())
+        .cloned()
+        .expect("the target obligation must reach the fulfillment verifier");
+    assert_eq!(fulfillment.tests_source().as_str(), "assert!(money.is_positive());\n");
+    assert!(fulfillment.entry_declaration().as_str().contains("Money"));
+    assert_eq!(fulfillment.spec_element().element_id.as_ref(), "IN-05");
+    assert_eq!(&fulfillment.spec_element().section, &SpecSectionKind::InScope);
+    assert_eq!(fulfillment.spec_element().text_label.as_str(), anchor_text());
+    assert_eq!(fulfillment.obligation_id(), obligation().id());
+    assert_eq!(fulfillment.obligation_brief().as_str(), "cover positivity");
+
+    let waiver = current
+        .waiver_driver
+        .pairs
+        .lock()
+        .unwrap()
+        .iter()
+        .find(|pair| pair.spec_element().element_id.as_ref() == "IN-06")
+        .cloned()
+        .expect("the second edge must reach the waiver verifier");
+    assert!(!waiver.entry_declaration().as_str().is_empty());
+    assert!(waiver.entry_declaration().as_str().contains("Obligation item"));
+    assert_eq!(waiver.spec_element().element_id.as_ref(), "IN-06");
+    assert_eq!(&waiver.spec_element().section, &SpecSectionKind::InScope);
+    assert_eq!(waiver.spec_element().text_label.as_str(), "Money conversions must be lossless.");
+    assert_eq!(waiver.waived_reason().as_str(), waiver_reason().as_str());
+    assert_eq!(waiver.obligation_id().entry_key().as_str(), "Money");
+    assert_eq!(waiver.obligation_id().item_identifier().as_str(), "voluntary:IN-06");
+
+    let moved = harness_with_read_models_and_config(
+        Some(obligations_doc()),
+        Some(context_forwarding_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("moved context forwarded".to_owned()).unwrap(),
+        },
+        Arc::new(StubScanner),
+        None,
+        None,
+        section_moved_spec_doc(),
+        money_catalogue(),
+        config_with_rate(0),
+    );
+    assert_eq!(run(moved.interactor.execute(&command())).unwrap().pass_count(), 2);
+
+    let moved_fulfillment = moved
+        .fulfillment_driver
+        .pairs
+        .lock()
+        .unwrap()
+        .iter()
+        .find(|pair| pair.obligation_id() == obligation().id())
+        .cloned()
+        .expect("the moved target obligation must still reach fulfillment");
+    assert_eq!(moved_fulfillment.spec_element().element_id.as_ref(), "IN-05");
+    assert_eq!(&moved_fulfillment.spec_element().section, &SpecSectionKind::OutOfScope);
+    assert_eq!(moved_fulfillment.spec_element().text_label.as_str(), anchor_text());
+
+    let moved_waiver = moved
+        .waiver_driver
+        .pairs
+        .lock()
+        .unwrap()
+        .iter()
+        .find(|pair| pair.spec_element().element_id.as_ref() == "IN-06")
+        .cloned()
+        .expect("the moved secondary edge must still reach waiver");
+    assert_eq!(&moved_waiver.spec_element().section, &SpecSectionKind::InScope);
+    assert_eq!(moved_waiver.waived_reason().as_str(), waiver_reason().as_str());
+}
+
+#[test]
+fn test_evaluate_forwards_same_spec_identity_and_text_for_every_authoritative_section() {
+    let sections = [
+        SpecSectionKind::Goal,
+        SpecSectionKind::InScope,
+        SpecSectionKind::OutOfScope,
+        SpecSectionKind::Constraint,
+        SpecSectionKind::AcceptanceCriteria,
+    ];
+
+    for section in sections {
+        let fulfillment = harness_with_read_models_and_config(
+            Some(obligations_doc()),
+            Some(fulfillment_bindings()),
+            fulfilled(),
+            fulfilled(),
+            WaiverVerdict::Pending,
+            Arc::new(StubScanner),
+            None,
+            None,
+            spec_doc_with_element_in_section(section.clone()),
+            money_catalogue(),
+            config_with_rate(0),
+        );
+        assert_eq!(run(fulfillment.interactor.execute(&command())).unwrap().pass_count(), 1);
+
+        let fulfillment_pair = fulfillment
+            .fulfillment_driver
+            .pairs
+            .lock()
+            .unwrap()
+            .first()
+            .cloned()
+            .expect("the fulfillment pair must reach the injected driver");
+        assert_eq!(fulfillment_pair.spec_element().element_id.as_ref(), SECTION_MATRIX_ELEMENT_ID);
+        assert_eq!(&fulfillment_pair.spec_element().section, &section);
+        assert_eq!(fulfillment_pair.spec_element().text_label, SECTION_MATRIX_TEXT);
+        assert_eq!(fulfillment_pair.obligation_id(), obligation().id());
+        assert_eq!(fulfillment_pair.obligation_brief().as_str(), "cover positivity");
+        assert!(fulfillment_pair.entry_declaration().as_str().contains("Money"));
+        assert!(fulfillment_pair.entry_declaration().as_str().contains("Obligation identity"));
+        assert_eq!(fulfillment_pair.tests_source().as_str(), "assert!(money.is_positive());\n");
+
+        let waiver = harness_with_read_models_and_config(
+            Some(obligations_doc()),
+            Some(waiver_bindings()),
+            fulfilled(),
+            fulfilled(),
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("section context forwarded".to_owned())
+                    .unwrap(),
+            },
+            Arc::new(StubScanner),
+            None,
+            None,
+            spec_doc_with_element_in_section(section.clone()),
+            money_catalogue(),
+            config_with_rate(0),
+        );
+        assert_eq!(run(waiver.interactor.execute(&command())).unwrap().pass_count(), 1);
+
+        let waiver_pair = waiver
+            .waiver_driver
+            .pairs
+            .lock()
+            .unwrap()
+            .first()
+            .cloned()
+            .expect("the waiver pair must reach the injected driver");
+        assert_eq!(waiver_pair.spec_element().element_id.as_ref(), SECTION_MATRIX_ELEMENT_ID);
+        assert_eq!(&waiver_pair.spec_element().section, &section);
+        assert_eq!(waiver_pair.spec_element().text_label, SECTION_MATRIX_TEXT);
+        assert_eq!(waiver_pair.obligation_id(), obligation().id());
+        assert_eq!(waiver_pair.obligation_brief().as_str(), "cover positivity");
+        assert!(!waiver_pair.entry_declaration().as_str().is_empty());
+        assert!(waiver_pair.entry_declaration().as_str().contains("Obligation item"));
+        assert_eq!(waiver_pair.waived_reason().as_str(), waiver_reason().as_str());
+    }
+}
+
+#[test]
+fn test_evaluate_preserves_injected_selected_input_and_selection_owner_outcomes() {
+    let selected = responsibility_obligation(
+        "SingleInputInteractor",
+        "handles_selected_input",
+        "handle one already-selected input",
+        "IN-05",
+        21,
+    );
+    let selecting = responsibility_obligation(
+        "SelectingInteractor",
+        "selects_input",
+        "select the input before evaluation",
+        "IN-06",
+        22,
+    );
+    let selection_failure = fulfillment_fail_for_category(FulfillmentFailCategory::Contradiction);
+    let driver = Arc::new(ScriptedResponsibilityDriver {
+        outcomes: vec![
+            (selected.id().clone(), fulfilled()),
+            (selecting.id().clone(), selection_failure.clone()),
+        ],
+        calls: AtomicUsize::new(0),
+        pairs: Mutex::new(Vec::new()),
+    });
+    let fulfillment_cache = Arc::new(CapFulfillmentCache::default());
+    let waiver_driver = Arc::new(ScriptedWaiver {
+        verdict: WaiverVerdict::Pending,
+        calls: Mutex::new(0),
+        tiers: Mutex::new(Vec::new()),
+        declarations: Mutex::new(Vec::new()),
+        pairs: Mutex::new(Vec::new()),
+    });
+    let interactor = EvaluateTestObligationsInteractor::new(
+        Arc::new(StubObligations(Some(ObligationsDocument::new(
+            track(),
+            vec![selected.clone(), selecting.clone()],
+        )))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(
+            track(),
+            vec![
+                TestBindingRecord::Fulfillment {
+                    obligation_id: selected.id().clone(),
+                    tests: NonEmptyTestLocations::try_new(vec![responsibility_location(
+                        "test_handles_selected_input",
+                    )])
+                    .unwrap(),
+                },
+                TestBindingRecord::Fulfillment {
+                    obligation_id: selecting.id().clone(),
+                    tests: NonEmptyTestLocations::try_new(vec![responsibility_location(
+                        "test_selects_input",
+                    )])
+                    .unwrap(),
+                },
+            ],
+        )))),
+        Arc::new(ResponsibilityScanner),
+        Arc::clone(&driver)
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        ObligationFulfillmentPair,
+                        ObligationFulfillmentCacheKey,
+                        ObligationFulfillmentVerdict,
+                        SemanticVerifierError,
+                    > + Send
+                    + Sync,
+            >,
+        Arc::clone(&waiver_driver)
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        WaiverPair,
+                        WaiverCacheKey,
+                        WaiverVerdict,
+                        SemanticVerifierError,
+                    > + Send
+                    + Sync,
+            >,
+        Arc::clone(&fulfillment_cache) as Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
+        Arc::new(CapWaiverCache::default()),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        config_with_rate(0),
+        Arc::new(StubSpec(responsibility_spec_doc())),
+        Arc::new(StubCatalogue(responsibility_catalogue())),
+        Arc::new(SumHasher),
+    );
+
+    let result = run(interactor.execute(&command()));
+    let expected_record = EdgeVerdictRecord::new(
+        None,
+        TestObligationEdgeId::new(
+            selecting.id().entry_key().clone(),
+            responsibility_anchor("IN-06"),
+        ),
+        None,
+        None,
+        EdgeResolutionOutcome::Fulfillment(selection_failure.clone()),
+        None,
+    );
+    match result {
+        Err(ObligationEvaluateError::SemanticFailuresConfirmed { records }) => {
+            assert_eq!(records.as_slice(), &[expected_record]);
+        }
+        other => panic!("the injected negative outcome must be preserved: {other:?}"),
+    }
+
+    let saved = fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    let selected_saved = saved
+        .entries()
+        .iter()
+        .find(|entry| entry.edge_id().anchor_id().element_id() == "IN-05")
+        .expect("the selected-input verdict must be cached");
+    assert_eq!(selected_saved.verdict(), &fulfilled());
+    let selecting_saved = saved
+        .entries()
+        .iter()
+        .find(|entry| entry.edge_id().anchor_id().element_id() == "IN-06")
+        .expect("the selection-owner verdict must be cached");
+    assert_eq!(selecting_saved.verdict(), &selection_failure);
+
+    assert_eq!(driver.calls.load(Ordering::SeqCst), 2);
+    let pairs = driver.pairs.lock().unwrap();
+    assert_eq!(pairs.len(), 2);
+    let selected_pair = pairs
+        .iter()
+        .find(|pair| pair.obligation_id() == selected.id())
+        .expect("selected-input obligation must reach the driver");
+    assert_eq!(selected_pair.spec_element().element_id.as_ref(), "IN-05");
+    assert_eq!(
+        selected_pair.spec_element().text_label,
+        "handles one caller-selected input without selecting or loading configuration"
+    );
+    assert_eq!(selected_pair.obligation_brief().as_str(), "handle one already-selected input");
+    assert!(selected_pair.entry_declaration().as_str().contains("handle_selected_input"));
+    assert_eq!(
+        selected_pair.tests_source().as_str(),
+        "assert_eq!(selected_input.id(), expected_id);\n"
+    );
+
+    let selecting_pair = pairs
+        .iter()
+        .find(|pair| pair.obligation_id() == selecting.id())
+        .expect("selection-owning obligation must reach the driver");
+    assert_eq!(selecting_pair.spec_element().element_id.as_ref(), "IN-06");
+    assert_eq!(selecting_pair.spec_element().text_label, "selects the input before evaluating it");
+    assert_eq!(selecting_pair.obligation_brief().as_str(), "select the input before evaluation");
+    assert!(selecting_pair.entry_declaration().as_str().contains("select_input"));
+    assert_eq!(
+        selecting_pair.tests_source().as_str(),
+        "assert_eq!(selector.select(input), expected_input);\n"
+    );
+    assert_ne!(
+        selected_pair.entry_declaration().as_str(),
+        selecting_pair.entry_declaration().as_str()
+    );
+    assert_ne!(selected_pair.tests_source().as_str(), selecting_pair.tests_source().as_str());
 }
 
 #[test]

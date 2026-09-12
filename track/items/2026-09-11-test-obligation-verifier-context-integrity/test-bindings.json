@@ -806,6 +806,268 @@
         }
       },
       "reason": "At FailingWaiverVerifier × CN-02, this fail-closed fallback always returns the configured VerifierPort error; it does not classify contradiction, substitution, missing evidence, or pending semantic material. Those classifications belong to WaiverVerifierAdapter and the configured semantic verifier."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "At CheckTestObligationsInteractor × AC-01, the declared read-only interactor has no semantic verifier or driver and never constructs the fulfillment and waiver pair inputs. It can verify freshness hashes for cached results, but preservation of every specification section's identifier, authoritative membership, and verbatim text in both verifier inputs belongs to the evaluator and adapter lanes. The existing check freshness tests remain evidence for the gate behavior it actually owns."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "reason": "At CheckTestObligationsInteractor × AC-02, the declared interactor has only cache, artifact, catalogue, spec, and status readers; it has no semantic verifier or driver and performs no selection-responsibility judgment. Distinguishing an already-selected-input declaration from a selection-owning declaration and preserving the corresponding positive/negative semantic outcome belongs to the evaluator/verifier lane, not this pure cached-gate query."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_forwards_structured_spec_and_owned_responsibility_to_both_verifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_forwards_same_spec_identity_and_text_for_every_authoritative_section"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_preserves_injected_selected_input_and_selection_owner_outcomes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_section_only_spec_move_reverifies_cached_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_matching_fulfillment_cache_reuses_frozen_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_changed_fulfillment_obligation_brief_invalidates_cache"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_parent_only_fulfillment_declaration_hash_reverifies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_reverifies_and_overwrites_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_fingerprint_reverifies_and_overwrites_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_binding_uses_waiver_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_matching_waiver_cache_reuses_frozen_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_parent_only_waiver_declaration_hash_reverifies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_mismatched_waiver_fingerprint_reverifies_and_overwrites_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_waiver_fingerprint_reverifies_and_overwrites_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_plan_fulfillment_trait_method_anchors_limits_each_obligation_to_owned_and_shared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_adjudicates_every_obligation_owning_the_edge"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_trait_impl_obligation_verifies_against_impl_declaration"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fresh_fulfilled_verdict_resolves_edge"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_section_only_spec_move_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_canonical_spec_element_material_keeps_section_id_and_verbatim_text"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_id_and_text_only_spec_changes_stale_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_declaration_change_stales_verdict_as_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_waiver_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_waiver_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_aggregates_historical_fulfillment_key_drifts_independent_of_row_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reads_bindings_without_mutating_the_artifact"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_test_obligation_results_interactor_reports_stale_and_post_reevaluation_freshness"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_interactor_aggregates_status_lanes_without_gate_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absent"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_new_aggregates_todo_in_progress_and_done_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"
+        }
+      ]
     }
   ]
 }

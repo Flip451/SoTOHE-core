@@ -193,7 +193,7 @@
       }
     },
     {
-      "claim_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "claim_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
@@ -212,12 +212,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。",
+        "citation": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "claim_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
@@ -236,12 +236,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。",
+        "citation": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "claim_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
@@ -260,12 +260,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。",
+        "citation": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "claim_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
@@ -289,7 +289,7 @@
       }
     },
     {
-      "claim_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "claim_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
@@ -313,7 +313,7 @@
       }
     },
     {
-      "claim_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "claim_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
@@ -337,7 +337,7 @@
       }
     },
     {
-      "claim_hash": "19f6eabe172946a513ed6ebcf7ee4f3426d828de7f386a33bbcb29cda144504e",
+      "claim_hash": "a2f1cdc5ef402e49e94bd113b5178197bfcb0f3b864e69e89517c47e03c83944",
       "claim_origin": {
         "data": {
           "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",

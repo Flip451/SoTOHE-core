@@ -16,7 +16,9 @@ use domain::tddd::catalogue_v2::{
     AttestedCatalogueDocument, CatalogueDocument, CrateName, ModulePath, StructKind, StructShape,
     TypeEntry, TypeKindV2,
 };
-use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
+use domain::tddd::semantic_verify::{
+    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SpecElementRef, SpecSectionKind,
+};
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
@@ -59,6 +61,9 @@ use super::{
 };
 use crate::pre_review_gate::{
     ImplPlanReadError, ImplPlanReaderPort, TaskContractReadError, TaskContractReaderPort,
+};
+use crate::test_obligation::{
+    declaration_with_obligation_context, obligation_declaration_text, sha256_content_hash,
 };
 use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 
@@ -508,6 +513,15 @@ fn status_interactor(
     fulfillment: Option<ObligationFulfillmentCacheDocument>,
     status: TaskStatusKind,
 ) -> TestObligationResultsInteractor {
+    status_interactor_with_spec(bindings, fulfillment, status, status_spec())
+}
+
+fn status_interactor_with_spec(
+    bindings: TestBindingsDocument,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    status: TaskStatusKind,
+    spec: SpecDocument,
+) -> TestObligationResultsInteractor {
     let task_id = TaskId::try_new("T001".to_owned()).unwrap();
     let mut entries = BTreeMap::new();
     entries.insert(
@@ -527,7 +541,7 @@ fn status_interactor(
         Arc::new(StubWaiverCache(None)),
         VerifierPromptFingerprint::new(hash(9)),
         VerifierPromptFingerprint::new(hash(10)),
-        Arc::new(StatusSpecReader(status_spec())),
+        Arc::new(StatusSpecReader(spec)),
         Arc::new(StatusCatalogueReader(status_catalogue())),
         Arc::new(StatusTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
         Arc::new(StatusImplPlanReader(statuses)),
@@ -536,6 +550,61 @@ fn status_interactor(
 
 fn status_command() -> TestObligationResultsCommand {
     TestObligationResultsCommand::new(track(), vec![PathBuf::from("domain-types.json")])
+}
+
+fn status_spec_moved_to_out_of_scope() -> SpecDocument {
+    SpecDocument::new(
+        "Status lane results".to_owned(),
+        "1.0".to_owned(),
+        Vec::new(),
+        SpecScope::new(
+            Vec::new(),
+            vec![
+                SpecRequirement::new(
+                    SpecElementId::try_new("IN-05").unwrap(),
+                    "aggregate unresolved results by status".to_owned(),
+                    Vec::new(),
+                    Vec::new(),
+                    Vec::new(),
+                )
+                .unwrap(),
+            ],
+        ),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        None,
+    )
+    .unwrap()
+}
+
+fn status_key_for_section(section: SpecSectionKind) -> ObligationFulfillmentCacheKey {
+    let obligation = status_obligation();
+    let declaration = declaration_with_obligation_context(
+        &obligation_declaration_text(&[status_catalogue()], &obligation).unwrap(),
+        obligation.id(),
+        obligation.brief(),
+    );
+    let element = SpecElementRef::new(
+        section,
+        SpecElementId::try_new("IN-05").unwrap(),
+        "aggregate unresolved results by status".to_owned(),
+    );
+    ObligationFulfillmentCacheKey::new(
+        BoundTestsSetHash::new(sha256_content_hash(b"assert status lane\n")),
+        DeclarationHash::new(sha256_content_hash(declaration.as_bytes())),
+        crate::test_obligation::freshness::spec_element_hash(&[element], &edge("Money", "IN-05")),
+        crate::test_obligation::freshness::responsibility_hash(obligation.id(), obligation.brief()),
+    )
+}
+
+fn status_fresh_key() -> ObligationFulfillmentCacheKey {
+    status_key_for_section(SpecSectionKind::InScope)
+}
+
+fn status_moved_key() -> ObligationFulfillmentCacheKey {
+    status_key_for_section(SpecSectionKind::OutOfScope)
 }
 
 // ---------------------------------------------------------------------------
@@ -932,6 +1001,102 @@ fn test_results_interactor_aggregates_status_lanes_without_gate_failure() {
         .find(|summary| summary.task_status() == TaskStatusKind::Done)
         .unwrap();
     assert_eq!(done.stale_count(), 1);
+}
+
+#[test]
+fn test_test_obligation_results_interactor_reports_stale_and_post_reevaluation_freshness() {
+    let obligation = status_obligation();
+    let binding =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+    for verdict in [
+        ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+        ObligationFulfillmentVerdict::Fail {
+            category: FulfillmentFailCategory::Contradiction,
+            reason: reason("cached failure"),
+        },
+    ] {
+        let cache = ObligationFulfillmentCacheDocument::new(
+            track(),
+            vec![cache_entry(
+                edge("Money", "IN-05"),
+                obligation.id().clone(),
+                status_fresh_key(),
+                verdict.clone(),
+                Some(VerifierPromptFingerprint::new(hash(9))),
+            )],
+        );
+        let fresh_interactor: TestObligationResultsInteractor = status_interactor_with_spec(
+            binding.clone(),
+            Some(cache.clone()),
+            TaskStatusKind::Done,
+            status_spec(),
+        );
+        let fresh = fresh_interactor.execute(&status_command()).unwrap();
+        let fresh_summary = fresh
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(fresh_summary.stale_count(), 0);
+
+        let moved_interactor: TestObligationResultsInteractor = status_interactor_with_spec(
+            binding.clone(),
+            Some(cache),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        );
+        let moved = moved_interactor.execute(&status_command()).unwrap();
+        let moved_summary = moved
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(moved_summary.stale_count(), 1);
+
+        let post_reevaluation_cache = ObligationFulfillmentCacheDocument::new(
+            track(),
+            vec![cache_entry(
+                edge("Money", "IN-05"),
+                obligation.id().clone(),
+                status_moved_key(),
+                verdict.clone(),
+                Some(VerifierPromptFingerprint::new(hash(9))),
+            )],
+        );
+        let post_reevaluation_interactor: TestObligationResultsInteractor =
+            status_interactor_with_spec(
+                binding.clone(),
+                Some(post_reevaluation_cache),
+                TaskStatusKind::Done,
+                status_spec_moved_to_out_of_scope(),
+            );
+        let post_reevaluation = post_reevaluation_interactor.execute(&status_command()).unwrap();
+        let post_summary = post_reevaluation
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(post_summary.stale_count(), 0);
+        let fulfillment_lane = post_reevaluation
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+            .unwrap();
+        match &verdict {
+            ObligationFulfillmentVerdict::Fulfilled { .. } => {
+                assert_eq!(fulfillment_lane.pass_count(), 1);
+            }
+            ObligationFulfillmentVerdict::Fail { .. } => {
+                assert_eq!(fulfillment_lane.fail_count(), 1);
+            }
+            ObligationFulfillmentVerdict::Pending => {
+                assert_eq!(fulfillment_lane.pending_count(), 1);
+            }
+        }
+    }
 }
 
 #[test]
