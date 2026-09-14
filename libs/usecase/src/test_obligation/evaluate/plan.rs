@@ -35,7 +35,7 @@ use domain::tddd::test_obligation::verdict::{
     FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument,
     ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheEntryState,
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
+    WaiverCacheEntry, WaiverCacheKey, WaiverCacheLookupError, WaiverVerdict,
 };
 
 use super::cache::{cached_fulfillment_verdict, cached_waiver_verdict};
@@ -411,20 +411,26 @@ impl EvaluateTestObligationsInteractor {
             spec_element_hash,
             responsibility_hash,
         );
-        if let Some(verdict) = cached_waiver_verdict(
+        match cached_waiver_verdict(
             existing_waiver_cache,
             edge_id,
             &obligation_id,
             &key,
             &self.waiver_verifier_fingerprint,
         ) {
-            plan.push(PlannedAction::Immediate(ImmediateOutcome::WaiverCached {
-                edge_id: edge_id.clone(),
-                obligation_id,
-                key,
-                verdict,
-            }));
-            return;
+            Ok(Some(verdict)) => {
+                plan.push(PlannedAction::Immediate(ImmediateOutcome::WaiverCached {
+                    edge_id: edge_id.clone(),
+                    obligation_id,
+                    key,
+                    verdict,
+                }));
+                return;
+            }
+            // `check` reports a complete-key ambiguity as corrupt cache state.
+            // `evaluate` is the recovery path: re-verify the pair and replace
+            // the cache document instead of using an arbitrary stored verdict.
+            Ok(None) | Err(WaiverCacheLookupError::AmbiguousCurrentEntries { .. }) => {}
         }
         plan.push(PlannedAction::Waiver(WaiverLlmTask {
             edge_id: edge_id.clone(),

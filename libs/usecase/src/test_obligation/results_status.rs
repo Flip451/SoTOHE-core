@@ -6,14 +6,17 @@ use domain::SpecDocumentLoaderPort;
 use domain::TrackId;
 use domain::tddd::test_obligation::binding::{TestBindingsDocument, TestLocation};
 use domain::tddd::test_obligation::errors::ObligationResultsError;
-use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
+use domain::tddd::test_obligation::hashes::{
+    BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint, WaivedReasonHash,
+};
 use domain::tddd::test_obligation::ids::{
     TestObligationBrief, TestObligationEdgeId, TestObligationId, WaivedReason,
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::TestSourceScannerPort;
 use domain::tddd::test_obligation::verdict::{
-    ObligationFulfillmentCacheDocument, ObligationFulfillmentVerdict, WaiverCacheDocument,
+    FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheKey,
+    ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverCacheKey, WaiverCacheLookupError,
     WaiverVerdict,
 };
 
@@ -36,10 +39,110 @@ use super::{
     sha256_content_hash, synthetic_voluntary_obligation_brief,
 };
 
+/// Cache rows that cannot be treated as current by the informational results
+/// projection. Indices are aligned with the loaded cache documents.
+pub(super) struct StatusLaneProjection {
+    status_lane_summaries: Vec<TestObligationStatusLaneSummary>,
+    invalidated_fulfillment: Vec<usize>,
+    invalidated_waiver: Vec<usize>,
+}
+
+impl StatusLaneProjection {
+    fn without_context(
+        fulfillment: Option<&ObligationFulfillmentCacheDocument>,
+        waiver: Option<&WaiverCacheDocument>,
+    ) -> Self {
+        Self {
+            status_lane_summaries: Vec::new(),
+            invalidated_fulfillment: fulfillment
+                .map_or_else(Vec::new, |document| (0..document.entries().len()).collect()),
+            invalidated_waiver: waiver
+                .map_or_else(Vec::new, |document| (0..document.entries().len()).collect()),
+        }
+    }
+
+    fn for_caches(
+        fulfillment: &ObligationFulfillmentCacheDocument,
+        waiver: &WaiverCacheDocument,
+    ) -> Self {
+        Self {
+            status_lane_summaries: Vec::new(),
+            invalidated_fulfillment: (0..fulfillment.entries().len()).collect(),
+            invalidated_waiver: (0..waiver.entries().len()).collect(),
+        }
+    }
+
+    fn set_status_lane_summaries(&mut self, summaries: Vec<TestObligationStatusLaneSummary>) {
+        self.status_lane_summaries = summaries;
+    }
+
+    /// Returns the status summaries for the task-status lanes.
+    #[must_use]
+    pub(super) fn status_lane_summaries(&self) -> &[TestObligationStatusLaneSummary] {
+        &self.status_lane_summaries
+    }
+
+    /// Returns fulfillment rows whose stored verdict is not current.
+    #[must_use]
+    pub(super) fn invalidated_fulfillment(&self) -> &[usize] {
+        &self.invalidated_fulfillment
+    }
+
+    /// Returns waiver rows whose stored verdict is not current.
+    #[must_use]
+    pub(super) fn invalidated_waiver(&self) -> &[usize] {
+        &self.invalidated_waiver
+    }
+
+    fn invalidate_fulfillment_rows(
+        &mut self,
+        cache: &ObligationFulfillmentCacheDocument,
+        edge: &TestObligationEdgeId,
+        obligation_id: &TestObligationId,
+        current: Option<(&ObligationFulfillmentCacheKey, &VerifierPromptFingerprint)>,
+    ) {
+        for (index, entry) in cache.entries().iter().enumerate() {
+            if entry.edge_id() != edge || entry.obligation_id() != obligation_id {
+                continue;
+            }
+            let is_current = current.is_some_and(|(key, fingerprint)| {
+                entry.key() == key && entry.verifier_fingerprint() == Some(fingerprint)
+            });
+            if is_current {
+                self.invalidated_fulfillment.retain(|candidate| *candidate != index);
+            } else if !self.invalidated_fulfillment.contains(&index) {
+                self.invalidated_fulfillment.push(index);
+            }
+        }
+    }
+
+    fn invalidate_waiver_rows(
+        &mut self,
+        cache: &WaiverCacheDocument,
+        edge: &TestObligationEdgeId,
+        obligation_id: &TestObligationId,
+        current: Option<(&WaiverCacheKey, &VerifierPromptFingerprint)>,
+    ) {
+        for (index, entry) in cache.entries().iter().enumerate() {
+            if entry.edge_id() != edge || entry.obligation_id() != Some(obligation_id) {
+                continue;
+            }
+            let is_current = current.is_some_and(|(key, fingerprint)| {
+                entry.key() == key && entry.verifier_fingerprint() == Some(fingerprint)
+            });
+            if is_current {
+                self.invalidated_waiver.retain(|candidate| *candidate != index);
+            } else if !self.invalidated_waiver.contains(&index) {
+                self.invalidated_waiver.push(index);
+            }
+        }
+    }
+}
+
 /// Computes the informational missing / stale / verdict-absent totals without
 /// changing any artifact or gate verdict.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn collect_status_lane_summaries(
+pub(super) fn collect_status_lane_projection(
     track_id: &TrackId,
     catalogue_paths: &[PathBuf],
     obligations: Option<&ObligationsDocument>,
@@ -53,12 +156,12 @@ pub(super) fn collect_status_lane_summaries(
     catalogue_reader: &dyn AttestedCatalogueDocumentLoaderPort,
     task_contract_reader: &dyn TaskContractReaderPort,
     impl_plan_reader: &dyn ImplPlanReaderPort,
-) -> Result<Vec<TestObligationStatusLaneSummary>, ObligationResultsError> {
+) -> Result<StatusLaneProjection, ObligationResultsError> {
     let (Some(obligations), Some(bindings)) = (obligations, bindings) else {
-        return Ok(Vec::new());
+        return Ok(StatusLaneProjection::without_context(fulfillment, waiver));
     };
     if catalogue_paths.is_empty() {
-        return Ok(Vec::new());
+        return Ok(StatusLaneProjection::without_context(fulfillment, waiver));
     }
     let catalogues = load_catalogues(catalogue_paths, catalogue_reader)?;
     let spec_path = PathBuf::from(format!("track/items/{}/spec.json", track_id.as_ref()));
@@ -80,6 +183,7 @@ pub(super) fn collect_status_lane_summaries(
     let waiver =
         waiver.cloned().unwrap_or_else(|| WaiverCacheDocument::new(track_id.clone(), Vec::new()));
     let mut findings = Vec::new();
+    let mut projection = StatusLaneProjection::for_caches(&fulfillment, &waiver);
 
     for obligation in obligations.obligations() {
         collect_obligation_findings(
@@ -92,6 +196,7 @@ pub(super) fn collect_status_lane_summaries(
             source_scanner,
             fulfillment_fingerprint,
             waiver_fingerprint,
+            &mut projection,
             &mut findings,
         )?;
     }
@@ -107,12 +212,13 @@ pub(super) fn collect_status_lane_summaries(
                 source_scanner,
                 fulfillment_fingerprint,
                 waiver_fingerprint,
+                &mut projection,
                 &mut findings,
             )?;
         }
     }
 
-    tally_findings(&attributor, &findings)
+    let summaries = tally_findings(&attributor, &findings)
         .map_err(|error| malformed(&format!("task attribution failed: {}", error.as_str())))
         .map(|tallies| {
             tallies
@@ -126,7 +232,9 @@ pub(super) fn collect_status_lane_summaries(
                     )
                 })
                 .collect()
-        })
+        })?;
+    projection.set_status_lane_summaries(summaries);
+    Ok(projection)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -140,6 +248,7 @@ fn collect_obligation_findings(
     source_scanner: &dyn TestSourceScannerPort,
     fulfillment_fingerprint: &VerifierPromptFingerprint,
     waiver_fingerprint: &VerifierPromptFingerprint,
+    projection: &mut StatusLaneProjection,
     findings: &mut Vec<StatusLaneFinding>,
 ) -> Result<(), ObligationResultsError> {
     let target = target_for_obligation(catalogues, obligation).map_err(|error| {
@@ -180,6 +289,7 @@ fn collect_obligation_findings(
                 spec_elements,
                 waiver,
                 waiver_fingerprint,
+                projection,
                 findings,
             );
         } else if let Some(tests) = fulfilled {
@@ -199,6 +309,7 @@ fn collect_obligation_findings(
                 fulfillment,
                 source_scanner,
                 fulfillment_fingerprint,
+                projection,
                 findings,
             )?;
         } else if let Some(tests) = voluntary_tests(bindings, &edge) {
@@ -218,6 +329,7 @@ fn collect_obligation_findings(
                 fulfillment,
                 source_scanner,
                 fulfillment_fingerprint,
+                projection,
                 findings,
             )?;
         } else {
@@ -238,6 +350,7 @@ fn collect_direct_edge_findings(
     source_scanner: &dyn TestSourceScannerPort,
     fulfillment_fingerprint: &VerifierPromptFingerprint,
     waiver_fingerprint: &VerifierPromptFingerprint,
+    projection: &mut StatusLaneProjection,
     findings: &mut Vec<StatusLaneFinding>,
 ) -> Result<(), ObligationResultsError> {
     let target = target_for_direct_edge(catalogues, edge).map_err(|error| {
@@ -260,6 +373,7 @@ fn collect_direct_edge_findings(
             spec_elements,
             waiver,
             waiver_fingerprint,
+            projection,
             findings,
         );
     } else if let Some(tests) = voluntary_tests(bindings, edge) {
@@ -274,6 +388,7 @@ fn collect_direct_edge_findings(
             fulfillment,
             source_scanner,
             fulfillment_fingerprint,
+            projection,
             findings,
         )?;
     } else {
@@ -294,6 +409,7 @@ fn inspect_fulfillment(
     cache: &ObligationFulfillmentCacheDocument,
     source_scanner: &dyn TestSourceScannerPort,
     verifier_fingerprint: &VerifierPromptFingerprint,
+    projection: &mut StatusLaneProjection,
     findings: &mut Vec<StatusLaneFinding>,
 ) -> Result<(), ObligationResultsError> {
     let mut source = String::new();
@@ -302,36 +418,52 @@ fn inspect_fulfillment(
             .scan_test_body(test)
             .map_err(|error| malformed(&format!("test source read failed: {error:?}")))?
         else {
+            projection.invalidate_fulfillment_rows(cache, edge, obligation_id, None);
             findings.push(missing(target.clone()));
             return Ok(());
         };
         source.push_str(&body);
         source.push('\n');
     }
-    let Some(entry) = cache
-        .entries()
-        .iter()
-        .find(|entry| entry.edge_id() == edge && entry.obligation_id() == obligation_id)
-    else {
-        findings.push(verdict_absent(target.clone()));
-        return Ok(());
-    };
-    if entry.verifier_fingerprint() != Some(verifier_fingerprint) {
-        findings.push(verdict_absent(target.clone()));
-        return Ok(());
-    }
     let current_bound = sha256_content_hash(source.as_bytes());
     let current_decl = sha256_content_hash(declaration.as_bytes());
     let current_spec_element = spec_element_hash(spec_elements, edge);
     let current_responsibility = responsibility_hash(obligation_id, obligation_brief);
-    let key = entry.key();
-    if key.bound_tests_set_hash().as_hash() != &current_bound
-        || key.declaration_hash().as_hash() != &current_decl
-        || key.spec_element_hash() != &current_spec_element
-        || key.responsibility_hash() != &current_responsibility
+    let current_key = ObligationFulfillmentCacheKey::new(
+        BoundTestsSetHash::new(current_bound),
+        DeclarationHash::new(current_decl),
+        current_spec_element,
+        current_responsibility,
+    );
+    let entry = match cache.lookup_current(edge, obligation_id, &current_key, verifier_fingerprint)
     {
-        findings.push(stale(target.clone()));
-    } else if !matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }) {
+        Ok(entry) => entry,
+        Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { .. }) => {
+            projection.invalidate_fulfillment_rows(cache, edge, obligation_id, None);
+            findings.push(verdict_absent(target.clone()));
+            return Ok(());
+        }
+    };
+    let Some(entry) = entry else {
+        projection.invalidate_fulfillment_rows(cache, edge, obligation_id, None);
+        if cache.entries().iter().any(|candidate| {
+            candidate.edge_id() == edge
+                && candidate.obligation_id() == obligation_id
+                && candidate.verifier_fingerprint() == Some(verifier_fingerprint)
+        }) {
+            findings.push(stale(target.clone()));
+        } else {
+            findings.push(verdict_absent(target.clone()));
+        }
+        return Ok(());
+    };
+    projection.invalidate_fulfillment_rows(
+        cache,
+        edge,
+        obligation_id,
+        Some((&current_key, verifier_fingerprint)),
+    );
+    if !matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }) {
         findings.push(verdict_absent(target.clone()));
     }
     Ok(())
@@ -348,32 +480,48 @@ fn inspect_waiver(
     spec_elements: &[SpecElement],
     cache: &WaiverCacheDocument,
     verifier_fingerprint: &VerifierPromptFingerprint,
+    projection: &mut StatusLaneProjection,
     findings: &mut Vec<StatusLaneFinding>,
 ) {
-    let Some(entry) = cache
-        .entries()
-        .iter()
-        .find(|entry| entry.edge_id() == edge && entry.obligation_id() == Some(obligation_id))
-    else {
-        findings.push(verdict_absent(target.clone()));
-        return;
-    };
-    if entry.verifier_fingerprint() != Some(verifier_fingerprint) {
-        findings.push(verdict_absent(target.clone()));
-        return;
-    }
     let current_reason = sha256_content_hash(reason.as_str().as_bytes());
     let current_decl = sha256_content_hash(declaration.as_bytes());
     let current_spec_element = spec_element_hash(spec_elements, edge);
     let current_responsibility = responsibility_hash(obligation_id, obligation_brief);
-    let key = entry.key();
-    if key.waived_reason_hash().as_hash() != &current_reason
-        || key.declaration_hash().as_hash() != &current_decl
-        || key.spec_element_hash() != &current_spec_element
-        || key.responsibility_hash() != &current_responsibility
+    let current_key = WaiverCacheKey::new(
+        WaivedReasonHash::new(current_reason),
+        DeclarationHash::new(current_decl),
+        current_spec_element,
+        current_responsibility,
+    );
+    let entry = match cache.lookup_current(edge, obligation_id, &current_key, verifier_fingerprint)
     {
-        findings.push(stale(target.clone()));
-    } else if !matches!(entry.verdict(), WaiverVerdict::Waived { .. }) {
+        Ok(entry) => entry,
+        Err(WaiverCacheLookupError::AmbiguousCurrentEntries { .. }) => {
+            projection.invalidate_waiver_rows(cache, edge, obligation_id, None);
+            findings.push(verdict_absent(target.clone()));
+            return;
+        }
+    };
+    let Some(entry) = entry else {
+        projection.invalidate_waiver_rows(cache, edge, obligation_id, None);
+        if cache.entries().iter().any(|candidate| {
+            candidate.edge_id() == edge
+                && candidate.obligation_id() == Some(obligation_id)
+                && candidate.verifier_fingerprint() == Some(verifier_fingerprint)
+        }) {
+            findings.push(stale(target.clone()));
+        } else {
+            findings.push(verdict_absent(target.clone()));
+        }
+        return;
+    };
+    projection.invalidate_waiver_rows(
+        cache,
+        edge,
+        obligation_id,
+        Some((&current_key, verifier_fingerprint)),
+    );
+    if !matches!(entry.verdict(), WaiverVerdict::Waived { .. }) {
         findings.push(verdict_absent(target.clone()));
     }
 }

@@ -175,6 +175,60 @@
     {
       "for_type": "ObligationResponsibilityHash",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationCheckError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationEvaluateError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "WaiverCacheLookupError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "WaiverCacheLookupError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "WaiverCacheLookupError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "WaiverCacheLookupError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "WaiverCacheLookupError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "WaiverCacheLookupError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
@@ -286,6 +340,7 @@
       },
       "methods": [
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -308,6 +363,7 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "as_hash",
@@ -463,6 +519,346 @@
       "spec_refs": [
         {
           "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::errors::ObligationCheckError": {
+      "action": "modify",
+      "docs": "Add the WaiverCacheLookup variant to ObligationCheckError. IN-04, CN-01, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RulesLoad",
+            "payload": {
+              "fields": [
+                "TestObligationRulesLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ObligationsAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BindingsAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "StaleObligationsArtifact",
+            "payload": {
+              "fields": [
+                {
+                  "name": "detail",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DriftsDetected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "drifts",
+                  "ty": "NonEmptyDrifts"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnresolvedEdges",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edges",
+                  "ty": "NonEmptyEdgeIds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "StaleVerdicts",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edges",
+                  "ty": "NonEmptyEdgeIds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "CatalogueDocumentLoaderError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecLoad",
+            "payload": {
+              "fields": [
+                "SpecDocumentLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCatalogueState",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactCodec",
+            "payload": {
+              "fields": [
+                "ArtifactCodecError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SourceScan",
+            "payload": {
+              "fields": [
+                "TestSourceScanError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CacheIo",
+            "payload": {
+              "fields": [
+                "VerifyCacheError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TaskAttribution",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FulfillmentCacheLookup",
+            "payload": {
+              "fields": [
+                "FulfillmentCacheLookupError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "WaiverCacheLookup",
+            "payload": {
+              "fields": [
+                "WaiverCacheLookupError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BindingConsistency",
+            "payload": {
+              "fields": [
+                "TestBindingConsistencyError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FulfillmentCacheRequiresEvaluation",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::errors::ObligationEvaluateError": {
+      "action": "modify",
+      "docs": "Add the WaiverCacheLookup variant to ObligationEvaluateError. IN-04, CN-01, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TrackNotActive",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "CatalogueDocumentLoaderError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecLoad",
+            "payload": {
+              "fields": [
+                "SpecDocumentLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactLoad",
+            "payload": {
+              "fields": [
+                "ArtifactCodecError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BindingConsistency",
+            "payload": {
+              "fields": [
+                "TestBindingConsistencyError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TestSourceScan",
+            "payload": {
+              "fields": [
+                "TestSourceScanError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "VerifierPort",
+            "payload": {
+              "fields": [
+                "SemanticVerifierError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CachePersistence",
+            "payload": {
+              "fields": [
+                "VerifyCacheError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FulfillmentCacheLookup",
+            "payload": {
+              "fields": [
+                "FulfillmentCacheLookupError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "WaiverCacheLookup",
+            "payload": {
+              "fields": [
+                "WaiverCacheLookupError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SemanticFailuresConfirmed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "records",
+                  "ty": "NonEmptyEdgeVerdictRecords"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "HumanEscalationRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "records",
+                  "ty": "NonEmptyEdgeVerdictRecords"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
           "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
         }
       ]
@@ -895,6 +1291,128 @@
         }
       ]
     },
+    "domain::tddd::test_obligation::verdict::WaiverCacheDocument": {
+      "action": "modify",
+      "docs": "Add lookup_current to WaiverCacheDocument. IN-04, CN-01, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "Vec<WaiverCacheEntry>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[WaiverCacheEntry]"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "lookup_current",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            },
+            {
+              "name": "obligation_id",
+              "ty": "&TestObligationId"
+            },
+            {
+              "name": "key",
+              "ty": "&WaiverCacheKey"
+            },
+            {
+              "name": "verifier_fingerprint",
+              "ty": "&VerifierPromptFingerprint"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<&WaiverCacheEntry>, WaiverCacheLookupError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
     "domain::tddd::test_obligation::verdict::WaiverCacheKey": {
       "action": "modify",
       "docs": "Value-equivalent domain cache-key value object for a waiver-verifier request.",
@@ -1003,6 +1521,55 @@
       "module_path": "tddd::test_obligation::verdict",
       "role": {
         "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::test_obligation::verdict::WaiverCacheLookupError": {
+      "action": "add",
+      "docs": "Add WaiverCacheLookupError for WaiverCacheDocument::lookup_current. IN-04, CN-01, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AmbiguousCurrentEntries",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edge_id",
+                  "ty": "TestObligationEdgeId"
+                },
+                {
+                  "name": "obligation_id",
+                  "ty": "TestObligationId"
+                },
+                {
+                  "name": "key",
+                  "ty": "WaiverCacheKey"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ErrorType": {}
       },
       "spec_refs": [
         {

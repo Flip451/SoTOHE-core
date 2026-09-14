@@ -82,6 +82,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "2d0471f3d809031639d6bea8ccccaaef71a928bf",
       "depends_on": [
         "T002"
       ],
@@ -95,7 +96,7 @@
       ],
       "description": "After T003's canonical-hash unit, own the remaining non-hash stale-verdict status projection and result aggregation operations in `libs/usecase/src/test_obligation/{check.rs,check_support.rs,check_tests.rs,results.rs,results_status.rs,results_tests.rs}` and add focused unit tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "5bf9f2473ccc5202e3862fc0cb41633d604a1dd9",
@@ -116,6 +117,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "2d0471f3d809031639d6bea8ccccaaef71a928bf",
       "depends_on": [
         "T003",
         "T005",

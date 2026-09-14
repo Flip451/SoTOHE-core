@@ -4,7 +4,8 @@ use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId};
 use domain::tddd::test_obligation::verdict::{
     FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheKey,
-    ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverCacheKey, WaiverVerdict,
+    ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverCacheKey, WaiverCacheLookupError,
+    WaiverVerdict,
 };
 
 /// Returns a frozen fulfillment verdict only when the edge, obligation, and
@@ -38,18 +39,14 @@ pub(super) fn cached_waiver_verdict(
     obligation_id: &TestObligationId,
     key: &WaiverCacheKey,
     verifier_fingerprint: &VerifierPromptFingerprint,
-) -> Option<WaiverVerdict> {
-    cache?
-        .entries()
-        .iter()
-        .find(|entry| {
-            entry.edge_id() == edge_id
-                && entry.obligation_id() == Some(obligation_id)
-                && entry.key() == key
-                && entry.verifier_fingerprint() == Some(verifier_fingerprint)
-                && !matches!(entry.verdict(), WaiverVerdict::Pending)
-        })
-        .map(|entry| entry.verdict().clone())
+) -> Result<Option<WaiverVerdict>, WaiverCacheLookupError> {
+    let Some(cache) = cache else {
+        return Ok(None);
+    };
+    Ok(cache
+        .lookup_current(edge_id, obligation_id, key, verifier_fingerprint)?
+        .filter(|entry| !matches!(entry.verdict(), WaiverVerdict::Pending))
+        .map(|entry| entry.verdict().clone()))
 }
 
 #[cfg(test)]
@@ -211,7 +208,10 @@ mod tests {
             &waiver_key(),
             &fingerprint(),
         );
-        assert!(found.is_none(), "cached Pending waiver must re-verify: {found:?}");
+        assert!(
+            found.as_ref().unwrap().is_none(),
+            "cached Pending waiver must re-verify: {found:?}"
+        );
     }
 
     #[test]
@@ -224,17 +224,50 @@ mod tests {
             vec![WaiverCacheEntry::new(edge(), None, waiver_key(), verdict, Some(fingerprint()))],
         );
 
-        assert!(
+        assert_eq!(
             cached_waiver_verdict(
                 Some(&cache),
                 &edge(),
                 &obligation(),
                 &waiver_key(),
                 &fingerprint(),
-            )
-            .is_none(),
+            ),
+            Ok(None),
             "legacy cache entries without an owner must re-verify"
         );
         Ok(())
+    }
+
+    #[test]
+    fn test_cached_waiver_duplicate_current_rows_return_ambiguity_error() {
+        let fingerprint = fingerprint();
+        let key = waiver_key();
+        let first = WaiverCacheEntry::new(
+            edge(),
+            Some(obligation()),
+            key.clone(),
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("first citation".to_owned()).unwrap(),
+            },
+            Some(fingerprint.clone()),
+        );
+        let second = WaiverCacheEntry::new(
+            edge(),
+            Some(obligation()),
+            key.clone(),
+            WaiverVerdict::Fail {
+                reason: domain::tddd::test_obligation::ids::DiagnosticMessage::try_new(
+                    "second verdict".to_owned(),
+                )
+                .unwrap(),
+            },
+            Some(fingerprint.clone()),
+        );
+        let cache = WaiverCacheDocument::new(track(), vec![first, second]);
+
+        assert!(matches!(
+            cached_waiver_verdict(Some(&cache), &edge(), &obligation(), &key, &fingerprint),
+            Err(WaiverCacheLookupError::AmbiguousCurrentEntries { .. })
+        ));
     }
 }

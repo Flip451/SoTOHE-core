@@ -387,6 +387,206 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::errors::tests",
+          "test_name": "test_obligation_errors_preserve_waiver_cache_lookup_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_waiver_rows_returns_lookup_error"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "At ObligationCheckError × CN-01, the declared domain enum owns only typed propagation of WaiverCacheLookupError for an ambiguous current-row lookup, exercised by test_obligation_errors_preserve_waiver_cache_lookup_identity. CN-01's remaining legacy, missing-fingerprint, and mismatched-fingerprint rejection for either verdict, task-state pending fallback, and freshness recovery by reevaluation belong to the check/evaluate/results consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "reason": "At ObligationCheckError × AC-03, the declared domain enum owns only carrying the typed WaiverCacheLookupError that identifies an ambiguous current cache row, exercised by test_obligation_errors_preserve_waiver_cache_lookup_identity. AC-03's remaining invalidation of old pass and fail verdicts after specification-section, responsibility, request-structure, or verifier-input changes, plus agreement after reevaluation, belongs to the check/evaluate/results consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "reason": "At ObligationEvaluateError × IN-04, the declared domain enum owns only typed propagation of WaiverCacheLookupError for an ambiguous current-row lookup, exercised by test_obligation_errors_preserve_waiver_cache_lookup_identity. IN-04's remaining freshness decision over the complete normalized request—specification membership/text, target responsibility, request structure, and verifier-input semantics—and its reevaluation belong to the evaluator and its cache consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "At ObligationEvaluateError × CN-01, the declared domain enum owns only carrying a typed WaiverCacheLookupError when current-row identity is ambiguous, exercised by test_obligation_errors_preserve_waiver_cache_lookup_identity. CN-01's remaining fail-closed treatment of legacy, missing, or mismatched fingerprints for both pass and fail, task-state pending fallback, and recovery only through fresh reevaluation belongs to the evaluator/cache consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "reason": "At ObligationEvaluateError × AC-03, the declared domain enum owns only preserving the typed WaiverCacheLookupError for duplicate current-row identity, exercised by test_obligation_errors_preserve_waiver_cache_lookup_identity. AC-03's remaining invalidation of old pass and fail verdicts for specification, responsibility, request-structure, or verifier-input revisions and convergence after reevaluation belongs to the evaluator/cache consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_fingerprint_or_key_mismatch_returns_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_waiver_rows_returns_lookup_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_duplicate_current_waiver_entries_reverify_and_replace_cache"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_projects_duplicate_current_rows_to_pending_in_both_lanes"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "At WaiverCacheDocument × CN-01, the declared document owns current-row lookup identity: lookup_current compares edge id, the owning obligation id, the complete WaiverCacheKey, and the verifier fingerprint, returning Ok(None) for a non-current row; the domain tests cover historical-row selection, duplicate detection, and fingerprint/key mismatch. CN-01's remaining legacy/missing-fingerprint invalidation for either verdict, task-state pending fallback, and recovery by reevaluation belong to the cache consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_fingerprint_or_key_mismatch_returns_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_declaration_spec_or_responsibility_mismatch_returns_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_invalidates_waived_and_failed_rows_for_every_identity_change"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "reason": "At WaiverCacheLookupError × IN-04, the declared domain error owns only the typed AmbiguousCurrentEntries payload carrying edge id, obligation id, and WaiverCacheKey for duplicate current-row identity, exercised by the domain lookup and propagation tests. IN-04's remaining freshness decision over the complete normalized request and reevaluation belongs to the evaluation/check/results consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "At WaiverCacheLookupError × CN-01, the declared domain error owns only typed reporting of duplicate current-row identity through AmbiguousCurrentEntries { edge_id, obligation_id, key }, exercised by the domain lookup and propagation tests. CN-01's remaining fail-closed treatment of legacy, missing, or mismatched fingerprints for either verdict, task-state pending fallback, and recovery by reevaluation belongs to the cache consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "reason": "At WaiverCacheLookupError × AC-03, the declared domain error owns only the typed AmbiguousCurrentEntries representation of duplicate current-row identity, carrying the edge, owning obligation, and complete waiver key as exercised by the domain lookup and propagation tests. AC-03's remaining invalidation of old pass/fail verdicts after specification, responsibility, request-structure, or verifier-input revisions and agreement after reevaluation belongs to the evaluation/check/results consumers; this waiver covers only that non-owned freshness remainder."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
         "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
         "anchor_id": {
           "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
@@ -1036,6 +1236,26 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_test_obligation_results_interactor_reports_stale_and_post_reevaluation_freshness"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_projects_stale_pass_and_fail_to_pending_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_target_responsibility_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_judgment_request_structure_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_verifier_input_format_changes"
         },
         {
           "layer": "usecase",

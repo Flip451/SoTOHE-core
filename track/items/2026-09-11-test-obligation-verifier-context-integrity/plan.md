@@ -6,7 +6,7 @@
 T001-T009 implement GO-01 through the cited specification anchors.
 The dependency order closes the admitted API migration in B1, then serializes later semantic and regression ownership through B2-B4.
 
-## Tasks (6/9 resolved)
+## Tasks (7/9 resolved)
 
 ### S1 — Typed request and compatibility closure
 
@@ -21,8 +21,8 @@ The dependency order closes the admitted API migration in B1, then serializes la
 > `libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,plan_input.rs,cache.rs,tests.rs}` and `libs/usecase/src/test_obligation/{check.rs,check_waiver.rs,check_support.rs,results.rs,results_status.rs,check_tests.rs,results_tests.rs}`: update the canonical section-aware specification/obligation hash material and its evaluate/check/results producers and consumers as one executable unit. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
 > `libs/usecase/src/test_obligation/{check.rs,check_support.rs,results.rs,results_status.rs,check_tests.rs,results_tests.rs}`: after the canonical hash unit, finish the non-hash stale-verdict status projection and result aggregation operations with focused tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.
 
-- [x] **T003**: After T002's compatibility closure, own the atomic canonical-hash unit in `libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,plan_input.rs,cache.rs,tests.rs}` and `libs/usecase/src/test_obligation/{check.rs,check_waiver.rs,check_support.rs,results.rs,results_status.rs,check_tests.rs,results_tests.rs}`: define section-aware specification/obligation material once, migrate the evaluate key producer and every check/results consumer, and add focused cross-lane key-compatibility tests. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
-- [ ] **T004**: After T003's canonical-hash unit, own the remaining non-hash stale-verdict status projection and result aggregation operations in `libs/usecase/src/test_obligation/{check.rs,check_support.rs,check_tests.rs,results.rs,results_status.rs,results_tests.rs}` and add focused unit tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.
+- [x] **T003**: After T002's compatibility closure, own the atomic canonical-hash unit in `libs/usecase/src/test_obligation/evaluate/{mod.rs,edges.rs,plan.rs,plan_input.rs,cache.rs,tests.rs}` and `libs/usecase/src/test_obligation/{check.rs,check_waiver.rs,check_support.rs,results.rs,results_status.rs,check_tests.rs,results_tests.rs}`: define section-aware specification/obligation material once, migrate the evaluate key producer and every check/results consumer, and add focused cross-lane key-compatibility tests. IN-01; IN-03; IN-04; IN-05; OUT-01; OUT-02; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04. (`2d0471f3d809031639d6bea8ccccaaef71a928bf`)
+- [x] **T004**: After T003's canonical-hash unit, own the remaining non-hash stale-verdict status projection and result aggregation operations in `libs/usecase/src/test_obligation/{check.rs,check_support.rs,check_tests.rs,results.rs,results_status.rs,results_tests.rs}` and add focused unit tests. IN-01; IN-03; IN-04; IN-05; OUT-02; OUT-03; CN-01; AC-01; AC-03; AC-04.
 
 ### S3 — Verifier adapters and fingerprints
 
@@ -36,7 +36,7 @@ The dependency order closes the admitted API migration in B1, then serializes la
 
 > Verifier adapter test modules and evaluate/check/results regression test modules: add the bounded deterministic cases cited by the specification. IN-01; IN-02; IN-03; IN-04; IN-05; OUT-01; OUT-02; OUT-03; OUT-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
 
-- [x] **T007**: The `#[cfg(test)]` modules in `libs/infrastructure/src/test_obligation/{fulfillment_verifier.rs,waiver_verifier.rs}`: add table-driven verifier-lane/spec-section and bounded diagnostic/calibration cases using `track/items/2026-09-11-test-obligation-verifier-context-integrity/research/verifier-input-diagnosis.md` only as diagnostic evidence. IN-01; IN-02; IN-03; OUT-01; CN-02; AC-01; AC-02.
+- [x] **T007**: The `#[cfg(test)]` modules in `libs/infrastructure/src/test_obligation/{fulfillment_verifier.rs,waiver_verifier.rs}`: add table-driven verifier-lane/spec-section and bounded diagnostic/calibration cases using `track/items/2026-09-11-test-obligation-verifier-context-integrity/research/verifier-input-diagnosis.md` only as diagnostic evidence. IN-01; IN-02; IN-03; OUT-01; CN-02; AC-01; AC-02. (`2d0471f3d809031639d6bea8ccccaaef71a928bf`)
 - [ ] **T008**: `libs/usecase/src/test_obligation/{evaluate/tests.rs,check_tests.rs,results_tests.rs}` and `libs/infrastructure/src/test_obligation/{fulfillment_cache_codec/tests.rs,waiver_cache_codec.rs}` test modules: add stale-Pass/stale-Fail evaluate/check/results and cache-wire regression matrices. IN-04; IN-05; OUT-02; OUT-03; OUT-04; CN-01; AC-03; AC-04.
 
 ### S5 — Binary and root-host validation

@@ -38,6 +38,21 @@ pub enum FulfillmentCacheLookupError {
     },
 }
 
+/// Failure from resolving a waiver-cache entry for current inputs.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum WaiverCacheLookupError {
+    /// More than one entry matches the complete current cache identity.
+    #[error("ambiguous waiver-cache entries for {edge_id:?} and {obligation_id:?}")]
+    AmbiguousCurrentEntries {
+        /// The edge whose current entry was ambiguous.
+        edge_id: TestObligationEdgeId,
+        /// The obligation whose current entry was ambiguous.
+        obligation_id: TestObligationId,
+        /// The complete cache key shared by the ambiguous entries.
+        key: WaiverCacheKey,
+    },
+}
+
 /// Validated known-bad calibration-probe detection rate as a `0..=100` percentage.
 ///
 /// Replaces a raw `NonZeroU8`, which wrongly rejected a legitimate `0%` detection
@@ -443,6 +458,39 @@ impl WaiverCacheDocument {
     pub fn entries(&self) -> &[WaiverCacheEntry] {
         &self.entries
     }
+
+    /// Finds the unique entry that matches the complete current cache identity.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`WaiverCacheLookupError::AmbiguousCurrentEntries`] when
+    /// multiple entries match the current identity.
+    #[allow(clippy::result_large_err)]
+    pub fn lookup_current(
+        &self,
+        edge_id: &TestObligationEdgeId,
+        obligation_id: &TestObligationId,
+        key: &WaiverCacheKey,
+        verifier_fingerprint: &VerifierPromptFingerprint,
+    ) -> Result<Option<&WaiverCacheEntry>, WaiverCacheLookupError> {
+        let mut matches = self.entries.iter().filter(|entry| {
+            entry.edge_id() == edge_id
+                && entry.obligation_id() == Some(obligation_id)
+                && entry.key() == key
+                && entry.verifier_fingerprint() == Some(verifier_fingerprint)
+        });
+        let Some(entry) = matches.next() else {
+            return Ok(None);
+        };
+        if matches.next().is_some() {
+            return Err(WaiverCacheLookupError::AmbiguousCurrentEntries {
+                edge_id: edge_id.clone(),
+                obligation_id: obligation_id.clone(),
+                key: key.clone(),
+            });
+        }
+        Ok(Some(entry))
+    }
 }
 
 #[cfg(test)]
@@ -714,6 +762,284 @@ mod tests {
             panic!("expected exactly one waiver cache entry");
         };
         assert_eq!(entry.verifier_fingerprint(), Some(&fingerprint));
+    }
+
+    #[test]
+    fn test_waiver_cache_lookup_with_historical_row_returns_current_entry() {
+        let fingerprint = verifier_fingerprint();
+        let current_key = waiver_key();
+        let historical_key = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([9u8; 32])),
+            current_key.declaration_hash().clone(),
+            current_key.spec_element_hash().clone(),
+            current_key.responsibility_hash().clone(),
+        );
+        let historical = WaiverCacheEntry::new(
+            edge_id(),
+            Some(obligation_id()),
+            historical_key,
+            WaiverVerdict::Waived { citation: citation("historical cite") },
+            Some(fingerprint.clone()),
+        );
+        let current = WaiverCacheEntry::new(
+            edge_id(),
+            Some(obligation_id()),
+            current_key.clone(),
+            WaiverVerdict::Waived { citation: citation("cite") },
+            Some(fingerprint.clone()),
+        );
+
+        for entries in
+            [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]
+        {
+            let document = WaiverCacheDocument::new(TrackId::try_new("my-track").unwrap(), entries);
+
+            let Ok(Some(entry)) =
+                document.lookup_current(&edge_id(), &obligation_id(), &current_key, &fingerprint)
+            else {
+                panic!("current waiver entry must be found regardless of cache row order");
+            };
+
+            assert_eq!(entry.key(), &current_key);
+            assert!(matches!(entry.verdict(), WaiverVerdict::Waived { .. }));
+        }
+    }
+
+    #[test]
+    fn test_waiver_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error() {
+        let fingerprint = verifier_fingerprint();
+        let key = waiver_key();
+        let waived = WaiverCacheEntry::new(
+            edge_id(),
+            Some(obligation_id()),
+            key.clone(),
+            WaiverVerdict::Waived { citation: citation("cite") },
+            Some(fingerprint.clone()),
+        );
+        let pending = WaiverCacheEntry::new(
+            edge_id(),
+            Some(obligation_id()),
+            key.clone(),
+            WaiverVerdict::Pending,
+            Some(fingerprint.clone()),
+        );
+
+        for entries in [vec![waived.clone(), pending.clone()], vec![pending.clone(), waived]] {
+            let document = WaiverCacheDocument::new(TrackId::try_new("my-track").unwrap(), entries);
+
+            match document.lookup_current(&edge_id(), &obligation_id(), &key, &fingerprint) {
+                Err(WaiverCacheLookupError::AmbiguousCurrentEntries {
+                    edge_id: actual_edge_id,
+                    obligation_id: actual_obligation_id,
+                    key: actual_key,
+                }) => {
+                    assert_eq!(actual_edge_id, edge_id());
+                    assert_eq!(actual_obligation_id, obligation_id());
+                    assert_eq!(actual_key, key);
+                }
+                other => {
+                    panic!(
+                        "expected waiver ambiguity error with the complete cache identity, got {other:?}"
+                    )
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_waiver_cache_lookup_with_fingerprint_or_key_mismatch_returns_none() {
+        let key = waiver_key();
+        let current_fingerprint = verifier_fingerprint();
+        let mismatched_fingerprint =
+            VerifierPromptFingerprint::new(ContentHash::from_bytes([6u8; 32]));
+        let mismatched_key = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([7u8; 32])),
+            key.declaration_hash().clone(),
+            key.spec_element_hash().clone(),
+            key.responsibility_hash().clone(),
+        );
+
+        for entry in [
+            WaiverCacheEntry::new(
+                edge_id(),
+                Some(obligation_id()),
+                key.clone(),
+                WaiverVerdict::Waived { citation: citation("cite") },
+                Some(mismatched_fingerprint),
+            ),
+            WaiverCacheEntry::new(
+                edge_id(),
+                Some(obligation_id()),
+                mismatched_key,
+                WaiverVerdict::Waived { citation: citation("cite") },
+                Some(current_fingerprint.clone()),
+            ),
+        ] {
+            let document =
+                WaiverCacheDocument::new(TrackId::try_new("my-track").unwrap(), vec![entry]);
+            assert_eq!(
+                document.lookup_current(&edge_id(), &obligation_id(), &key, &current_fingerprint,),
+                Ok(None)
+            );
+        }
+    }
+
+    #[test]
+    fn test_waiver_cache_lookup_with_declaration_spec_or_responsibility_mismatch_returns_none() {
+        let key = waiver_key();
+        let fingerprint = verifier_fingerprint();
+        let mismatched_keys = [
+            WaiverCacheKey::new(
+                key.waived_reason_hash().clone(),
+                DeclarationHash::new(ContentHash::from_bytes([6u8; 32])),
+                key.spec_element_hash().clone(),
+                key.responsibility_hash().clone(),
+            ),
+            WaiverCacheKey::new(
+                key.waived_reason_hash().clone(),
+                key.declaration_hash().clone(),
+                SpecElementHash::new(ContentHash::from_bytes([6u8; 32])),
+                key.responsibility_hash().clone(),
+            ),
+            WaiverCacheKey::new(
+                key.waived_reason_hash().clone(),
+                key.declaration_hash().clone(),
+                key.spec_element_hash().clone(),
+                ObligationResponsibilityHash::new(ContentHash::from_bytes([7u8; 32])),
+            ),
+        ];
+
+        for mismatched_key in mismatched_keys {
+            let entry = WaiverCacheEntry::new(
+                edge_id(),
+                Some(obligation_id()),
+                mismatched_key,
+                WaiverVerdict::Waived { citation: citation("cite") },
+                Some(fingerprint.clone()),
+            );
+            let document =
+                WaiverCacheDocument::new(TrackId::try_new("my-track").unwrap(), vec![entry]);
+
+            assert_eq!(
+                document.lookup_current(&edge_id(), &obligation_id(), &key, &fingerprint),
+                Ok(None)
+            );
+        }
+    }
+
+    #[test]
+    fn test_waiver_cache_lookup_invalidates_waived_and_failed_rows_for_every_identity_change() {
+        let current_key = waiver_key();
+        let current_fingerprint = verifier_fingerprint();
+        let identity_changes = [
+            (
+                "verifier_fingerprint",
+                current_key.clone(),
+                VerifierPromptFingerprint::new(ContentHash::from_bytes([6u8; 32])),
+            ),
+            (
+                "spec_element_hash",
+                WaiverCacheKey::new(
+                    current_key.waived_reason_hash().clone(),
+                    current_key.declaration_hash().clone(),
+                    SpecElementHash::new(ContentHash::from_bytes([6u8; 32])),
+                    current_key.responsibility_hash().clone(),
+                ),
+                current_fingerprint.clone(),
+            ),
+            (
+                "responsibility_hash",
+                WaiverCacheKey::new(
+                    current_key.waived_reason_hash().clone(),
+                    current_key.declaration_hash().clone(),
+                    current_key.spec_element_hash().clone(),
+                    ObligationResponsibilityHash::new(ContentHash::from_bytes([7u8; 32])),
+                ),
+                current_fingerprint.clone(),
+            ),
+            (
+                "declaration_hash",
+                WaiverCacheKey::new(
+                    current_key.waived_reason_hash().clone(),
+                    DeclarationHash::new(ContentHash::from_bytes([8u8; 32])),
+                    current_key.spec_element_hash().clone(),
+                    current_key.responsibility_hash().clone(),
+                ),
+                current_fingerprint.clone(),
+            ),
+            (
+                "waived_reason_hash",
+                WaiverCacheKey::new(
+                    WaivedReasonHash::new(ContentHash::from_bytes([9u8; 32])),
+                    current_key.declaration_hash().clone(),
+                    current_key.spec_element_hash().clone(),
+                    current_key.responsibility_hash().clone(),
+                ),
+                current_fingerprint.clone(),
+            ),
+        ];
+        let prior_outcomes = [
+            (
+                "Waived",
+                WaiverVerdict::Waived { citation: citation("prior waived outcome") },
+                WaiverVerdict::Fail { reason: diagnostic("replacement failed outcome") },
+            ),
+            (
+                "Fail",
+                WaiverVerdict::Fail { reason: diagnostic("prior failed outcome") },
+                WaiverVerdict::Waived { citation: citation("replacement waived outcome") },
+            ),
+        ];
+
+        for (prior_outcome, prior_verdict, replacement_verdict) in &prior_outcomes {
+            for (identity_change, changed_key, changed_fingerprint) in &identity_changes {
+                let prior_entry = WaiverCacheEntry::new(
+                    edge_id(),
+                    Some(obligation_id()),
+                    current_key.clone(),
+                    prior_verdict.clone(),
+                    Some(current_fingerprint.clone()),
+                );
+                let stale_document = WaiverCacheDocument::new(
+                    TrackId::try_new("my-track").unwrap(),
+                    vec![prior_entry.clone()],
+                );
+
+                assert_eq!(
+                    stale_document.lookup_current(
+                        &edge_id(),
+                        &obligation_id(),
+                        changed_key,
+                        changed_fingerprint,
+                    ),
+                    Ok(None),
+                    "prior {prior_outcome} row must be invalidated by {identity_change}"
+                );
+
+                let replacement_entry = WaiverCacheEntry::new(
+                    edge_id(),
+                    Some(obligation_id()),
+                    changed_key.clone(),
+                    replacement_verdict.clone(),
+                    Some(changed_fingerprint.clone()),
+                );
+                let document_after_replacement = WaiverCacheDocument::new(
+                    TrackId::try_new("my-track").unwrap(),
+                    vec![prior_entry, replacement_entry.clone()],
+                );
+
+                assert_eq!(
+                    document_after_replacement.lookup_current(
+                        &edge_id(),
+                        &obligation_id(),
+                        changed_key,
+                        changed_fingerprint,
+                    ),
+                    Ok(Some(&replacement_entry)),
+                    "new current row must replace prior {prior_outcome} row after {identity_change}"
+                );
+            }
+        }
     }
 
     #[test]

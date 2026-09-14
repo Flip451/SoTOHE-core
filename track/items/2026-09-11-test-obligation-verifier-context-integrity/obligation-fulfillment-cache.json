@@ -1024,6 +1024,152 @@
     {
       "bound_tests": [
         {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::errors::tests",
+          "test_name": "test_obligation_errors_preserve_waiver_cache_lookup_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_waiver_rows_returns_lookup_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError"
+      },
+      "key": {
+        "bound_tests_set_hash": "e27651de011da6a04bed5b50a61e0043e7f2f76c49affc4106ce5889a6739220",
+        "declaration_hash": "e012b2102bf513f3813f79fb37ecb05635d3c77849cb7b16720ae34b5de887be",
+        "responsibility_hash": "2b734b2742219d9d7733f8c21600335be1fb5d7a533b7a2cc19abbd61e006785",
+        "spec_element_hash": "e3f9e99f856bf219ebe588080bc4ebe8ab7c716f525456082f0e504c4152b7e0"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Err(ObligationCheckError::WaiverCacheLookup(\n                WaiverCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            ))",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_fingerprint_or_key_mismatch_returns_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_waiver_rows_returns_lookup_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_duplicate_current_waiver_entries_reverify_and_replace_cache"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_projects_duplicate_current_rows_to_pending_in_both_lanes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument"
+      },
+      "key": {
+        "bound_tests_set_hash": "45785321bfc5bb0f746fd710ed4a76cc8e6023104e276c2e1d1610f221c7d5d7",
+        "declaration_hash": "6c537d57a46a92c665a9529c5d7ea134539c689340047c350baf5c8e2ebd3387",
+        "responsibility_hash": "beb1f827322421f8935602b2e21fa5e9a9bb021ed2583cd8a8c316c760b9ef3b",
+        "spec_element_hash": "e3f9e99f856bf219ebe588080bc4ebe8ab7c716f525456082f0e504c4152b7e0"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n                document.lookup_current(&edge_id(), &obligation_id(), &key, &current_fingerprint,),\n                Ok(None)\n            );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_fingerprint_or_key_mismatch_returns_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_with_declaration_spec_or_responsibility_mismatch_returns_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_waiver_cache_lookup_invalidates_waived_and_failed_rows_for_every_identity_change"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument"
+      },
+      "key": {
+        "bound_tests_set_hash": "ae4ace88f0d0c9fa176ae4b7af392d04631ca5417828a641068647a999a7a9c0",
+        "declaration_hash": "1f7affe6716d180f699e4ed9004223a52c23cb89e33531e696c106509c6d7b7f",
+        "responsibility_hash": "180ba69da0fd568fe2c0ffb2e7a5e7bf61a9b1d1aab95f827f4833d7b5717701",
+        "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for (prior_outcome, prior_verdict, replacement_verdict) in &prior_outcomes { for (identity_change, changed_key, changed_fingerprint) in &identity_changes { ... assert_eq!( stale_document.lookup_current( &edge_id(), &obligation_id(), changed_key, changed_fingerprint, ), Ok(None), \"prior {prior_outcome} row must be invalidated by {identity_change}\" ); ... assert_eq!( document_after_replacement.lookup_current( &edge_id(), &obligation_id(), changed_key, changed_fingerprint, ), Ok(Some(&replacement_entry)), \"new current row must replace prior {prior_outcome} row after {identity_change}\" ); } }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
+    },
+    {
+      "bound_tests": [
+        {
           "layer": "infrastructure",
           "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
           "test_name": "test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation"
@@ -2993,6 +3139,26 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_projects_stale_pass_and_fail_to_pending_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_target_responsibility_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_judgment_request_structure_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_verifier_input_format_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_results_interactor_aggregates_status_lanes_without_gate_failure"
         },
         {
@@ -3029,7 +3195,7 @@
         "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "f8ea7abda59c268f9ae5144f03505d83faa6b717ea0bd7809d49104fa72ae754",
+        "bound_tests_set_hash": "87254e1a2c9d661e9fb847fea312a22dba416e9f82bc9d853281053e7dc36b18",
         "declaration_hash": "b42514e3385c5c948b15ae1d82fa9a00f832e8c907372bf34c41bcee814094a3",
         "responsibility_hash": "91942f89f4996cc3ba3806ca473ee17e3197c899cd88f2539ea7817d9390d1f4",
         "spec_element_hash": "e3f9e99f856bf219ebe588080bc4ebe8ab7c716f525456082f0e504c4152b7e0"
@@ -3040,7 +3206,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(fresh_summary.stale_count(), 0); ... assert_eq!(moved_summary.stale_count(), 1); ... assert_eq!(post_summary.stale_count(), 0);",
+        "citation": "assert_eq!(moved_summary.stale_count(), 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -3051,6 +3217,26 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_test_obligation_results_interactor_reports_stale_and_post_reevaluation_freshness"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_projects_stale_pass_and_fail_to_pending_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_target_responsibility_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_judgment_request_structure_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_verifier_input_format_changes"
         },
         {
           "layer": "usecase",
@@ -3091,7 +3277,7 @@
         "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "f8ea7abda59c268f9ae5144f03505d83faa6b717ea0bd7809d49104fa72ae754",
+        "bound_tests_set_hash": "87254e1a2c9d661e9fb847fea312a22dba416e9f82bc9d853281053e7dc36b18",
         "declaration_hash": "b42514e3385c5c948b15ae1d82fa9a00f832e8c907372bf34c41bcee814094a3",
         "responsibility_hash": "91942f89f4996cc3ba3806ca473ee17e3197c899cd88f2539ea7817d9390d1f4",
         "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d"
@@ -3102,7 +3288,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(moved_summary.stale_count(), 1); ... assert_eq!(post_summary.stale_count(), 0);",
+        "citation": "\"let moved_interactor: TestObligationResultsInteractor = status_interactor_with_spec(\\n            binding.clone(),\\n            Some(cache),\\n            TaskStatusKind::Done,\\n            status_spec_moved_to_out_of_scope(),\\n        );\" and \"assert_eq!(moved_summary.stale_count(), 1);\" and \"assert_eq!(post_summary.stale_count(), 0);\" and \"assert_stale_and_refreshed_fulfillment_results(\\n        stale_key,\\n        VerifierPromptFingerprint::new(hash(9)),\\n    );\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -3113,6 +3299,26 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_test_obligation_results_interactor_reports_stale_and_post_reevaluation_freshness"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_projects_stale_pass_and_fail_to_pending_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_target_responsibility_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_judgment_request_structure_changes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_stales_pass_and_fail_when_verifier_input_format_changes"
         },
         {
           "layer": "usecase",
@@ -3153,7 +3359,7 @@
         "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "f8ea7abda59c268f9ae5144f03505d83faa6b717ea0bd7809d49104fa72ae754",
+        "bound_tests_set_hash": "87254e1a2c9d661e9fb847fea312a22dba416e9f82bc9d853281053e7dc36b18",
         "declaration_hash": "b42514e3385c5c948b15ae1d82fa9a00f832e8c907372bf34c41bcee814094a3",
         "responsibility_hash": "91942f89f4996cc3ba3806ca473ee17e3197c899cd88f2539ea7817d9390d1f4",
         "spec_element_hash": "3b2d0bb26a62f3f8a998ff4ac0df626ba60578c32b25229d96e0998865829f90"

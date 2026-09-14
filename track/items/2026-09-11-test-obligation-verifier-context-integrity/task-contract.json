@@ -22,6 +22,10 @@
       {"layer": "usecase", "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"}
     ],
     "T004": [
+      {"layer": "domain", "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument"},
+      {"layer": "domain", "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError"},
+      {"layer": "domain", "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError"},
+      {"layer": "domain", "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError"},
       {"layer": "usecase", "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"},
       {"layer": "usecase", "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"}
     ],

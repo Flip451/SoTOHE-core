@@ -375,7 +375,7 @@ impl CheckTestObligationsInteractor {
                         spec_elements,
                         waiver,
                         gate,
-                    );
+                    )?;
                 } else if let Some(tests) = fulfilled {
                     self.resolve_fulfillment_edge(
                         &edge,
@@ -418,7 +418,7 @@ impl CheckTestObligationsInteractor {
                     spec_elements,
                     waiver,
                     gate,
-                );
+                )?;
             } else if let Some(tests) = voluntary_tests(bindings, edge) {
                 self.resolve_direct_fulfillment_edge(
                     edge,

@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "b9961e87bb958ff6f0199651251774085a4c2c2ec98805d6642753421487b55a",
+  "catalogue_declaration_hash": "c4e523322cfb895dcc0f34b57db8fbfccc6b5d2624cfda0066f50c7bf35c3a00",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "864122d74f6f4c0a0c6803b75c385157d734748874c473eac3d8537486458299",
+      "entry_hash": "33bf25a1337aa7adba448a257e4bb9ef2b97cda413d914561ac3a83bfda31806",
       "signal": "blue",
       "type_name": "ObligationResponsibilityHash"
     },
@@ -16,6 +16,16 @@
       "entry_hash": "004c418d028c176422f8e91138924cf88323bec67209177754ef8f076ff096b0",
       "signal": "blue",
       "type_name": "domain::tddd::semantic_verify::SpecElementRef"
+    },
+    {
+      "entry_hash": "01de2e41228c0a7f6f0233169a672b1e36fa214b132cf5a62b7e74bf66fadf02",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::errors::ObligationCheckError"
+    },
+    {
+      "entry_hash": "39cf6d95d1ce8f18b4bbaf22b0436f637043e3a992b81a4936fd1a48c8309605",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::errors::ObligationEvaluateError"
     },
     {
       "entry_hash": "67e6cdd3b093981246ae1bb6821dbbd1a2f82be0af00c9b63ca168adae4c2b54",
@@ -33,9 +43,19 @@
       "type_name": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey"
     },
     {
+      "entry_hash": "fd094836c1c4e563b87b149fd1db9563655236c556a4db3a4da21253b5b43d21",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::verdict::WaiverCacheDocument"
+    },
+    {
       "entry_hash": "4bc66862aa35aa1337d63b68e93e6b3075752f6d68cd88163c7c396463918767",
       "signal": "blue",
       "type_name": "domain::tddd::test_obligation::verdict::WaiverCacheKey"
+    },
+    {
+      "entry_hash": "847c0986b12ef96a659aac2c234460bf9a116978766def3bf39bb174db6b34a4",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError"
     },
     {
       "entry_hash": "bfd1038496d1ebe943ad94823e1ec4e8aafa8d5d24e2ca17bd6d90de24b7c4b8",

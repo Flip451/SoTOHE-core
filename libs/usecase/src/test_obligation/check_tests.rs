@@ -55,7 +55,7 @@ use domain::tddd::test_obligation::verdict::{
     FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument,
     ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheEntryState,
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
+    WaiverCacheEntry, WaiverCacheKey, WaiverCacheLookupError, WaiverVerdict,
 };
 use domain::tddd::test_obligation::vocab::{
     TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind, TestObligationPerAxis,
@@ -4033,6 +4033,48 @@ fn test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error() {
             }
             other => {
                 panic!("expected ambiguity error with the complete cache identity, got {other:?}")
+            }
+        }
+    }
+}
+
+#[test]
+fn test_check_with_duplicate_current_waiver_rows_returns_lookup_error() {
+    let current =
+        fresh_waiver_cache_for_fingerprint(&obligation(), Some(waiver_verifier_fingerprint()))
+            .entries()[0]
+            .clone();
+    let duplicate = WaiverCacheEntry::new(
+        current.edge_id().clone(),
+        current.obligation_id().cloned(),
+        current.key().clone(),
+        WaiverVerdict::Pending,
+        current.verifier_fingerprint().cloned(),
+    );
+
+    for entries in [vec![current.clone(), duplicate.clone()], vec![duplicate, current.clone()]] {
+        let cache = WaiverCacheDocument::new(track(), entries);
+        let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+        let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
+        let result =
+            interactor(Some(obligations), Some(bindings), None, Some(cache)).execute(&command());
+
+        match result {
+            Err(ObligationCheckError::WaiverCacheLookup(
+                WaiverCacheLookupError::AmbiguousCurrentEntries {
+                    edge_id: actual_edge_id,
+                    obligation_id: actual_obligation_id,
+                    key: actual_key,
+                },
+            )) => {
+                assert_eq!(actual_edge_id, edge());
+                assert_eq!(actual_obligation_id, obligation().id().clone());
+                assert_eq!(actual_key, current.key().clone());
+            }
+            other => {
+                panic!(
+                    "expected waiver ambiguity error with the complete cache identity, got {other:?}"
+                )
             }
         }
     }

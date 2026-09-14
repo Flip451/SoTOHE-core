@@ -3496,6 +3496,41 @@ fn test_matching_waiver_cache_reuses_frozen_verdict() {
 }
 
 #[test]
+fn test_duplicate_current_waiver_entries_reverify_and_replace_cache() {
+    let current = cached_waiver_doc(WaiverVerdict::Waived {
+        citation: EvidenceCitation::try_new("cached waiver citation".to_owned()).unwrap(),
+    })
+    .entries()[0]
+        .clone();
+    let duplicate = WaiverCacheEntry::new(
+        current.edge_id().clone(),
+        current.obligation_id().cloned(),
+        current.key().clone(),
+        WaiverVerdict::Pending,
+        current.verifier_fingerprint().cloned(),
+    );
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(waiver_bindings()),
+        fulfillment_fail(),
+        fulfillment_fail(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("fresh waiver citation".to_owned()).unwrap(),
+        },
+        None,
+        Some(WaiverCacheDocument::new(track(), vec![current, duplicate])),
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 1);
+    let saved = h.waiver_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.entries().len(), 1);
+    assert!(matches!(saved.entries()[0].verdict(), WaiverVerdict::Waived { .. }));
+}
+
+#[test]
 fn test_changed_fulfillment_obligation_brief_invalidates_cache() {
     let h = harness_with_existing_caches(
         Some(ObligationsDocument::new(
