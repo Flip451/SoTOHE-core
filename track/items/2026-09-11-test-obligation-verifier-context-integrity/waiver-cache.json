@@ -1,0 +1,480 @@
+{
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError"
+      },
+      "key": {
+        "declaration_hash": "a8e2fdbac5fa36fdd79d1b524f5ec171d7aef0c994107caca1c57faeaba65679",
+        "responsibility_hash": "c62f112273023d5e9952cb75978018681d121016cdd02a627bc2c1c4fbd42a31",
+        "spec_element_hash": "a3f52b717f3b5127626f8fd64b8a501aef9d89df317be5514488cfc9ffd34074",
+        "waived_reason_hash": "972c41f13455ab789a1023d1ae16d9a992f1ccc39aa1a7a1c21e2c3a4d30647f"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Add the WaiverCacheLookup variant to ObligationCheckError. IN-04, CN-01, AC-03.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError"
+      },
+      "key": {
+        "declaration_hash": "c1642596fb2e340aae8e55c268a4028b765523cc4a419714b5ceb71dd8dd2b02",
+        "responsibility_hash": "8996476dfed9382807ecd0946d18a3c880fde72933eaf1cd6fe96fd9426d6ed8",
+        "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d",
+        "waived_reason_hash": "0c95656ace520e940ab2f1fe8bdd746a32f12e6b148dba6132080a3bf3fa8673"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationCheckError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "VariantDecl { name: VariantName(Identifier(\"WaiverCacheLookup\")), payload: Tuple([TypeRef(\"WaiverCacheLookupError\")]) }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError"
+      },
+      "key": {
+        "declaration_hash": "1c942d41de90d06b3204a667a1a6a35c3cb94d2ab2ad88b2fbedd4c3e4c7bd5a",
+        "responsibility_hash": "2907cb896ea58618f44a619ac7400f8f30ef9753ff033bca1d2df91c90280dbd",
+        "spec_element_hash": "e3f9e99f856bf219ebe588080bc4ebe8ab7c716f525456082f0e504c4152b7e0",
+        "waived_reason_hash": "031dff5d44930f279a88df4c8b41cf095469eae15eb3a4475cd90e10e63c0389"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Add the WaiverCacheLookup variant to ObligationEvaluateError. IN-04, CN-01, AC-03.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError"
+      },
+      "key": {
+        "declaration_hash": "31f590094c2607d8f07f8f325c7ccf897d37a3a78894b8d004df2ae8179c79fc",
+        "responsibility_hash": "77f950d503383fa80daea482be12c52267c121f886465c0fa300e2a9de718388",
+        "spec_element_hash": "a3f52b717f3b5127626f8fd64b8a501aef9d89df317be5514488cfc9ffd34074",
+        "waived_reason_hash": "156ed31a4243e50e7ffe4591256d1e3495ae6d536a729543622389657a718695"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Add the WaiverCacheLookup variant to ObligationEvaluateError. IN-04, CN-01, AC-03.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError"
+      },
+      "key": {
+        "declaration_hash": "f44826dd5683e36bf03c267a44bd42a0956bafa2c0c72addab539b207a1bc609",
+        "responsibility_hash": "0acaff80e9c1ead12e82549af6fe6b1e6f8a754fb9aa23b95f5f3a05cfb8b33f",
+        "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d",
+        "waived_reason_hash": "c5fa45d603953a5744bf0e6d15f332cd5d9a4b1a300deba4e73eef2d7908ac60"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::errors::ObligationEvaluateError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "VariantDecl { name: VariantName(Identifier(\"WaiverCacheLookup\")), payload: Tuple([TypeRef(\"WaiverCacheLookupError\")]) }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument"
+      },
+      "key": {
+        "declaration_hash": "304d623a72427dfcabed347b90c198f0a6f15c1361360177977c5d868bdc5a0c",
+        "responsibility_hash": "99b8b55eefbfa50d838016942fbabfde3fa381904302908bb815b218cb26d555",
+        "spec_element_hash": "a3f52b717f3b5127626f8fd64b8a501aef9d89df317be5514488cfc9ffd34074",
+        "waived_reason_hash": "031938295b5efa75d497a8ecb2afbfea40a03fcf1839ea037d72dda9dccdae84"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheDocument",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "MethodDeclaration { name: MethodName(Identifier(\"lookup_current\")), ... returns: TypeRef(\"Result<Option<&WaiverCacheEntry>, WaiverCacheLookupError>\"), ... action: Add }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError"
+      },
+      "key": {
+        "declaration_hash": "9b9f9cd83c2047c6afcbaa32ac4c59644744fd56974a049265e6fa16b4aadaee",
+        "responsibility_hash": "a97ddd8f5d687c30792262a6570bf7f25bf28fa0f2183eceda9d04d369ab9c7a",
+        "spec_element_hash": "e3f9e99f856bf219ebe588080bc4ebe8ab7c716f525456082f0e504c4152b7e0",
+        "waived_reason_hash": "5a210322d65bcca884d32d676901d6a214bdf59caaa2fe7fce830f366854ec7d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "VariantDecl { name: VariantName(Identifier(\"AmbiguousCurrentEntries\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"edge_id\")), ty: TypeRef(\"TestObligationEdgeId\") }, FieldDecl { name: FieldName(Identifier(\"obligation_id\")), ty: TypeRef(\"TestObligationId\") }, FieldDecl { name: FieldName(Identifier(\"key\")), ty: TypeRef(\"WaiverCacheKey\") }]) }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError"
+      },
+      "key": {
+        "declaration_hash": "c6c635fc7de2aa96e408eb362d07bc6c7f9efc650b93c6023d53601106014f7e",
+        "responsibility_hash": "fa9c5d7de1b7e73555a1f5d3f7d2371f97f0f9fa7d45f2ac62d3ca98e9639f80",
+        "spec_element_hash": "a3f52b717f3b5127626f8fd64b8a501aef9d89df317be5514488cfc9ffd34074",
+        "waived_reason_hash": "a46c8d5800ae6163d04c19f3c7c7e98b9d63cc98e4b3375b63ff54c266257d51"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Add WaiverCacheLookupError for WaiverCacheDocument::lookup_current.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError"
+      },
+      "key": {
+        "declaration_hash": "36f8c0b6b541f0843078b961093a605127750333f072c7170a2ed2313219cfcd",
+        "responsibility_hash": "936a5bd450ddbe35f25c6c3fc75856601b77becf0a60337f706c2073ea8dc217",
+        "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d",
+        "waived_reason_hash": "5e964f0d03b82ddc035d8d1f6dfe6a73821e920fbe2fbee6fdf3299b64410167"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Add WaiverCacheLookupError for WaiverCacheDocument::lookup_current.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+      },
+      "key": {
+        "declaration_hash": "a4998cf271dde302273f33f070b9edf15a2b30e2e2798bfd3ffddd40134c6f9a",
+        "responsibility_hash": "7fda6a0cdcf7509c4d517b022c7ce6d0a17af04e404b9f15e3eda1181c6d05f5",
+        "spec_element_hash": "a3f52b717f3b5127626f8fd64b8a501aef9d89df317be5514488cfc9ffd34074",
+        "waived_reason_hash": "fa3d67f6b1354f56f44becc9f8c74ee82bdba453e888b2409b1949c904ddff2c"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Computes the waiver verifier contract fingerprint.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "ObligationResponsibilityHash"
+      },
+      "key": {
+        "declaration_hash": "62fab80747fb3b33418cd8ada2505cb4685ccb6e4e4bd457b3c2b87dcfc27606",
+        "responsibility_hash": "11f3a01e44b33b8fbe541f208972f6b3bf4adae0b99681f390576fb1ec2f625b",
+        "spec_element_hash": "a3f52b717f3b5127626f8fd64b8a501aef9d89df317be5514488cfc9ffd34074",
+        "waived_reason_hash": "f90c71d5b473f88056d41c17e0c37b311e579c3a51bbd18ac9c2df566fd9c5ce"
+      },
+      "obligation_id": {
+        "entry_key": "ObligationResponsibilityHash",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Value-equivalent domain wrapper for the hash of typed obligation identity and responsibility context.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "SpecElementHash"
+      },
+      "key": {
+        "declaration_hash": "0e0ba050137a924e229df06a0fc73404bd07262c58c373149158af920d7292b8",
+        "responsibility_hash": "da2cac9ac69907e3d892d24ebaa42c4515dc06c01e535f312dc9782f71ace1fe",
+        "spec_element_hash": "a3f52b717f3b5127626f8fd64b8a501aef9d89df317be5514488cfc9ffd34074",
+        "waived_reason_hash": "44ffac93110d29c6f42529f87d5a3bebaac2a8d1ce59bb00ab9feeaa779148cf"
+      },
+      "obligation_id": {
+        "entry_key": "SpecElementHash",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Value-equivalent domain wrapper for the hash of one normalized specification element.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "SpecElementHash"
+      },
+      "key": {
+        "declaration_hash": "2f6c1b3ba965b8bdd37ac4dfbfd94af25a8ac5987e8b8a39701cd29cb759e67c",
+        "responsibility_hash": "715f22eedbebd2e179a1ba6e44841d46d33ccd5fc93b78e109d88e3a77fb3ac7",
+        "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d",
+        "waived_reason_hash": "f445a260bad9ddb3a1b0ed5b02df287c6b420aa30a01a15ea636699f8c9e0c36"
+      },
+      "obligation_id": {
+        "entry_key": "SpecElementHash",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Value-equivalent domain wrapper for the hash of one normalized specification element.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+      },
+      "key": {
+        "declaration_hash": "1a4118614e1b69ff6c1c33ce593c4bdf383171b35ae4580001dbb68a7f5cbdd2",
+        "responsibility_hash": "ed2f5359cf77b992a4f4d0049145f5414a674e0c69e77af960950e871cce6f43",
+        "spec_element_hash": "8520494fdb932280b5fbf1b31dde1dd7d0e85d9c308f6ceeb77391d45b4891f5",
+        "waived_reason_hash": "15c0bae18f4d149b370ec285e4c34c78d56837086de9a6da258ad6817218ba48"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "Fail-closed driven adapter for the normalized WaiverVerifierPort; preserves the existing bounded diagnostic when verifier configuration cannot be loaded.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+      },
+      "key": {
+        "declaration_hash": "1a4118614e1b69ff6c1c33ce593c4bdf383171b35ae4580001dbb68a7f5cbdd2",
+        "responsibility_hash": "ed2f5359cf77b992a4f4d0049145f5414a674e0c69e77af960950e871cce6f43",
+        "spec_element_hash": "65417ce538258f0f871104737c846c3c9b0610448ec88656fdf09ed5d0ae7477",
+        "waived_reason_hash": "ae620abb90e0e7a1bfed2505d32247c445dc38948a2ea7bf7e61438b3b8deab9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "Fail-closed driven adapter for the normalized WaiverVerifierPort; preserves the existing bounded diagnostic when verifier configuration cannot be loaded.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+      },
+      "key": {
+        "declaration_hash": "1a4118614e1b69ff6c1c33ce593c4bdf383171b35ae4580001dbb68a7f5cbdd2",
+        "responsibility_hash": "ed2f5359cf77b992a4f4d0049145f5414a674e0c69e77af960950e871cce6f43",
+        "spec_element_hash": "cced80916ce786d2b1043f04d6af3cac0270be7554a4116e9619b5b08d986c31",
+        "waived_reason_hash": "eb71fbe3b02c002162de33d742c34fdb3a489f17a63e11010d0935c67c19bddf"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "Fail-closed driven adapter for the normalized WaiverVerifierPort; preserves the existing bounded diagnostic when verifier configuration cannot be loaded.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+      },
+      "key": {
+        "declaration_hash": "9e625b2eae59c4b701e2339e318aff43e7800a63b70bd4ff119634931614517c",
+        "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
+        "spec_element_hash": "0b538c6cfa074483728666dca17acb56838abdfccd156dbb2a75428f725124e7",
+        "waived_reason_hash": "95894cbec8cc3afa8263510a75019be40e385a55e52e5cfd96161bc8213fca99"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "Interactor modified for read-only test-obligation checking",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+      },
+      "key": {
+        "declaration_hash": "9e625b2eae59c4b701e2339e318aff43e7800a63b70bd4ff119634931614517c",
+        "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
+        "spec_element_hash": "51cd2d53336a96b019cbd62b91b015d6c81a420bcd667a6d0c2a8f83e4a94123",
+        "waived_reason_hash": "8d710175dc71dde5d4de338bc478bf587ac309f516c5a9592e078ccf927b7e45"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "\"Interactor modified for read-only test-obligation checking; behavioral requirements are cited in spec_refs.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+      },
+      "key": {
+        "declaration_hash": "9646ab374a59e32e5f46e7a8854b43a5747fb115dd076821ccc7e37755ed2c4f",
+        "responsibility_hash": "da858c451154158dab2a4dc0ddfa55eb262c1529c3f4e2948b86e407545c268d",
+        "spec_element_hash": "0b538c6cfa074483728666dca17acb56838abdfccd156dbb2a75428f725124e7",
+        "waived_reason_hash": "e8f286ab9483212a165908d8f66c96f82e8c7d832633dd276734154535513c91"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "「識別子・所属区分・本文が両検証器の実入力に保持され」",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    }
+  ],
+  "track_id": "2026-09-11-test-obligation-verifier-context-integrity"
+}

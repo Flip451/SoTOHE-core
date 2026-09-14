@@ -3,20 +3,26 @@
 use std::future::Future;
 use std::pin::Pin;
 
-use domain::tddd::semantic_verify::{CatalogueEntryKey, ModelTier};
+use domain::SpecElementId;
+use domain::tddd::semantic_verify::{
+    CatalogueEntryKey, ModelTier, SpecElementRef, SpecSectionKind,
+};
 use domain::tddd::test_obligation::errors::{ObligationEvaluateError, SemanticVerifierError};
-use domain::tddd::test_obligation::hashes::{AnchorTextHash, BoundTestsSetHash, DeclarationHash};
+use domain::tddd::test_obligation::hashes::{
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+};
 use domain::tddd::test_obligation::ids::{
     TestObligationBrief, TestObligationId, TestObligationItemIdentifier,
 };
 use domain::tddd::test_obligation::pair::{
-    AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource,
+    EntryDeclaration, ObligationFulfillmentPair, TestsSource,
 };
 use domain::tddd::test_obligation::verdict::{
     DetectionRatePercent, ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict,
 };
 use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationKind};
 
+use super::super::freshness::{responsibility_material, spec_element_material};
 use super::calibration::{
     CategoryTally, LocalResponsibilityExpectation, calibration_probe_count,
     local_responsibility_probe_shapes, probe_shape_for,
@@ -161,11 +167,6 @@ impl EvaluateTestObligationsInteractor {
                 + 'a,
         >,
     > {
-        let key = ObligationFulfillmentCacheKey::new(
-            BoundTestsSetHash::new(self.hasher.sha256(shape.tests_source.as_bytes())),
-            DeclarationHash::new(self.hasher.sha256(shape.declaration.as_bytes())),
-            AnchorTextHash::new(self.hasher.sha256(shape.anchor_text.as_bytes())),
-        );
         let super::calibration::CalibrationProbeShape {
             tests_source,
             declaration,
@@ -181,18 +182,34 @@ impl EvaluateTestObligationsInteractor {
             let calibration_brief =
                 TestObligationBrief::try_new("exercise the known-bad calibration probe".to_owned())
                     .map_err(|_| invalid_input_error("calibration_obligation_brief"))?;
+            let obligation_id = TestObligationId::new(
+                calibration_entry_key,
+                TestObligationKind::Logic,
+                calibration_item,
+            );
+            let spec_element = SpecElementRef::new(
+                SpecSectionKind::InScope,
+                SpecElementId::try_new("IN-01".to_owned())
+                    .map_err(|_| invalid_input_error("calibration_spec_element_id"))?,
+                anchor_text.to_owned(),
+            );
+            let key = ObligationFulfillmentCacheKey::new(
+                BoundTestsSetHash::new(self.hasher.sha256(tests_source.as_bytes())),
+                DeclarationHash::new(self.hasher.sha256(declaration.as_bytes())),
+                SpecElementHash::new(
+                    self.hasher.sha256(spec_element_material(&spec_element).as_bytes()),
+                ),
+                ObligationResponsibilityHash::new(self.hasher.sha256(
+                    responsibility_material(&obligation_id, &calibration_brief).as_bytes(),
+                )),
+            );
             let pair = ObligationFulfillmentPair::new(
                 TestsSource::try_new(tests_source)
                     .map_err(|_| invalid_input_error("tests_source"))?,
                 EntryDeclaration::try_new(declaration.to_owned())
                     .map_err(|_| invalid_input_error("entry_declaration"))?,
-                AnchorText::try_new(anchor_text.to_owned())
-                    .map_err(|_| invalid_input_error("anchor_text"))?,
-                TestObligationId::new(
-                    calibration_entry_key,
-                    TestObligationKind::Logic,
-                    calibration_item,
-                ),
+                spec_element,
+                obligation_id,
                 calibration_brief,
             );
             self.fulfillment_driver
@@ -213,11 +230,6 @@ impl EvaluateTestObligationsInteractor {
                 + 'a,
         >,
     > {
-        let key = ObligationFulfillmentCacheKey::new(
-            BoundTestsSetHash::new(self.hasher.sha256(shape.tests_source.as_bytes())),
-            DeclarationHash::new(self.hasher.sha256(shape.entry_declaration.as_bytes())),
-            AnchorTextHash::new(self.hasher.sha256(shape.anchor_text.as_bytes())),
-        );
         let super::calibration::LocalResponsibilityProbeShape {
             tests_source,
             entry_key,
@@ -234,14 +246,31 @@ impl EvaluateTestObligationsInteractor {
                 .map_err(|_| invalid_input_error("local_calibration_item_identifier"))?;
             let brief = TestObligationBrief::try_new(obligation_brief.to_owned())
                 .map_err(|_| invalid_input_error("local_calibration_obligation_brief"))?;
+            let obligation_id =
+                TestObligationId::new(entry_key, TestObligationKind::Contract, item);
+            let spec_element = SpecElementRef::new(
+                SpecSectionKind::InScope,
+                SpecElementId::try_new("IN-01".to_owned())
+                    .map_err(|_| invalid_input_error("local_calibration_spec_element_id"))?,
+                anchor_text.to_owned(),
+            );
+            let key = ObligationFulfillmentCacheKey::new(
+                BoundTestsSetHash::new(self.hasher.sha256(tests_source.as_bytes())),
+                DeclarationHash::new(self.hasher.sha256(entry_declaration.as_bytes())),
+                SpecElementHash::new(
+                    self.hasher.sha256(spec_element_material(&spec_element).as_bytes()),
+                ),
+                ObligationResponsibilityHash::new(
+                    self.hasher.sha256(responsibility_material(&obligation_id, &brief).as_bytes()),
+                ),
+            );
             let pair = ObligationFulfillmentPair::new(
                 TestsSource::try_new(tests_source)
                     .map_err(|_| invalid_input_error("tests_source"))?,
                 EntryDeclaration::try_new(entry_declaration.to_owned())
                     .map_err(|_| invalid_input_error("entry_declaration"))?,
-                AnchorText::try_new(anchor_text.to_owned())
-                    .map_err(|_| invalid_input_error("anchor_text"))?,
-                TestObligationId::new(entry_key, TestObligationKind::Contract, item),
+                spec_element,
+                obligation_id,
                 brief,
             );
             self.fulfillment_driver

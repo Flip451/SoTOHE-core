@@ -1,0 +1,937 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-11T13:26:19Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md",
+              "line": 56,
+              "message": "D4 commits to reflecting every change in any variable semantic input in freshness, but does not resolve the open-ended set of such inputs. Record whether this is delegated to an existing authority, handled by conservative over-approximation, or enforced strictly with an acknowledged depth estimate; delegating only the normalization/hash implementation to downstream design is insufficient.",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:b8f989ba628efc29f6f3072be213c51e169461c94bac43cb84b9de8838a3a60f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T13:32:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:398e881c57fa716f05bc111395f7b47235be79c192957c33ee7e03d5f4a7114e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T13:35:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:398e881c57fa716f05bc111395f7b47235be79c192957c33ee7e03d5f4a7114e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T14:00:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a90655628a4852c154e6fd6ddff9955f4f2b2e002cb2553cf49610831e3aebb5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T14:04:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a90655628a4852c154e6fd6ddff9955f4f2b2e002cb2553cf49610831e3aebb5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:50:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f3444437ea6286721f330e42832cbc99fce2c0b1d41da16268aaf9481a544c9f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:18:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f3444437ea6286721f330e42832cbc99fce2c0b1d41da16268aaf9481a544c9f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075669adefa63190d9d3991fb60cde4dd719a6b555968795e26a594d88668306",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:18:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075669adefa63190d9d3991fb60cde4dd719a6b555968795e26a594d88668306",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19d5f0bd26647c204c674e4d88c4e42735bdb98aa7868b77faddf166aa170e47",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:20:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19d5f0bd26647c204c674e4d88c4e42735bdb98aa7868b77faddf166aa170e47",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:50:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c63d917350c79fbbd60a8b64d12fa43506dc33237b726852b317650128fa8f3d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:57:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c63d917350c79fbbd60a8b64d12fa43506dc33237b726852b317650128fa8f3d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T07:11:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:64ba864414f31f777a63c70e07e7921b227ea5078f6db59037f4f75ece36816b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T07:18:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:64ba864414f31f777a63c70e07e7921b227ea5078f6db59037f4f75ece36816b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T01:26:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:831fab0ad306f5ade6bfc06f6c03b221f94ab14e4977d9e97a70e2f1c5b75603",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T01:35:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:831fab0ad306f5ade6bfc06f6c03b221f94ab14e4977d9e97a70e2f1c5b75603",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-11T16:02:08Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/batch-plan.json",
+              "line": 77,
+              "message": "B1 is not independently buildable: T001 changes the pair/cache-key constructors, but the affected check/results callers remain in T003/B2, while cache codecs and CLI composition/driver callers are not owned by any task. Migrate all affected call sites in the same batch/order as the domain change, or declare concrete ownership before B1.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 105,
+              "message": "T006 is not executable as written: its description names only “Test-obligation regression fixtures and bounded calibration path” and “root-host validation”, without a target file or symbol. Name the concrete fixture/test and validation targets.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 6,
+              "message": "Sections S1-S4 restate upstream behavior contracts instead of limiting the plan sections to target, operation, and anchor. Examples include “make the existing structured specification element the normalized verifier input”, “invalidating old Pass and Fail values alike”, and “section-aware exclusion semantics”. Remove the behavioral rationale from these section descriptions; retain concrete targets, operations, and anchors.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 67,
+              "message": "T002-T006 contain upstream contract restatements beyond the permitted target/operation/anchor form, including “retain missing-material pending behavior”, “map stale ... to ... pending”, “exclusions are not affirmative requirements”, “preserve fail-closed configuration diagnostics”, and the extensive regression-behavior list in T006. Cite the targets and anchors without repeating the spec behavior prose; see .harness/policies/no-upstream-restatement.md.",
+              "severity": "P2"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 105,
+              "message": "Before implementation starts, split T006 into independently verifiable units: verifier-lane/spec-section regressions (IN-01/IN-02/AC-01/AC-02), stale Pass/Fail evaluate-check-results freshness (IN-04/IN-05/AC-03), and normal cache-preserving binary/root-host validation (AC-04). Each unit can be tested independently and currently has a single broad task boundary.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:33269ecb95d6bf31d0dbab337a398bfd79d20723958ff0719e24e326188dd967",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T16:14:36Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/task-coverage.json",
+              "line": 8,
+              "message": "`task-coverage.json` maps IN-02 and AC-02 to T004, but T004 only targets check/results freshness checks and focused tests; it does not implement or validate exclusion/non-guarantee semantics or caller-owned input selection. Remove these mappings or assign them to a task whose description owns those verifier behaviors.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:0e6977b5d844ecfeaac838b10fef443bbfb525a30672987e94aa21d228b63981",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T16:17:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6b6ce873e19d7932316fa2047b03769c9e943c78ba485685dc01984bb89843ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:23:14Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/batch-plan.json",
+              "line": 63,
+              "message": "B1 groups T002 and T003 despite overlapping write ownership: both tasks claim `libs/usecase/src/test_obligation/evaluate/{plan.rs,cache.rs,tests.rs}`, and their operations overlap on request/cache-key migration and tests. Reassign those files exclusively—such as making T003 their sole owner—or place the tasks in separate batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/batch-plan.json",
+              "line": 64,
+              "message": "B2 groups T004 and T008 even though both claim `libs/usecase/src/test_obligation/{check_tests.rs,results_tests.rs}` without a symbol-level ownership partition. Give T008 separate regression-test targets, assign those files exclusively to one task, or separate the tasks into different batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/impl-plan.json",
+              "line": 113,
+              "message": "T009 is the only task carrying the normal cache-preserving validation handoff for AC-04, but all three declared commands use the nonexistent `test-obligations` subcommand; `bin/sotp` accepts only singular `test-obligation`. As written, the load-bearing AC-04 validation cannot execute. Correct the evaluate/check/results commands to `bin/sotp test-obligation ...`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:6b6ce873e19d7932316fa2047b03769c9e943c78ba485685dc01984bb89843ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T16:31:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf5b5f16ff4341b81f3176217a2d8d5792bef8ea740804170b600e5ee9f71b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:34:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf5b5f16ff4341b81f3176217a2d8d5792bef8ea740804170b600e5ee9f71b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T17:37:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62b5fc69b4099afafc192b857699f256739992aa6abf06aeff5dff69d03bd2e0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T17:43:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62b5fc69b4099afafc192b857699f256739992aa6abf06aeff5dff69d03bd2e0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T19:17:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:135412f6ee14f0920e38e2370875a6ee3e21d40d67ebd512e683e164bc9663e7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T19:23:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:135412f6ee14f0920e38e2370875a6ee3e21d40d67ebd512e683e164bc9663e7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T20:48:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bded419769a25acf73da43880a929f83bae5506b672c884d15834f514b991a9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T20:51:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bded419769a25acf73da43880a929f83bae5506b672c884d15834f514b991a9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T22:17:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:520f22e9a26fac0df887ba2e79cee4ed089b0828582d8e48f0a2a78e1312160d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T22:23:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:520f22e9a26fac0df887ba2e79cee4ed089b0828582d8e48f0a2a78e1312160d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:47:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd1cf2d2146bec61c4c652e22b00e72ca501284710aaa0c5286f73cbdf1fc3fc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:55:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd1cf2d2146bec61c4c652e22b00e72ca501284710aaa0c5286f73cbdf1fc3fc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T05:02:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:058ef385c3930aefb420e5bfd8c06140d941fffd4727ea0c2ed53b172de918bb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T05:10:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:058ef385c3930aefb420e5bfd8c06140d941fffd4727ea0c2ed53b172de918bb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T07:09:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:879a3d17daa196f63b83b0c76a6edde8690009c39723a339698af3638ce84027",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T07:16:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:879a3d17daa196f63b83b0c76a6edde8690009c39723a339698af3638ce84027",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T02:58:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6efbbee2c055b6771a56f5b661ae17ea96b2392b6b031d97add459c8380fd8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:03:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6efbbee2c055b6771a56f5b661ae17ea96b2392b6b031d97add459c8380fd8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:32:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:992a96c71608b5f358a3a3811f08c5ad882c6c8d8f237cd8c5a0c2305858b970",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:33:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:992a96c71608b5f358a3a3811f08c5ad882c6c8d8f237cd8c5a0c2305858b970",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:41Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 201,
+              "message": "`save` performs a check-then-use symlink validation, then calls `std::fs::write`, which follows a symlink if the cache path is replaced between the check and write. A local race can redirect cache contents outside `items_dir`; use descriptor-pinned no-follow writing as in the fulfillment cache codec.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:89b2a603a827909f958951fd0bf795356deb6432790734d026f8d3f27c4c11b5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:02:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5476ffa077feb0f366da0491832476c4d6ccba318df7c1140107ee7ccc082dc6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:25:55Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 200,
+              "message": "`未宣言の前提への依存`: `save` now routes every waiver-cache write through `open_fulfillment_cache_for_write_guarded`, whose non-Unix branch unconditionally returns `Unsupported`. This regresses the previous `std::fs::write` behavior on Windows, while neither the track spec nor `environment-assumptions.md` declares waiver-cache persistence Unix-only. Provide a descriptor-pinned writer for supported non-Unix targets, or formally declare and enforce this adapter's platform boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5476ffa077feb0f366da0491832476c4d6ccba318df7c1140107ee7ccc082dc6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:41:56Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 248,
+              "message": "The new Windows writer remains check-then-use: `create_dir_all(parent)` mutates by pathname, then `reject_symlinks_below` checks the path, and `.open(path)` resolves the full pathname again. `FILE_FLAG_OPEN_REPARSE_POINT` protects only the final component; it does not pin intermediate directories. A junction can replace an ancestor around either check, causing directory creation or the later truncate/write outside `trusted_root`. Use component-by-component handle-relative traversal like the Unix writer, or formally make this adapter fail closed on Windows.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:81d6682541b373f4c4680bbb6add6725a08146c9479d371ba20715a15d7ed4e6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:58:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5476ffa077feb0f366da0491832476c4d6ccba318df7c1140107ee7ccc082dc6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:50:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:655d4596a08e1882e14eb2f1969b943690cde4161c4fad904299e72394d17725",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:57:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:655d4596a08e1882e14eb2f1969b943690cde4161c4fad904299e72394d17725",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:01:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8089fd6ff845771c3191f72d08bd0ffe3f87767bda29543259bce15f42cf2c4c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:15:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8089fd6ff845771c3191f72d08bd0ffe3f87767bda29543259bce15f42cf2c4c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-11T13:29:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:abcfce41893ecbfffb8d3fc45fbec3a127a2e4923b220b05d2eae0c834d2b470",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T13:34:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:abcfce41893ecbfffb8d3fc45fbec3a127a2e4923b220b05d2eae0c834d2b470",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:02:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37b8922cf3bc40e936b78adbc240de52043da09c6c6075e5efd4eb258713af4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T16:05:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37b8922cf3bc40e936b78adbc240de52043da09c6c6075e5efd4eb258713af4b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T20:50:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8f9238709f4958707d38404253dca3019ab03ea38bf23f7d35e3fc3bc6e9c552",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:01:44Z",
+          "findings": [
+            {
+              "category": "test-evidence integrity",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/test-bindings.json",
+              "line": 796,
+              "message": "Three edges have conflicting outcomes: `ObligationResponsibilityHash × CN-01` and `SpecElementHash × {CN-01, AC-03}` are declared first as voluntary bindings (lines 162, 201, and 218) and again here as waivers. Waiver precedence silently suppresses the cited tests, leaving misleading dead test evidence instead of one honest edge outcome. Remove the shadowed voluntary bindings, or replace the waivers only if entry-local tests genuinely fulfill those edges.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8f9238709f4958707d38404253dca3019ab03ea38bf23f7d35e3fc3bc6e9c552",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T21:07:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c34979813a2f698046ef0f3a46cf5485199ce35abc4d90ad05164dba3be4165",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:44:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:27805bd962daed6790163e4d4deb8af991eca64d38b154f02fb24ae94bd9798f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:52:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:27805bd962daed6790163e4d4deb8af991eca64d38b154f02fb24ae94bd9798f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T05:03:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:15893b856e22e6d4fe3859bdf071394fe893d96651f3a07ef9c3656c6253be17",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T05:10:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:15893b856e22e6d4fe3859bdf071394fe893d96651f3a07ef9c3656c6253be17",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T01:22:26Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/test-bindings.json",
+              "line": 465,
+              "message": "The WaiverCacheDocument × IN-04 lookup-identity tests are classified as `voluntary_binding`, so they generate only a voluntary obligation instead of fulfilling the owned lookup contract described in the briefing. Record this as the required fulfillment binding with the canonical obligation identity.",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/test-bindings.json",
+              "line": 518,
+              "message": "The WaiverCacheDocument × AC-03 lookup miss/replacement tests are classified as `voluntary_binding`, but the briefing explicitly requires this edge to be a fulfillment. Reclassify the record as a fulfillment with the canonical obligation identity so the AC-03 contract is actually fulfilled.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6cace23e3415fe4f401b530b0bfe4575dd2df9bbabc0e45e1e5836b388b8d417",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-14T01:43:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cace23e3415fe4f401b530b0bfe4575dd2df9bbabc0e45e1e5836b388b8d417",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T01:48:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cace23e3415fe4f401b530b0bfe4575dd2df9bbabc0e45e1e5836b388b8d417",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T02:59:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43afa6ca868ee68a3c6663e8341dddd118216d18ac21d82a06cf8cd8d5e142fa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:08:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43afa6ca868ee68a3c6663e8341dddd118216d18ac21d82a06cf8cd8d5e142fa",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-11T14:16:33Z",
+          "findings": [
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+              "line": 91,
+              "message": "CN-02 is not concretely testable: “対象自身の矛盾”, “別の振る舞いへのすり替え”, and especially “中心的な約束” have no observable boundary or deterministic classification. Downstream type/implementation planning would have to invent which inputs produce 不合格 versus 保留.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:afa8a1edbe9a25e2ac4806c109a0185fd21790eb523a6c486d1ab72c62369e3b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T14:19:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54fcfa00832daae00bc561512e19eacbe1d699e19d76fff1a87b3168282ab334",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T14:24:03Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+              "line": 19,
+              "message": "GO-01 の仕様区分保持と対象外の意味反転防止には AC coverage が不足している。AC-01 は同一本文の in_scope / out_of_scope 区別と、対象外の名詞句を肯定的な実装要求へ変えないことしか検証しないため、D1 / IN-01 が要求する goal・constraint・acceptance_criteria を含む全区分の識別子・所属・本文保持や、D2 / IN-02 が要求する「非保証から否定要件を作らず、対象責務内の明示禁止は検証する」という区別が壊れても、現在の AC はすべて成立し得る。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:54fcfa00832daae00bc561512e19eacbe1d699e19d76fff1a87b3168282ab334",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T14:27:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc2366f070dcb890d0c600b462216f6e04f20d32515f0ac44c096f692c42800f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-11T15:16:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:232fba67660569057636916dcf08bd1693f1d791661efc70923466606a6dd3d4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T15:28:49Z",
+          "findings": [
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 559,
+              "message": "`domain::tddd::test_obligation::pair::WaiverPair::new` は `WaivedReason`、`EntryDeclaration`、`SpecElementRef` しか保持せず、兄弟の `ObligationFulfillmentPair::new` が保持する `TestObligationId` と `TestObligationBrief` を失っている。唯一の waiver port 入力も `&WaiverPair` なので、IN-03/CN-02 が要求する義務の同一性・説明を型付きデータとして waiver verifier へ渡せず、`EntryDeclaration` 文字列への埋め込みに頼る lossy boundary になる。責務情報を型付き aggregate として WaiverPair と鮮度契約へ追加する必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 208,
+              "message": "`WaiverVerifierPort::verify_pair` は provider-backed semantic verification を表す変更対象 port だが `is_async: false` のままで、entry docs は blocking 実行や既存の spawn-blocking scheduling を意図した選択だと説明していない。同期境界を維持するならその理由を契約に記録し、そうでなければ async surface にする必要がある。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 261,
+              "message": "`.harness/policies/no-upstream-restatement.md` に反し、`SpecElementHash`、`domain::tddd::test_obligation::pair::{ObligationFulfillmentPair,WaiverPair}`、`domain::tddd::test_obligation::verdict::{ObligationFulfillmentCacheKey,WaiverCacheKey}` の docs が、区分移動時の失効、外部探索禁止、両 lane の入力保持、全可変入力の freshness といった upstream behavior を文章で再記述している。型の意味・配置根拠だけを残し、挙動は spec anchor 参照に置き換える必要がある。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/usecase-types.json",
+              "line": 27,
+              "message": "`.harness/policies/no-upstream-restatement.md` に反し、`usecase::test_obligation::{check::CheckTestObligationsInteractor,evaluate::EvaluateTestObligationsInteractor,results::TestObligationResultsInteractor}` の docs が、旧指紋の扱い、完全要求の hash、再評価、三経路の freshness 一致を再記述している。各 entry は変更対象と役割だけを述べ、挙動は IN/AC anchor に委ねる必要がある。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/infrastructure-types.json",
+              "line": 6,
+              "message": "`.harness/policies/no-upstream-restatement.md` に反し、両 `*_verifier_fingerprint` function と `ObligationFulfillmentVerifierAdapter` / `WaiverVerifierAdapter` の docs が、fingerprint の構成・除外、prompt に渡す情報、対象外解釈、fail-closed 条件を upstream contract から再記述している。変更対象と adapter/function の局所的な型目的だけを残し、挙動は spec_refs の anchor で参照する必要がある。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:232fba67660569057636916dcf08bd1693f1d791661efc70923466606a6dd3d4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-11T15:50:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:043062b196a6b94019c07febb96d916cb458207949ec053d4e530f32d885d712",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T15:53:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:043062b196a6b94019c07febb96d916cb458207949ec053d4e530f32d885d712",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:30:31Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/usecase-types.json",
+              "line": null,
+              "message": "レビューを完了できませんでした。現在のサンドボックスが read-only mount lock の作成に失敗し、指定された briefing、対象 JSON、current diff をローカルから読み取れませんでした。したがって types scope の内容に基づく判定は未実施です。",
+              "severity": "blocker"
+            }
+          ],
+          "hash": "rvw1:sha256:76bc0c9f604343cdd37372569ecb1bf27a7204f86b1ff1cbe016a0048f671e3b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-12T03:31:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76bc0c9f604343cdd37372569ecb1bf27a7204f86b1ff1cbe016a0048f671e3b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:34:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76bc0c9f604343cdd37372569ecb1bf27a7204f86b1ff1cbe016a0048f671e3b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T06:46:48Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 528,
+              "message": "`domain::tddd::test_obligation::errors::ObligationCheckError` の `docs` が、`WaiverCacheLookup` が曖昧な current-row lookup を typed data として保持するという挙動契約を散文で再記述しています。docs は変更対象と spec anchor の参照に留め、上流挙動は再記述しないでください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 722,
+              "message": "`domain::tddd::test_obligation::errors::ObligationEvaluateError` の `docs` が、current-row waiver resolution の ambiguity を typed data として伝播する挙動を再記述しています。上流 anchor の参照に置き換えてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 1296,
+              "message": "`domain::tddd::test_obligation::verdict::WaiverCacheDocument` の `docs` が、`lookup_current` の副作用なし・一意行導出・入力条件という挙動契約を再記述しています。docs は変更対象と spec anchor の参照に留めてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+              "line": 1542,
+              "message": "`domain::tddd::test_obligation::verdict::WaiverCacheLookupError` の `docs` が、複数一致時に返すというエラー挙動を再記述しています。挙動契約を散文で複製せず、上流 anchor を参照してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:7b2ca69512bb43f8d63c3ff636f2392daa8b6e1002cfafcb76363dc5482f3c19",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-12T06:58:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b96ccf164195d1354156602811ae2785a79568efc401d06531230245872b77f9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T07:04:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b96ccf164195d1354156602811ae2785a79568efc401d06531230245872b77f9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-09-11T20:52:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:771d22d21d0f9ee9bad4e484db533a84533f1ef23d45b99dab3cfab28a88cab6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-11T21:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:771d22d21d0f9ee9bad4e484db533a84533f1ef23d45b99dab3cfab28a88cab6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T03:51:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ff689ab3718e4028bd3844dbe20bc8b70b44c0115cf1247e95f3576921c6007",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T04:01:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ff689ab3718e4028bd3844dbe20bc8b70b44c0115cf1247e95f3576921c6007",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T05:06:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f7afa7e8df791d94fa60b9250058df9fa7def50278c4b1521ae5cfd53eff501",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T05:17:33Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results.rs",
+              "line": 316,
+              "message": "status projection の失敗を「無効 row なし」に変換しないでください。ここで `Err` を `.ok()` に落とすため、catalogue/spec/source scan/task-contract/impl-plan の取得に失敗すると旧 `Fulfilled`/`Waived` が pass、旧 `Fail` が fail として再表示されます。`results_status.rs:154-158` の context 不在時も空の invalidation を返すため、fingerprint のない legacy row さえ raw verdict のままです。IN-04/CN-01/AC-03 に従い、status summary の診断とは独立して、鮮度を確認できない cache row は fail-closed で pending にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 432,
+              "message": "domain の current-cache lookup を迂回しています。この `find` は同一 edge/obligation/key/fingerprint の row が複数あると最初の1件だけを採用し、後続処理は一致する全 row を current 扱いします。競合 verdict があれば status summary と lane counts が矛盾し、`check` が拒否する `AmbiguousCurrentEntries` を `results` は受理します。`ObligationFulfillmentCacheDocument::lookup_current` を使用し、曖昧性を pending または診断へ写像してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f7afa7e8df791d94fa60b9250058df9fa7def50278c4b1521ae5cfd53eff501",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-12T05:39:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:32704bbf96a04d9b94a769ba0037e52018dd9f88b78cbf29ee35d3d349d7ec7a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T05:45:18Z",
+          "findings": [
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 533,
+              "message": "Waiver cache の current identity と重複判定を usecase 内へ実装しないでください。`lookup_current_waiver` は edge・owner・key・fingerprint の一致と一意性を決める domain rule です。fulfillment 側では同じ規則を `ObligationFulfillmentCacheDocument::lookup_current` と typed error が所有していますが、waiver 側だけここで再実装したため、現在も first-match の evaluate/check と、duplicate を pending にする results の意味が分岐します。`WaiverCacheDocument` に対応する lookup と error を置き、全 consumer で共有してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:32704bbf96a04d9b94a769ba0037e52018dd9f88b78cbf29ee35d3d349d7ec7a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-12T07:12:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f90759807d6db5b9bf3eeae306cfb5c445f5b724b6bf923ae25891c068580c92",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-12T07:17:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f90759807d6db5b9bf3eeae306cfb5c445f5b724b6bf923ae25891c068580c92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:01:31Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_tests.rs",
+              "line": 1439,
+              "message": "`refreshed_verdict` is matched by value at line 1439 and then used again at line 1461, but `WaiverVerdict` is not `Copy`; this causes a compile error (use-after-move). Match by reference or compute the boolean before the match.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:5577bf454a90e75352d1bd990975780d2c87bdacdab91ee571d3622e47773cdf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-14T03:08:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:671a782b55d09d963c85357ba55603633123c1c26b2ecfd4db5d6161040cde76",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:18:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:671a782b55d09d963c85357ba55603633123c1c26b2ecfd4db5d6161040cde76",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

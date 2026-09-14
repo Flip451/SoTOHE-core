@@ -256,23 +256,89 @@ pub(super) fn local_responsibility_probe_shapes() -> Vec<LocalResponsibilityProb
 }
 
 fn memory_positive_probe_source() -> String {
-    "#[test]\nfn local_responsibility_probe_memory_positive() {\n    let mut names = std::collections::BTreeMap::new();\n    names.insert(\"alpha\", 1_u8);\n    names.insert(\"beta\", 2_u8);\n    assert_eq!(names.get(\"alpha\"), Some(&1_u8));\n    assert_eq!(names.get(\"beta\"), Some(&2_u8));\n}\n"
-        .to_owned()
+    r#"#[test]
+fn local_responsibility_probe_memory_positive() {
+    struct InMemoryNameIndex {
+        names: std::collections::BTreeMap<&'static str, u8>,
+    }
+
+    impl InMemoryNameIndex {
+        fn lookup(&self, name: &str) -> Option<&u8> {
+            self.names.get(name)
+        }
+    }
+
+    let mut index = InMemoryNameIndex { names: std::collections::BTreeMap::new() };
+    index.names.insert("alpha", 1_u8);
+    index.names.insert("beta", 2_u8);
+    assert_eq!(index.lookup("alpha"), Some(&1_u8));
+    assert_eq!(index.lookup("beta"), Some(&2_u8));
+}
+"#
+    .to_owned()
 }
 
 fn memory_negative_probe_source() -> String {
-    "#[test]\nfn local_responsibility_probe_memory_negative() {\n    let mut names = std::collections::BTreeMap::new();\n    names.insert(\"alpha\", 1_u8);\n    // Only one name is exercised, so independent-name coexistence remains unverified.\n    assert_eq!(names.get(\"alpha\"), Some(&1_u8));\n}\n"
-        .to_owned()
+    r#"#[test]
+fn local_responsibility_probe_memory_negative() {
+    struct InMemoryNameIndex {
+        names: std::collections::BTreeMap<&'static str, u8>,
+    }
+
+    impl InMemoryNameIndex {
+        fn lookup(&self, name: &str) -> Option<&u8> {
+            self.names.get(name)
+        }
+    }
+
+    let mut index = InMemoryNameIndex { names: std::collections::BTreeMap::new() };
+    index.names.insert("alpha", 1_u8);
+    assert_eq!(index.lookup("alpha"), Some(&1_u8));
+}
+"#
+    .to_owned()
 }
 
 fn persistence_positive_probe_source() -> String {
-    "#[test]\nfn local_responsibility_probe_persistence_positive() {\n    use std::path::{Path, PathBuf};\n\n    fn project_local_storage_location(project_root: &Path) -> PathBuf {\n        project_root.join(\".state\").join(\"values.data\")\n    }\n\n    let project_root = Path::new(\"project-root\");\n    let user_global_root = Path::new(\"user-global-root\");\n    let location = project_local_storage_location(project_root);\n    assert!(location.starts_with(project_root));\n    assert!(!location.starts_with(user_global_root));\n}\n"
-        .to_owned()
+    r#"#[test]
+fn local_responsibility_probe_persistence_positive() {
+    use std::path::{Path, PathBuf};
+
+    struct PersistencePathTarget {
+        storage_location: PathBuf,
+    }
+
+    let project_root = Path::new("project-root");
+    let user_global_root = Path::new("user-global-root");
+    let target = PersistencePathTarget {
+        storage_location: project_root.join(".state").join("values.data"),
+    };
+    assert!(target.storage_location.starts_with(project_root));
+    assert!(!target.storage_location.starts_with(user_global_root));
+}
+"#
+    .to_owned()
 }
 
 fn persistence_negative_probe_source() -> String {
-    "#[test]\nfn local_responsibility_probe_persistence_negative() {\n    use std::path::{Path, PathBuf};\n\n    fn user_global_storage_location(user_global_root: &Path) -> PathBuf {\n        user_global_root.join(\"values.data\")\n    }\n\n    let project_root = Path::new(\"project-root\");\n    let user_global_root = Path::new(\"user-global-root\");\n    let location = user_global_storage_location(user_global_root);\n    assert!(location.starts_with(user_global_root));\n    assert!(!location.starts_with(project_root));\n}\n"
-        .to_owned()
+    r#"#[test]
+fn local_responsibility_probe_persistence_negative() {
+    use std::path::{Path, PathBuf};
+
+    struct PersistencePathTarget {
+        storage_location: PathBuf,
+    }
+
+    let project_root = Path::new("project-root");
+    let user_global_root = Path::new("user-global-root");
+    let target = PersistencePathTarget {
+        storage_location: user_global_root.join("values.data"),
+    };
+    assert!(target.storage_location.starts_with(user_global_root));
+    assert!(!target.storage_location.starts_with(project_root));
+}
+"#
+    .to_owned()
 }
 
 /// Percentage-scaled probe count (AC-08 / IN-01).

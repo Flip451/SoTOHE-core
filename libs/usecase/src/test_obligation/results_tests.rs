@@ -16,7 +16,9 @@ use domain::tddd::catalogue_v2::{
     AttestedCatalogueDocument, CatalogueDocument, CrateName, ModulePath, StructKind, StructShape,
     TypeEntry, TypeKindV2,
 };
-use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
+use domain::tddd::semantic_verify::{
+    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SpecElementRef, SpecSectionKind,
+};
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
@@ -26,7 +28,10 @@ use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, ObligationResultsError, VerifyCacheError,
 };
 use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
-use domain::tddd::test_obligation::hashes::{AnchorTextHash, BoundTestsSetHash, DeclarationHash};
+use domain::tddd::test_obligation::hashes::{
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+    WaivedReasonHash,
+};
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestFunctionName, TestModulePath, TestObligationAnchorId,
     TestObligationBrief, TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
@@ -57,6 +62,10 @@ use super::{
 };
 use crate::pre_review_gate::{
     ImplPlanReadError, ImplPlanReaderPort, TaskContractReadError, TaskContractReaderPort,
+};
+use crate::test_obligation::{
+    declaration_with_obligation_context, declaration_with_obligation_item,
+    obligation_declaration_text, sha256_content_hash,
 };
 use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 
@@ -322,7 +331,8 @@ fn fulfillment_key() -> ObligationFulfillmentCacheKey {
     ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(hash(1)),
         DeclarationHash::new(hash(2)),
-        AnchorTextHash::new(hash(3)),
+        SpecElementHash::new(hash(3)),
+        ObligationResponsibilityHash::new(hash(4)),
     )
 }
 
@@ -389,7 +399,8 @@ fn waiver_failure_cache(edge_id: TestObligationEdgeId) -> WaiverCacheDocument {
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
                 DeclarationHash::new(hash(2)),
-                AnchorTextHash::new(hash(3)),
+                SpecElementHash::new(hash(3)),
+                ObligationResponsibilityHash::new(hash(4)),
             ),
             WaiverVerdict::Fail { reason: reason("does not hold") },
             None,
@@ -504,6 +515,25 @@ fn status_interactor(
     fulfillment: Option<ObligationFulfillmentCacheDocument>,
     status: TaskStatusKind,
 ) -> TestObligationResultsInteractor {
+    status_interactor_with_spec(bindings, fulfillment, status, status_spec())
+}
+
+fn status_interactor_with_spec(
+    bindings: TestBindingsDocument,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    status: TaskStatusKind,
+    spec: SpecDocument,
+) -> TestObligationResultsInteractor {
+    status_interactor_with_caches(bindings, fulfillment, None, status, spec)
+}
+
+fn status_interactor_with_caches(
+    bindings: TestBindingsDocument,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    waiver: Option<WaiverCacheDocument>,
+    status: TaskStatusKind,
+    spec: SpecDocument,
+) -> TestObligationResultsInteractor {
     let task_id = TaskId::try_new("T001".to_owned()).unwrap();
     let mut entries = BTreeMap::new();
     entries.insert(
@@ -520,10 +550,10 @@ fn status_interactor(
         Arc::new(StubBindings(Some(bindings))),
         Arc::new(StatusScanner),
         Arc::new(StubFulfillmentCache(fulfillment)),
-        Arc::new(StubWaiverCache(None)),
+        Arc::new(StubWaiverCache(waiver)),
         VerifierPromptFingerprint::new(hash(9)),
         VerifierPromptFingerprint::new(hash(10)),
-        Arc::new(StatusSpecReader(status_spec())),
+        Arc::new(StatusSpecReader(spec)),
         Arc::new(StatusCatalogueReader(status_catalogue())),
         Arc::new(StatusTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
         Arc::new(StatusImplPlanReader(statuses)),
@@ -532,6 +562,225 @@ fn status_interactor(
 
 fn status_command() -> TestObligationResultsCommand {
     TestObligationResultsCommand::new(track(), vec![PathBuf::from("domain-types.json")])
+}
+
+fn status_spec_moved_to_out_of_scope() -> SpecDocument {
+    SpecDocument::new(
+        "Status lane results".to_owned(),
+        "1.0".to_owned(),
+        Vec::new(),
+        SpecScope::new(
+            Vec::new(),
+            vec![
+                SpecRequirement::new(
+                    SpecElementId::try_new("IN-05").unwrap(),
+                    "aggregate unresolved results by status".to_owned(),
+                    Vec::new(),
+                    Vec::new(),
+                    Vec::new(),
+                )
+                .unwrap(),
+            ],
+        ),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        None,
+    )
+    .unwrap()
+}
+
+fn status_key_for_section(section: SpecSectionKind) -> ObligationFulfillmentCacheKey {
+    let obligation = status_obligation();
+    let declaration = declaration_with_obligation_context(
+        &obligation_declaration_text(&[status_catalogue()], &obligation).unwrap(),
+        obligation.id(),
+        obligation.brief(),
+    );
+    let element = SpecElementRef::new(
+        section,
+        SpecElementId::try_new("IN-05").unwrap(),
+        "aggregate unresolved results by status".to_owned(),
+    );
+    ObligationFulfillmentCacheKey::new(
+        BoundTestsSetHash::new(sha256_content_hash(b"assert status lane\n")),
+        DeclarationHash::new(sha256_content_hash(declaration.as_bytes())),
+        crate::test_obligation::freshness::spec_element_hash(&[element], &edge("Money", "IN-05")),
+        crate::test_obligation::freshness::responsibility_hash(obligation.id(), obligation.brief()),
+    )
+}
+
+fn status_fresh_key() -> ObligationFulfillmentCacheKey {
+    status_key_for_section(SpecSectionKind::InScope)
+}
+
+fn status_key_with_declaration_hash(
+    declaration_hash: DeclarationHash,
+) -> ObligationFulfillmentCacheKey {
+    let current = status_fresh_key();
+    ObligationFulfillmentCacheKey::new(
+        current.bound_tests_set_hash().clone(),
+        declaration_hash,
+        current.spec_element_hash().clone(),
+        current.responsibility_hash().clone(),
+    )
+}
+
+fn status_key_with_responsibility_hash(
+    responsibility_hash: ObligationResponsibilityHash,
+) -> ObligationFulfillmentCacheKey {
+    let current = status_fresh_key();
+    ObligationFulfillmentCacheKey::new(
+        current.bound_tests_set_hash().clone(),
+        current.declaration_hash().clone(),
+        current.spec_element_hash().clone(),
+        responsibility_hash,
+    )
+}
+
+fn status_moved_key() -> ObligationFulfillmentCacheKey {
+    status_key_for_section(SpecSectionKind::OutOfScope)
+}
+
+fn status_waiver_reason() -> WaivedReason {
+    WaivedReason::try_new("valid status-lane waiver".to_owned()).unwrap()
+}
+
+fn status_waiver_key_for_section(section: SpecSectionKind) -> WaiverCacheKey {
+    let obligation = status_obligation();
+    let declaration = declaration_with_obligation_item(
+        &obligation_declaration_text(&[status_catalogue()], &obligation).unwrap(),
+        obligation.id().item_identifier().as_str(),
+    );
+    let element = SpecElementRef::new(
+        section,
+        SpecElementId::try_new("IN-05").unwrap(),
+        "aggregate unresolved results by status".to_owned(),
+    );
+    WaiverCacheKey::new(
+        WaivedReasonHash::new(sha256_content_hash(status_waiver_reason().as_str().as_bytes())),
+        DeclarationHash::new(sha256_content_hash(declaration.as_bytes())),
+        crate::test_obligation::freshness::spec_element_hash(&[element], &edge("Money", "IN-05")),
+        crate::test_obligation::freshness::responsibility_hash(obligation.id(), obligation.brief()),
+    )
+}
+
+fn status_waiver_cache(verdict: WaiverVerdict, key: WaiverCacheKey) -> WaiverCacheDocument {
+    WaiverCacheDocument::new(
+        track(),
+        vec![WaiverCacheEntry::new(
+            edge("Money", "IN-05"),
+            Some(status_obligation().id().clone()),
+            key,
+            verdict,
+            Some(VerifierPromptFingerprint::new(hash(10))),
+        )],
+    )
+}
+
+fn assert_stale_and_refreshed_fulfillment_results(
+    stale_key: ObligationFulfillmentCacheKey,
+    stale_fingerprint: VerifierPromptFingerprint,
+) {
+    let obligation = status_obligation();
+    let binding =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+    let current_key = status_fresh_key();
+    let current_fingerprint = VerifierPromptFingerprint::new(hash(9));
+
+    for verdict in [
+        ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+        ObligationFulfillmentVerdict::Fail {
+            category: FulfillmentFailCategory::Contradiction,
+            reason: reason("cached failure"),
+        },
+    ] {
+        let refreshed_verdict_is_absent =
+            matches!(&verdict, ObligationFulfillmentVerdict::Fail { .. });
+        let stale = status_interactor_with_spec(
+            binding.clone(),
+            Some(ObligationFulfillmentCacheDocument::new(
+                track(),
+                vec![cache_entry(
+                    edge("Money", "IN-05"),
+                    obligation.id().clone(),
+                    stale_key.clone(),
+                    verdict.clone(),
+                    Some(stale_fingerprint.clone()),
+                )],
+            )),
+            TaskStatusKind::Done,
+            status_spec(),
+        )
+        .execute(&status_command())
+        .unwrap();
+
+        let stale_lane = stale
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+            .unwrap();
+        assert_eq!(stale_lane.pass_count(), 0);
+        assert_eq!(stale_lane.fail_count(), 0);
+        assert_eq!(stale_lane.pending_count(), 1);
+        assert_eq!(stale.records().len(), 1);
+        let stale_status = stale
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(stale_status.stale_count() + stale_status.verdict_absent_count(), 1);
+
+        let refreshed = status_interactor_with_spec(
+            binding.clone(),
+            Some(ObligationFulfillmentCacheDocument::new(
+                track(),
+                vec![cache_entry(
+                    edge("Money", "IN-05"),
+                    obligation.id().clone(),
+                    current_key.clone(),
+                    verdict.clone(),
+                    Some(current_fingerprint.clone()),
+                )],
+            )),
+            TaskStatusKind::Done,
+            status_spec(),
+        )
+        .execute(&status_command())
+        .unwrap();
+
+        let refreshed_lane = refreshed
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+            .unwrap();
+        match verdict {
+            ObligationFulfillmentVerdict::Fulfilled { .. } => {
+                assert_eq!(refreshed_lane.pass_count(), 1);
+                assert_eq!(refreshed_lane.fail_count(), 0);
+                assert_eq!(refreshed.records().len(), 0);
+            }
+            ObligationFulfillmentVerdict::Fail { .. } => {
+                assert_eq!(refreshed_lane.pass_count(), 0);
+                assert_eq!(refreshed_lane.fail_count(), 1);
+                assert_eq!(refreshed.records().len(), 1);
+            }
+            ObligationFulfillmentVerdict::Pending => panic!("fixture has no pending verdict"),
+        }
+        let refreshed_status = refreshed
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(refreshed_status.stale_count(), 0);
+        assert_eq!(
+            refreshed_status.verdict_absent_count(),
+            usize::from(refreshed_verdict_is_absent)
+        );
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -555,7 +804,7 @@ fn test_fulfillment_lane_counts_and_records() {
     let entries = vec![
         cache_entry(
             edge("Money", "IN-05"),
-            fulfilled_id,
+            fulfilled_id.clone(),
             fulfillment_key(),
             ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
             None,
@@ -587,20 +836,25 @@ fn test_fulfillment_lane_counts_and_records() {
         .filter(|l| *l.chain_name() == TestObligationChainLabel::Fulfillment)
         .collect();
     assert_eq!(fulfillment_lanes.len(), 1);
-    assert_eq!(fulfillment_lanes[0].pass_count(), 1);
-    assert_eq!(fulfillment_lanes[0].fail_count(), 1);
-    assert_eq!(fulfillment_lanes[0].pending_count(), 1);
-    // Records are emitted for the fail + pending edges only.
-    assert_eq!(output.records().len(), 2);
+    assert_eq!(fulfillment_lanes[0].pass_count(), 0);
+    assert_eq!(fulfillment_lanes[0].fail_count(), 0);
+    assert_eq!(fulfillment_lanes[0].pending_count(), 3);
+    // Without freshness context every legacy row is fail-closed as pending.
+    assert_eq!(output.records().len(), 3);
+    assert!(output.records().contains(&EdgeVerdictRecord::new(
+        Some(fulfilled_id),
+        edge("Money", "IN-05"),
+        Some(reason("fulfillment binding")),
+        Some(reason("infrastructure::infrastructure::tests::test_case")),
+        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
+        None,
+    )));
     assert!(output.records().contains(&EdgeVerdictRecord::new(
         Some(failed_id),
         edge("Money", "IN-06"),
         Some(reason("fulfillment binding")),
         Some(reason("infrastructure::infrastructure::tests::test_case")),
-        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {
-            category: FulfillmentFailCategory::Contradiction,
-            reason: reason("asserts the opposite"),
-        }),
+        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
         None,
     )));
     assert!(output.records().contains(&EdgeVerdictRecord::new(
@@ -681,7 +935,8 @@ fn test_waiver_lane_counts() {
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(4)),
                 DeclarationHash::new(hash(2)),
-                AnchorTextHash::new(hash(3)),
+                SpecElementHash::new(hash(3)),
+                ObligationResponsibilityHash::new(hash(4)),
             ),
             WaiverVerdict::Waived { citation: citation() },
             None,
@@ -692,7 +947,8 @@ fn test_waiver_lane_counts() {
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
                 DeclarationHash::new(hash(2)),
-                AnchorTextHash::new(hash(3)),
+                SpecElementHash::new(hash(3)),
+                ObligationResponsibilityHash::new(hash(4)),
             ),
             WaiverVerdict::Fail { reason: reason("does not hold") },
             None,
@@ -714,14 +970,16 @@ fn test_waiver_lane_counts() {
         .filter(|l| *l.chain_name() == TestObligationChainLabel::Waiver)
         .collect();
     assert_eq!(waiver_lanes.len(), 1);
-    assert_eq!(waiver_lanes[0].pass_count(), 1);
-    assert_eq!(waiver_lanes[0].fail_count(), 1);
+    assert_eq!(waiver_lanes[0].pass_count(), 0);
+    assert_eq!(waiver_lanes[0].fail_count(), 0);
+    assert_eq!(waiver_lanes[0].pending_count(), 2);
+    assert_eq!(output.records().len(), 2);
     assert!(output.records().contains(&EdgeVerdictRecord::new(
         Some(resolved_obligation_id),
         waived_edge,
         Some(reason("waiver")),
         Some(reason(waiver_reason)),
-        EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
+        EdgeResolutionOutcome::Waiver(WaiverVerdict::Pending),
         None,
     )));
 }
@@ -735,7 +993,7 @@ fn test_waiver_record_without_exact_binding_has_no_provenance() {
         waived_edge.clone(),
         None,
         None,
-        EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
+        EdgeResolutionOutcome::Waiver(WaiverVerdict::Pending),
         None,
     );
 
@@ -792,7 +1050,7 @@ fn test_waiver_record_resolves_unique_owner_by_anchor() {
             waived_edge,
             Some(reason("waiver")),
             Some(reason("valid waiver")),
-            EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
+            EdgeResolutionOutcome::Waiver(WaiverVerdict::Pending),
             None,
         )]
     );
@@ -827,7 +1085,7 @@ fn test_waiver_record_with_ambiguous_anchor_owner_leaves_obligation_unresolved()
             waived_edge,
             Some(reason("waiver")),
             Some(reason("valid waiver")),
-            EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
+            EdgeResolutionOutcome::Waiver(WaiverVerdict::Pending),
             None,
         )]
     );
@@ -926,6 +1184,337 @@ fn test_results_interactor_aggregates_status_lanes_without_gate_failure() {
         .find(|summary| summary.task_status() == TaskStatusKind::Done)
         .unwrap();
     assert_eq!(done.stale_count(), 1);
+}
+
+#[test]
+fn test_test_obligation_results_interactor_reports_stale_and_post_reevaluation_freshness() {
+    let obligation = status_obligation();
+    let binding =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+    for verdict in [
+        ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+        ObligationFulfillmentVerdict::Fail {
+            category: FulfillmentFailCategory::Contradiction,
+            reason: reason("cached failure"),
+        },
+    ] {
+        let cache = ObligationFulfillmentCacheDocument::new(
+            track(),
+            vec![cache_entry(
+                edge("Money", "IN-05"),
+                obligation.id().clone(),
+                status_fresh_key(),
+                verdict.clone(),
+                Some(VerifierPromptFingerprint::new(hash(9))),
+            )],
+        );
+        let fresh_interactor: TestObligationResultsInteractor = status_interactor_with_spec(
+            binding.clone(),
+            Some(cache.clone()),
+            TaskStatusKind::Done,
+            status_spec(),
+        );
+        let fresh = fresh_interactor.execute(&status_command()).unwrap();
+        let fresh_summary = fresh
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(fresh_summary.stale_count(), 0);
+
+        let moved_interactor: TestObligationResultsInteractor = status_interactor_with_spec(
+            binding.clone(),
+            Some(cache),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        );
+        let moved = moved_interactor.execute(&status_command()).unwrap();
+        let moved_summary = moved
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(moved_summary.stale_count(), 1);
+
+        let post_reevaluation_cache = ObligationFulfillmentCacheDocument::new(
+            track(),
+            vec![cache_entry(
+                edge("Money", "IN-05"),
+                obligation.id().clone(),
+                status_moved_key(),
+                verdict.clone(),
+                Some(VerifierPromptFingerprint::new(hash(9))),
+            )],
+        );
+        let post_reevaluation_interactor: TestObligationResultsInteractor =
+            status_interactor_with_spec(
+                binding.clone(),
+                Some(post_reevaluation_cache),
+                TaskStatusKind::Done,
+                status_spec_moved_to_out_of_scope(),
+            );
+        let post_reevaluation = post_reevaluation_interactor.execute(&status_command()).unwrap();
+        let post_summary = post_reevaluation
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(post_summary.stale_count(), 0);
+        let fulfillment_lane = post_reevaluation
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+            .unwrap();
+        match &verdict {
+            ObligationFulfillmentVerdict::Fulfilled { .. } => {
+                assert_eq!(fulfillment_lane.pass_count(), 1);
+            }
+            ObligationFulfillmentVerdict::Fail { .. } => {
+                assert_eq!(fulfillment_lane.fail_count(), 1);
+            }
+            ObligationFulfillmentVerdict::Pending => {
+                assert_eq!(fulfillment_lane.pending_count(), 1);
+            }
+        }
+    }
+}
+
+#[test]
+fn test_results_projects_stale_pass_and_fail_to_pending_in_both_verifier_lanes() {
+    let obligation = status_obligation();
+    let fulfillment_binding =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+
+    for verdict in [
+        ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+        ObligationFulfillmentVerdict::Fail {
+            category: FulfillmentFailCategory::Contradiction,
+            reason: reason("cached failure"),
+        },
+    ] {
+        let output = status_interactor_with_spec(
+            fulfillment_binding.clone(),
+            Some(ObligationFulfillmentCacheDocument::new(
+                track(),
+                vec![cache_entry(
+                    edge("Money", "IN-05"),
+                    obligation.id().clone(),
+                    status_fresh_key(),
+                    verdict,
+                    Some(VerifierPromptFingerprint::new(hash(9))),
+                )],
+            )),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        )
+        .execute(&status_command())
+        .unwrap();
+
+        let fulfillment_lane = output
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+            .unwrap();
+        assert_eq!(fulfillment_lane.pass_count(), 0);
+        assert_eq!(fulfillment_lane.fail_count(), 0);
+        assert_eq!(fulfillment_lane.pending_count(), 1);
+        assert_eq!(output.records().len(), 1);
+        let done = output
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(done.stale_count(), 1);
+        assert_eq!(done.verdict_absent_count(), 0);
+    }
+
+    let waiver_binding = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: edge("Money", "IN-05"),
+            reason: status_waiver_reason(),
+        }],
+    );
+    for verdict in [
+        WaiverVerdict::Waived { citation: citation() },
+        WaiverVerdict::Fail { reason: reason("cached waiver failure") },
+    ] {
+        let output = status_interactor_with_caches(
+            waiver_binding.clone(),
+            None,
+            Some(status_waiver_cache(
+                verdict,
+                status_waiver_key_for_section(SpecSectionKind::InScope),
+            )),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        )
+        .execute(&status_command())
+        .unwrap();
+
+        let waiver_lane = output
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Waiver)
+            .unwrap();
+        assert_eq!(waiver_lane.pass_count(), 0);
+        assert_eq!(waiver_lane.fail_count(), 0);
+        assert_eq!(waiver_lane.pending_count(), 1);
+        assert_eq!(output.records().len(), 1);
+        let done = output
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(done.stale_count(), 1);
+        assert_eq!(done.verdict_absent_count(), 0);
+    }
+}
+
+#[test]
+fn test_results_rechecks_stale_waiver_pass_and_fail_after_refresh() {
+    // AC-03 / AC-04: a stale waiver row is shown as pending, while the normal
+    // replacement write restores the new pass/fail result without deleting it.
+    let binding = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: edge("Money", "IN-05"),
+            reason: status_waiver_reason(),
+        }],
+    );
+
+    for (stale_verdict, refreshed_verdict) in [
+        (
+            WaiverVerdict::Waived { citation: citation() },
+            WaiverVerdict::Fail { reason: reason("refreshed waiver failure") },
+        ),
+        (
+            WaiverVerdict::Fail { reason: reason("stale waiver failure") },
+            WaiverVerdict::Waived { citation: citation() },
+        ),
+    ] {
+        let stale = status_interactor_with_caches(
+            binding.clone(),
+            None,
+            Some(status_waiver_cache(
+                stale_verdict,
+                status_waiver_key_for_section(SpecSectionKind::InScope),
+            )),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        )
+        .execute(&status_command())
+        .unwrap();
+        let stale_lane = stale
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Waiver)
+            .unwrap();
+        assert_eq!(stale_lane.pass_count(), 0);
+        assert_eq!(stale_lane.fail_count(), 0);
+        assert_eq!(stale_lane.pending_count(), 1);
+
+        let refreshed = status_interactor_with_caches(
+            binding.clone(),
+            None,
+            Some(status_waiver_cache(
+                refreshed_verdict.clone(),
+                status_waiver_key_for_section(SpecSectionKind::OutOfScope),
+            )),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        )
+        .execute(&status_command())
+        .unwrap();
+        let refreshed_lane = refreshed
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Waiver)
+            .unwrap();
+        match &refreshed_verdict {
+            WaiverVerdict::Waived { .. } => {
+                assert_eq!(refreshed_lane.pass_count(), 1);
+                assert_eq!(refreshed_lane.fail_count(), 0);
+                assert_eq!(refreshed.records().len(), 0);
+            }
+            WaiverVerdict::Fail { .. } => {
+                assert_eq!(refreshed_lane.pass_count(), 0);
+                assert_eq!(refreshed_lane.fail_count(), 1);
+                assert_eq!(refreshed.records().len(), 1);
+            }
+            WaiverVerdict::Pending => panic!("matrix has no pending verdict"),
+        }
+        let status = refreshed
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(status.stale_count(), 0);
+        assert_eq!(
+            status.verdict_absent_count(),
+            usize::from(matches!(refreshed_verdict, WaiverVerdict::Fail { .. }))
+        );
+    }
+}
+
+#[test]
+fn test_results_stales_pass_and_fail_when_target_responsibility_changes() {
+    // AC-03: a changed target-responsibility brief invalidates both cached
+    // outcomes while all other cache-key components remain current.
+    let obligation = status_obligation();
+    let previous_brief =
+        TestObligationBrief::try_new("previous target responsibility".to_owned()).unwrap();
+    let stale_responsibility =
+        crate::test_obligation::freshness::responsibility_hash(obligation.id(), &previous_brief);
+    let current = status_fresh_key();
+    assert_ne!(stale_responsibility, *current.responsibility_hash());
+    let stale_key = status_key_with_responsibility_hash(stale_responsibility);
+    assert_eq!(stale_key.bound_tests_set_hash(), current.bound_tests_set_hash());
+    assert_eq!(stale_key.declaration_hash(), current.declaration_hash());
+    assert_eq!(stale_key.spec_element_hash(), current.spec_element_hash());
+
+    assert_stale_and_refreshed_fulfillment_results(
+        stale_key,
+        VerifierPromptFingerprint::new(hash(9)),
+    );
+}
+
+#[test]
+fn test_results_stales_pass_and_fail_when_judgment_request_structure_changes() {
+    // AC-03: a changed normalized request/declaration input invalidates both
+    // cached outcomes while the evidence, specification, and responsibility
+    // inputs remain current.
+    let current = status_fresh_key();
+    let stale_declaration = DeclarationHash::new(sha256_content_hash(
+        b"previous normalized judgment request structure",
+    ));
+    assert_ne!(stale_declaration, *current.declaration_hash());
+    let stale_key = status_key_with_declaration_hash(stale_declaration);
+    assert_eq!(stale_key.bound_tests_set_hash(), current.bound_tests_set_hash());
+    assert_eq!(stale_key.spec_element_hash(), current.spec_element_hash());
+    assert_eq!(stale_key.responsibility_hash(), current.responsibility_hash());
+
+    assert_stale_and_refreshed_fulfillment_results(
+        stale_key,
+        VerifierPromptFingerprint::new(hash(9)),
+    );
+}
+
+#[test]
+fn test_results_stales_pass_and_fail_when_verifier_input_format_changes() {
+    // AC-03 / CN-01: a prior verifier input-format or semantic fingerprint
+    // cannot make either cached outcome look current; reevaluation restores it.
+    let current_fingerprint = VerifierPromptFingerprint::new(hash(9));
+    let stale_fingerprint = VerifierPromptFingerprint::new(hash(8));
+    assert_ne!(stale_fingerprint, current_fingerprint);
+
+    assert_stale_and_refreshed_fulfillment_results(status_fresh_key(), stale_fingerprint);
 }
 
 #[test]
@@ -1043,6 +1632,109 @@ fn test_results_interactor_with_unresolved_or_status_read_error_returns_ok() {
 }
 
 #[test]
+fn test_results_projects_rows_pending_when_status_projection_fails() {
+    let obligation = status_obligation();
+    let binding =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+
+    for verdict in [
+        ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+        ObligationFulfillmentVerdict::Fail {
+            category: FulfillmentFailCategory::CentralUnverified,
+            reason: reason("cached failure"),
+        },
+    ] {
+        let interactor = TestObligationResultsInteractor::new(
+            Arc::new(StubObligations(Some(ObligationsDocument::new(
+                track(),
+                vec![obligation.clone()],
+            )))),
+            Arc::new(StubBindings(Some(binding.clone()))),
+            Arc::new(StatusScanner),
+            Arc::new(StubFulfillmentCache(Some(ObligationFulfillmentCacheDocument::new(
+                track(),
+                vec![cache_entry(
+                    edge("Money", "IN-05"),
+                    obligation.id().clone(),
+                    status_fresh_key(),
+                    verdict,
+                    Some(VerifierPromptFingerprint::new(hash(9))),
+                )],
+            )))),
+            Arc::new(StubWaiverCache(None)),
+            VerifierPromptFingerprint::new(hash(9)),
+            VerifierPromptFingerprint::new(hash(10)),
+            Arc::new(StatusSpecReader(status_spec())),
+            Arc::new(UnusedCatalogueReader),
+            Arc::new(UnusedTaskContractReader),
+            Arc::new(UnusedImplPlanReader),
+        );
+
+        let output = interactor.execute(&status_command()).unwrap();
+        let lane = output
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+            .unwrap();
+        assert_eq!(lane.pass_count(), 0);
+        assert_eq!(lane.fail_count(), 0);
+        assert_eq!(lane.pending_count(), 1);
+        assert_eq!(output.records().len(), 1);
+        assert!(matches!(
+            output.status_lane_summaries(),
+            Err(message) if message.as_str().contains("catalogue read failed")
+        ));
+    }
+
+    let waiver_binding = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: edge("Money", "IN-05"),
+            reason: status_waiver_reason(),
+        }],
+    );
+    for verdict in [
+        WaiverVerdict::Waived { citation: citation() },
+        WaiverVerdict::Fail { reason: reason("cached waiver failure") },
+    ] {
+        let interactor = TestObligationResultsInteractor::new(
+            Arc::new(StubObligations(Some(ObligationsDocument::new(
+                track(),
+                vec![obligation.clone()],
+            )))),
+            Arc::new(StubBindings(Some(waiver_binding.clone()))),
+            Arc::new(StatusScanner),
+            Arc::new(StubFulfillmentCache(None)),
+            Arc::new(StubWaiverCache(Some(status_waiver_cache(
+                verdict,
+                status_waiver_key_for_section(SpecSectionKind::InScope),
+            )))),
+            VerifierPromptFingerprint::new(hash(9)),
+            VerifierPromptFingerprint::new(hash(10)),
+            Arc::new(StatusSpecReader(status_spec())),
+            Arc::new(UnusedCatalogueReader),
+            Arc::new(UnusedTaskContractReader),
+            Arc::new(UnusedImplPlanReader),
+        );
+
+        let output = interactor.execute(&status_command()).unwrap();
+        let lane = output
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Waiver)
+            .unwrap();
+        assert_eq!(lane.pass_count(), 0);
+        assert_eq!(lane.fail_count(), 0);
+        assert_eq!(lane.pending_count(), 1);
+        assert_eq!(output.records().len(), 1);
+        assert!(matches!(
+            output.status_lane_summaries(),
+            Err(message) if message.as_str().contains("catalogue read failed")
+        ));
+    }
+}
+
+#[test]
 fn test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absent() {
     let obligation = status_obligation();
     let bindings =
@@ -1061,6 +1753,15 @@ fn test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absen
     let output = status_interactor(bindings, Some(cache), TaskStatusKind::Done)
         .execute(&status_command())
         .unwrap();
+    let fulfillment_lane = output
+        .lane_summaries()
+        .iter()
+        .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+        .unwrap();
+    assert_eq!(fulfillment_lane.pass_count(), 0);
+    assert_eq!(fulfillment_lane.fail_count(), 0);
+    assert_eq!(fulfillment_lane.pending_count(), 1);
+    assert_eq!(output.records().len(), 1);
     let done = output
         .status_lane_summaries()
         .unwrap()
@@ -1070,6 +1771,110 @@ fn test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absen
     assert_eq!(done.missing_count(), 0);
     assert_eq!(done.stale_count(), 0);
     assert_eq!(done.verdict_absent_count(), 1);
+}
+
+#[test]
+fn test_results_projects_duplicate_current_rows_to_pending_in_both_lanes() {
+    let obligation = status_obligation();
+    let binding =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+    let fingerprint = VerifierPromptFingerprint::new(hash(9));
+    let key = status_fresh_key();
+    let fulfillment_cache = ObligationFulfillmentCacheDocument::new(
+        track(),
+        vec![
+            cache_entry(
+                edge("Money", "IN-05"),
+                obligation.id().clone(),
+                key.clone(),
+                ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+                Some(fingerprint.clone()),
+            ),
+            cache_entry(
+                edge("Money", "IN-05"),
+                obligation.id().clone(),
+                key,
+                ObligationFulfillmentVerdict::Fail {
+                    category: FulfillmentFailCategory::Contradiction,
+                    reason: reason("conflicting current row"),
+                },
+                Some(fingerprint.clone()),
+            ),
+        ],
+    );
+    let fulfillment_output =
+        status_interactor(binding, Some(fulfillment_cache), TaskStatusKind::Done)
+            .execute(&status_command())
+            .unwrap();
+    let fulfillment_lane = fulfillment_output
+        .lane_summaries()
+        .iter()
+        .find(|summary| summary.chain_name() == &TestObligationChainLabel::Fulfillment)
+        .unwrap();
+    assert_eq!(fulfillment_lane.pass_count(), 0);
+    assert_eq!(fulfillment_lane.fail_count(), 0);
+    assert_eq!(fulfillment_lane.pending_count(), 2);
+    assert_eq!(fulfillment_output.records().len(), 2);
+    let fulfillment_status = fulfillment_output
+        .status_lane_summaries()
+        .unwrap()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Done)
+        .unwrap();
+    assert_eq!(fulfillment_status.verdict_absent_count(), 1);
+
+    let waiver_binding = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: edge("Money", "IN-05"),
+            reason: status_waiver_reason(),
+        }],
+    );
+    let waiver_key = status_waiver_key_for_section(SpecSectionKind::InScope);
+    let waiver_cache = WaiverCacheDocument::new(
+        track(),
+        vec![
+            WaiverCacheEntry::new(
+                edge("Money", "IN-05"),
+                Some(obligation.id().clone()),
+                waiver_key.clone(),
+                WaiverVerdict::Waived { citation: citation() },
+                Some(VerifierPromptFingerprint::new(hash(10))),
+            ),
+            WaiverCacheEntry::new(
+                edge("Money", "IN-05"),
+                Some(obligation.id().clone()),
+                waiver_key,
+                WaiverVerdict::Fail { reason: reason("conflicting current row") },
+                Some(VerifierPromptFingerprint::new(hash(10))),
+            ),
+        ],
+    );
+    let waiver_output = status_interactor_with_caches(
+        waiver_binding,
+        None,
+        Some(waiver_cache),
+        TaskStatusKind::Done,
+        status_spec(),
+    )
+    .execute(&status_command())
+    .unwrap();
+    let waiver_lane = waiver_output
+        .lane_summaries()
+        .iter()
+        .find(|summary| summary.chain_name() == &TestObligationChainLabel::Waiver)
+        .unwrap();
+    assert_eq!(waiver_lane.pass_count(), 0);
+    assert_eq!(waiver_lane.fail_count(), 0);
+    assert_eq!(waiver_lane.pending_count(), 2);
+    assert_eq!(waiver_output.records().len(), 2);
+    let waiver_status = waiver_output
+        .status_lane_summaries()
+        .unwrap()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Done)
+        .unwrap();
+    assert_eq!(waiver_status.verdict_absent_count(), 1);
 }
 
 #[test]

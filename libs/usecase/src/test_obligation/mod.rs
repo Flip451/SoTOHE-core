@@ -12,12 +12,13 @@
 //! * [`mod@bindings_skeleton`] — read-only skeleton generation for implementer-authored bindings.
 //!
 //! Shared, verifier-agnostic helpers (active-track guard, content hashing, and
-//! catalogue declaration canonicalisation) live here so `derive` and `check`
-//! freeze and compare declaration hashes identically.
+//! catalogue declaration canonicalisation) live here so derivation and the
+//! evaluate/check/results lanes freeze and compare declaration hashes identically.
 
 mod check_contract;
 mod check_sources;
 mod check_support;
+mod freshness;
 mod results_status;
 mod status_lanes;
 
@@ -36,7 +37,7 @@ use std::path::{Component, Path, PathBuf};
 
 use domain::ContentHash;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::{CatalogueDocument, TraitImplDeclV2};
+use domain::tddd::catalogue_v2::{CatalogueDocument, TraitImplDeclV2, TypeEntry};
 use domain::tddd::semantic_verify::{CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationBrief, TestObligationEdgeId, TestObligationId,
@@ -374,24 +375,33 @@ fn trait_impl_declaration_text_in<'a>(
                 derive::resolve_named_type_key(catalogue, impl_decl.for_type()).ok()?;
             if resolved_for_type.as_str() == for_type && impl_decl.trait_ref().as_str() == trait_ref
             {
+                let implementing_type = catalogue.types().get(&resolved_for_type)?;
                 let trait_declaration =
                     trait_declaration_text_for_impl(all_catalogues, impl_decl).ok()??;
-                return Some(trait_impl_pair_declaration_text(impl_decl, &trait_declaration));
+                return Some(trait_impl_pair_declaration_text(
+                    impl_decl,
+                    implementing_type,
+                    &trait_declaration,
+                ));
             }
         }
     }
     None
 }
 
-/// Canonical declaration text for a trait implementation and the contract it
-/// implements. Both derivation and verification use this exact composition so
-/// an implementation's cache key changes with either side of the pair.
+/// Canonical declaration text for a trait implementation, its implementing type,
+/// and the contract it implements. Both derivation and verification use this
+/// exact composition so an implementation's cache key changes when any
+/// declaration-owned responsibility input changes.
 #[must_use]
 pub(crate) fn trait_impl_pair_declaration_text(
     impl_declaration: &TraitImplDeclV2,
+    implementing_type: &TypeEntry,
     trait_declaration: &str,
 ) -> String {
-    format!("trait_impl: {impl_declaration:?}\ntrait_declaration: {trait_declaration}")
+    format!(
+        "trait_impl: {impl_declaration:?}\nimplementing_type: {implementing_type:?}\ntrait_declaration: {trait_declaration}"
+    )
 }
 
 fn trait_declaration_text_for_impl(

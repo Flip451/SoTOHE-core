@@ -1,0 +1,2 @@
+{"hash":"5a9c761eca7d8f0f90964660199e169375f9714423d347b2a3e01dec23231f23","kind":"init","source":"2026-09-11-1320-test-obligation-verifier-context-integrity.md","timestamp":"2026-09-11T13:23:47Z"}
+{"hash":"531dcd3ef18682d7952385480af2e8e10e665b907666817fc66747df77438db4","kind":"escalation","reason":"review-refinement: レビューで指摘されたD4の意味入力集合の境界を、正規化済み判定要求を正とする形へ精緻化した。保守的な過大包含と形式改訂時の失効を明記し、守護者は元の決定を狭めず保持する明確化と判定した。承認参照の適用もユーザー裁定に忠実であると再監査した。","source":"2026-09-11-1320-test-obligation-verifier-context-integrity.md","timestamp":"2026-09-11T14:07:15Z"}

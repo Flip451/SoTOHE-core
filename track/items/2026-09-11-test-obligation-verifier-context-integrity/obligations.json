@@ -1,0 +1,329 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a contract test covering 'trait_method:verify_pair' of WaiverVerifierPort",
+      "declaration_hash": "e7e7ff412f67f11db2f89f0944b9544c24601a9c9e0596c3bd9f6287ade6bef2",
+      "id": {
+        "entry_key": "WaiverVerifierPort",
+        "item_identifier": "trait_method:verify_pair",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "WaiverVerifierPort",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/domain-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of usecase::test_obligation::check::CheckTestObligationsInteractor",
+      "declaration_hash": "e045dadbd6287968b6a1f20bacf2a5f0a0fa8417c60a866cc816dfa16d9120ae",
+      "id": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+      "declaration_hash": "5d2f69509bd7323d3f0923f9636363038035022f9fbe5c0305d19b9b7140a3b9",
+      "id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of usecase::test_obligation::results::TestObligationResultsInteractor",
+      "declaration_hash": "7987e25fc463c66be15cc7c931536825a89679ef4f30c4a7fcf54c976f4a9dca",
+      "id": {
+        "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+      "declaration_hash": "2eb4d5cb9083120e3b2b9c65a145e5a03e2b544d63bbdd3977723038fafca48c",
+      "id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+      "declaration_hash": "6e967c8a9dc8d8cd56f3efcffc3894adb9be50fcf4022f2d1e76822db448a398",
+      "id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort' of infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+      "declaration_hash": "2698cfe5a38cab8bb6ef4bdb8360003e593e7634c4df2c78a85e9845d2d4aabd",
+      "id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort' of infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+      "declaration_hash": "91a3c7c4d24cc228531f7cac44ae23a4315413fbb087507b5e7dde93c07a4ebb",
+      "id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort' of infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+      "declaration_hash": "e2d4f30e259808130b1850c4402eb71424232a9e2b00689de7b723a9ec4002aa",
+      "id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier",
+        "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    }
+  ],
+  "track_id": "2026-09-11-test-obligation-verifier-context-integrity"
+}

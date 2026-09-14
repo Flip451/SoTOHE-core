@@ -1,0 +1,260 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint": {
+      "action": "modify",
+      "docs": "Computes the fulfillment verifier contract fingerprint.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint": {
+      "action": "modify",
+      "docs": "Computes the waiver verifier contract fingerprint.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "ObligationFulfillmentVerifierAdapter",
+      "trait_ref": "domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "WaiverVerifierAdapter",
+      "trait_ref": "domain::tddd::test_obligation::ports::WaiverVerifierPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "domain::tddd::test_obligation::ports::WaiverVerifierPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "core::clone::Clone"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter": {
+      "action": "modify",
+      "docs": "Driven adapter implementing ObligationFulfillmentVerifierPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "agent_profile",
+              "ty": "AgentProfiles"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_verifier",
+      "role": { "SecondaryAdapter": {} },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier": {
+      "action": "modify",
+      "docs": "Fail-closed driven adapter for the normalized WaiverVerifierPort; preserves the existing bounded diagnostic when verifier configuration cannot be loaded. The from_message &str is intentionally opaque diagnostic text with no domain format or finite vocabulary and is immediately converted to DiagnosticMessage.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_message",
+          "params": [
+            {
+              "name": "message",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::waiver_verifier",
+      "role": { "SecondaryAdapter": {} },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    },
+    "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter": {
+      "action": "modify",
+      "docs": "Driven adapter implementing WaiverVerifierPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "agent_profile",
+              "ty": "AgentProfiles"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::waiver_verifier",
+      "role": { "SecondaryAdapter": {} },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        }
+      ]
+    }
+  }
+}

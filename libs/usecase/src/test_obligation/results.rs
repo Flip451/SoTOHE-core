@@ -39,7 +39,7 @@ use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 use super::diag;
 use super::ports::ObligationFulfillmentCachePort;
-use super::results_status::collect_status_lane_summaries;
+use super::results_status::collect_status_lane_projection;
 
 /// Verdict-chain lane discriminant for the results output (IN-10 / AC-09).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -294,23 +294,7 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
         let fulfillment = self.fulfillment_cache.load(&cmd.track_id).map_err(map_cache_error)?;
         let waiver = self.waiver_cache.load(&cmd.track_id).map_err(map_cache_error)?;
 
-        let mut lane_summaries = Vec::new();
-        let mut records = Vec::new();
-
-        if let Some(document) = fulfillment.as_ref() {
-            fulfillment_lanes(document, bindings.as_ref(), &mut lane_summaries, &mut records);
-        }
-        if let Some(document) = waiver.as_ref() {
-            waiver_lane(
-                document,
-                bindings.as_ref(),
-                obligations.as_ref(),
-                &mut lane_summaries,
-                &mut records,
-            );
-        }
-
-        let status_lane_summaries = collect_status_lane_summaries(
+        let status_projection = collect_status_lane_projection(
             &cmd.track_id,
             &cmd.catalogue_paths,
             obligations.as_ref(),
@@ -324,8 +308,47 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
             self.catalogue_reader.as_ref(),
             self.task_contract_reader.as_ref(),
             self.impl_plan_reader.as_ref(),
-        )
-        .map_err(status_lane_diagnostic);
+        );
+        let (status_lane_summaries, invalidated_fulfillment, invalidated_waiver) =
+            match status_projection {
+                Ok(projection) => (
+                    Ok(projection.status_lane_summaries().to_vec()),
+                    projection.invalidated_fulfillment().to_vec(),
+                    projection.invalidated_waiver().to_vec(),
+                ),
+                Err(error) => (
+                    Err(status_lane_diagnostic(&error)),
+                    fulfillment.as_ref().map_or_else(Vec::new, |document| {
+                        all_row_indices(document.entries().len())
+                    }),
+                    waiver.as_ref().map_or_else(Vec::new, |document| {
+                        all_row_indices(document.entries().len())
+                    }),
+                ),
+            };
+
+        let mut lane_summaries = Vec::new();
+        let mut records = Vec::new();
+
+        if let Some(document) = fulfillment.as_ref() {
+            fulfillment_lanes(
+                document,
+                bindings.as_ref(),
+                &invalidated_fulfillment,
+                &mut lane_summaries,
+                &mut records,
+            );
+        }
+        if let Some(document) = waiver.as_ref() {
+            waiver_lane(
+                document,
+                bindings.as_ref(),
+                obligations.as_ref(),
+                &invalidated_waiver,
+                &mut lane_summaries,
+                &mut records,
+            );
+        }
 
         Ok(TestObligationResultsOutput::new(
             lane_summaries,
@@ -338,12 +361,16 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
 
 /// Extracts the validated diagnostic for an independently unavailable status lane.
 fn status_lane_diagnostic(
-    error: ObligationResultsError,
+    error: &ObligationResultsError,
 ) -> domain::tddd::test_obligation::ids::DiagnosticMessage {
     match error {
         ObligationResultsError::IoError(message)
-        | ObligationResultsError::MalformedArtifact(message) => message,
+        | ObligationResultsError::MalformedArtifact(message) => message.clone(),
     }
+}
+
+fn all_row_indices(length: usize) -> Vec<usize> {
+    (0..length).collect()
 }
 
 /// Maps an obligations / bindings artifact error onto the results vocabulary.
@@ -390,22 +417,36 @@ impl Counts {
 fn fulfillment_lanes(
     document: &ObligationFulfillmentCacheDocument,
     bindings: Option<&TestBindingsDocument>,
+    invalidated_rows: &[usize],
     lanes: &mut Vec<TestObligationLaneSummary>,
     records: &mut Vec<EdgeVerdictRecord>,
 ) {
     let mut buckets: Vec<(LayerId, Counts)> = Vec::new();
-    for entry in document.entries() {
+    for (row_index, entry) in document.entries().iter().enumerate() {
         let layer = resolve_layer(entry.obligation_id(), entry.edge_id(), bindings);
-        let index = match buckets.iter().position(|(existing, _)| *existing == layer) {
+        let bucket_index = match buckets.iter().position(|(existing, _)| *existing == layer) {
             Some(index) => index,
             None => {
                 buckets.push((layer, Counts::default()));
                 buckets.len().saturating_sub(1)
             }
         };
-        let Some((_, counts)) = buckets.get_mut(index) else {
+        let Some((_, counts)) = buckets.get_mut(bucket_index) else {
             continue;
         };
+        if invalidated_rows.contains(&row_index) {
+            // A stale / legacy / wrong-fingerprint row is no longer a usable
+            // verdict. Keep it visible as pending so the chain summary cannot
+            // claim a historical pass or fail after the status lane reported
+            // the row as unresolved.
+            counts.pending += 1;
+            records.push(fulfillment_record(
+                entry,
+                EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
+                bindings,
+            ));
+            continue;
+        }
         match entry.verdict() {
             ObligationFulfillmentVerdict::Fulfilled { .. } => counts.pass += 1,
             ObligationFulfillmentVerdict::Fail { .. } => {
@@ -442,11 +483,22 @@ fn waiver_lane(
     document: &WaiverCacheDocument,
     bindings: Option<&TestBindingsDocument>,
     obligations: Option<&ObligationsDocument>,
+    invalidated_rows: &[usize],
     lanes: &mut Vec<TestObligationLaneSummary>,
     records: &mut Vec<EdgeVerdictRecord>,
 ) {
     let mut counts = Counts::default();
-    for entry in document.entries() {
+    for (row_index, entry) in document.entries().iter().enumerate() {
+        if invalidated_rows.contains(&row_index) {
+            counts.pending += 1;
+            records.push(waiver_record(
+                entry.edge_id(),
+                EdgeResolutionOutcome::Waiver(WaiverVerdict::Pending),
+                bindings,
+                obligations,
+            ));
+            continue;
+        }
         match entry.verdict() {
             WaiverVerdict::Waived { .. } => counts.pass += 1,
             WaiverVerdict::Fail { .. } => {

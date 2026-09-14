@@ -1,23 +1,42 @@
 //! Content-hash value objects for test-obligation verdict / fulfillment caches.
 //!
 //! Each newtype wraps a canonical [`ContentHash`] so a cache key can distinguish
-//! *which* hashed input it stands for at the type level: anchor text, catalogue
-//! declaration, bound-tests set, waiver reason, or a bound test's body span.
+//! *which* hashed input it stands for at the type level: a specification
+//! element, catalogue declaration, bound-tests set, waiver reason, obligation
+//! responsibility, or a bound test's body span.
 //! Keeping them distinct stops two structurally identical hashes from being
 //! swapped by accident when a cache key is assembled (IN-05 / IN-09 / AC-06).
 
 use crate::ContentHash;
 
-/// Hash of the anchor text a test obligation is bound to (verdict cache key).
-///
-/// See AC-06.
+/// Hash of one normalized specification element (verdict cache key).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AnchorTextHash {
+pub struct SpecElementHash {
     hash: ContentHash,
 }
 
-impl AnchorTextHash {
-    /// Wraps `hash` as an [`AnchorTextHash`].
+impl SpecElementHash {
+    /// Wraps `hash` as a [`SpecElementHash`].
+    #[must_use]
+    pub fn new(hash: ContentHash) -> Self {
+        Self { hash }
+    }
+
+    /// Borrows the inner content hash.
+    #[must_use]
+    pub fn as_hash(&self) -> &ContentHash {
+        &self.hash
+    }
+}
+
+/// Hash of the typed obligation identity and responsibility context.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ObligationResponsibilityHash {
+    hash: ContentHash,
+}
+
+impl ObligationResponsibilityHash {
+    /// Wraps `hash` as an [`ObligationResponsibilityHash`].
     #[must_use]
     pub fn new(hash: ContentHash) -> Self {
         Self { hash }
@@ -152,9 +171,27 @@ mod tests {
     }
 
     #[test]
-    fn test_anchor_text_hash_round_trips() {
+    fn test_spec_element_hash_round_trips() {
         let hash = sample_hash();
-        let wrapped = AnchorTextHash::new(hash.clone());
+        let wrapped = SpecElementHash::new(hash.clone());
+        assert_eq!(wrapped.as_hash(), &hash);
+    }
+
+    #[test]
+    fn test_spec_element_hash_distinguishes_revised_specification_inputs() {
+        let original_hash = ContentHash::from_bytes([1u8; 32]);
+        let revised_hash = ContentHash::from_bytes([2u8; 32]);
+        let original = SpecElementHash::new(original_hash);
+        let revised = SpecElementHash::new(revised_hash.clone());
+
+        assert_ne!(original, revised);
+        assert_eq!(revised.as_hash(), &revised_hash);
+    }
+
+    #[test]
+    fn test_obligation_responsibility_hash_round_trips() {
+        let hash = sample_hash();
+        let wrapped = ObligationResponsibilityHash::new(hash.clone());
         assert_eq!(wrapped.as_hash(), &hash);
     }
 
@@ -195,8 +232,8 @@ mod tests {
 
     #[test]
     fn test_distinct_wrappers_compare_by_inner_hash() {
-        let a = AnchorTextHash::new(ContentHash::from_bytes([1u8; 32]));
-        let b = AnchorTextHash::new(ContentHash::from_bytes([2u8; 32]));
+        let a = SpecElementHash::new(ContentHash::from_bytes([1u8; 32]));
+        let b = SpecElementHash::new(ContentHash::from_bytes([2u8; 32]));
         assert_ne!(a, b);
     }
 }

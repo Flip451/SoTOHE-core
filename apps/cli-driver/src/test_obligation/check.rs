@@ -128,7 +128,7 @@ mod tests {
     use domain::ContentHash;
     use domain::tddd::semantic_verify::CatalogueEntryKey;
     use domain::tddd::test_obligation::hashes::{
-        AnchorTextHash, BoundTestsSetHash, DeclarationHash,
+        BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
     };
     use domain::tddd::test_obligation::ids::{
         TestObligationAnchorId, TestObligationEdgeId, TestObligationId,
@@ -156,7 +156,8 @@ mod tests {
         let key = ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([1; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([4; 32])),
         );
 
         usecase::test_obligation::errors::ObligationCheckError::FulfillmentCacheLookup(

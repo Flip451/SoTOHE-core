@@ -1,0 +1,8 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "layer": "cli",
+  "schema_version": 5,
+  "traits": {},
+  "types": {}
+}

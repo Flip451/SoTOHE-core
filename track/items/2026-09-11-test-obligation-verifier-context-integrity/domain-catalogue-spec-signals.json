@@ -1,0 +1,81 @@
+{
+  "catalogue_declaration_hash": "c4e523322cfb895dcc0f34b57db8fbfccc6b5d2624cfda0066f50c7bf35c3a00",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "33bf25a1337aa7adba448a257e4bb9ef2b97cda413d914561ac3a83bfda31806",
+      "signal": "blue",
+      "type_name": "ObligationResponsibilityHash"
+    },
+    {
+      "entry_hash": "1a184a918927a919f14c5178cf55b31f96efade179e4c25ffbcd0d8b8ad399f5",
+      "signal": "blue",
+      "type_name": "SpecElementHash"
+    },
+    {
+      "entry_hash": "004c418d028c176422f8e91138924cf88323bec67209177754ef8f076ff096b0",
+      "signal": "blue",
+      "type_name": "domain::tddd::semantic_verify::SpecElementRef"
+    },
+    {
+      "entry_hash": "01de2e41228c0a7f6f0233169a672b1e36fa214b132cf5a62b7e74bf66fadf02",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::errors::ObligationCheckError"
+    },
+    {
+      "entry_hash": "39cf6d95d1ce8f18b4bbaf22b0436f637043e3a992b81a4936fd1a48c8309605",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::errors::ObligationEvaluateError"
+    },
+    {
+      "entry_hash": "67e6cdd3b093981246ae1bb6821dbbd1a2f82be0af00c9b63ca168adae4c2b54",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::pair::ObligationFulfillmentPair"
+    },
+    {
+      "entry_hash": "3ffea62ab7cdbab793aa8a854fe4d34744e91e3be2a30c0fc7a154b1d03356cb",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::pair::WaiverPair"
+    },
+    {
+      "entry_hash": "cfb9a2a6b0a59f1f343dfaea0ce579308d628570827ccec135ec8ed2f9e53c64",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey"
+    },
+    {
+      "entry_hash": "fd094836c1c4e563b87b149fd1db9563655236c556a4db3a4da21253b5b43d21",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::verdict::WaiverCacheDocument"
+    },
+    {
+      "entry_hash": "4bc66862aa35aa1337d63b68e93e6b3075752f6d68cd88163c7c396463918767",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::verdict::WaiverCacheKey"
+    },
+    {
+      "entry_hash": "847c0986b12ef96a659aac2c234460bf9a116978766def3bf39bb174db6b34a4",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::verdict::WaiverCacheLookupError"
+    },
+    {
+      "entry_hash": "bfd1038496d1ebe943ad94823e1ec4e8aafa8d5d24e2ca17bd6d90de24b7c4b8",
+      "signal": "blue",
+      "type_name": "ObligationFulfillmentVerifierPort"
+    },
+    {
+      "entry_hash": "7b70cc049ddc0489bb42d1a6af1b3a697e2e96c0d3637fb8d9b67d47db8c76bc",
+      "signal": "blue",
+      "type_name": "WaiverVerifierPort"
+    },
+    {
+      "entry_hash": "d3bf14577a7c524e84cc8328a151dbfe1c022dacd44a5cece35bcbf52f5dd5e0",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::hashes::AnchorTextHash"
+    },
+    {
+      "entry_hash": "4dccce1f5740de4677f8539e8201532821a57cf6dca5c289979804c6be81cbd7",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::pair::AnchorText"
+    }
+  ]
+}

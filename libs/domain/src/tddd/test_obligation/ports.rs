@@ -10,7 +10,7 @@
 //!   repositories (IN-05 / IN-06 / AC-03 / AC-04).
 //! * [`WaiverCachePort`] — waiver verdict-cache persistence (IN-09 / CN-04 / AC-06).
 //! * [`ObligationFulfillmentVerifierPort`] / [`WaiverVerifierPort`] — semantic
-//!   judgement (IN-09 / IN-11 / CN-08 / AC-07).
+//!   judgement over structured verifier pairs (IN-09 / IN-11 / CN-08 / AC-07).
 //! * [`TestSourceScannerPort`] — worktree test-body evidence (IN-06 / IN-09).
 
 use crate::tddd::test_obligation::binding::{TestBindingsDocument, TestLocation};
@@ -21,6 +21,7 @@ use crate::tddd::test_obligation::errors::{
 use crate::tddd::test_obligation::hashes::TestBodySpanHash;
 use crate::tddd::test_obligation::ids::DiagnosticMessage;
 use crate::tddd::test_obligation::obligations::ObligationsDocument;
+use crate::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 use crate::tddd::test_obligation::rules::TestObligationRulesDocument;
 use crate::tddd::test_obligation::verdict::{
     ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverVerdict,
@@ -101,8 +102,8 @@ pub trait WaiverCachePort {
     fn save(&self, doc: &WaiverCacheDocument) -> Result<(), DiagnosticMessage>;
 }
 
-/// Semantically verifies an obligation-fulfillment pair (tests vs anchor and
-/// the entry-local responsibility inputs carried by the pair).
+/// Semantically verifies an obligation-fulfillment pair (tests vs structured
+/// spec element and the entry-local responsibility inputs carried by the pair).
 pub trait ObligationFulfillmentVerifierPort {
     /// Verifies whether the pair's bound tests fulfill its cited anchor for
     /// its entry declaration and entry-local responsibility at the given model
@@ -114,15 +115,15 @@ pub trait ObligationFulfillmentVerifierPort {
     /// return a verdict.
     fn verify_pair(
         &self,
-        pair: &crate::tddd::test_obligation::pair::ObligationFulfillmentPair,
+        pair: &ObligationFulfillmentPair,
         tier: ModelTier,
     ) -> Result<ObligationFulfillmentVerdict, SemanticVerifierError>;
 }
 
-/// Semantically verifies a waiver pair (waived reason vs anchor).
+/// Semantically verifies a waiver pair (waived reason vs structured spec
+/// element and entry-local responsibility).
 pub trait WaiverVerifierPort {
-    /// Verifies whether `waived_reason` holds for `anchor_text` and
-    /// `entry_declaration` at the given model `tier`.
+    /// Verifies whether the waiver pair holds at the given model `tier`.
     ///
     /// # Errors
     ///
@@ -130,9 +131,7 @@ pub trait WaiverVerifierPort {
     /// return a verdict.
     fn verify_pair(
         &self,
-        waived_reason: &str,
-        entry_declaration: &str,
-        anchor_text: &str,
+        pair: &WaiverPair,
         tier: ModelTier,
     ) -> Result<WaiverVerdict, SemanticVerifierError>;
 }

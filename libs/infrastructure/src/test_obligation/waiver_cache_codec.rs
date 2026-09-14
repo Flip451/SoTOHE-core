@@ -2,13 +2,16 @@
 //!
 //! Serialises the domain [`WaiverCacheDocument`] to a track-scoped
 //! `waiver-cache.json` and validates it back (IN-09 / AC-06 / CN-04). Each entry
-//! freezes a waiver verdict against the three-hash cache key (waived-reason hash,
-//! entry-declaration hash, anchor-text hash, ADR D6): the hashes are serialised as
-//! lowercase hex and any change to a component produces a different key, so a
-//! stale verdict is treated as absent. Each entry also persists its verifier-prompt
-//! fingerprint; an absent legacy fingerprint remains readable but is fail-closed
-//! by cache readers, and recovery is only via re-evaluation (CN-04). A passing
-//! verdict structurally carries its evidence citation.
+//! freezes a waiver verdict against the four-hash cache key (waived-reason hash,
+//! entry-declaration hash, specification-element hash, and
+//! obligation-responsibility hash): the hashes are serialised as lowercase hex
+//! and any change to a component produces a different key, so a stale verdict is
+//! treated as absent. Each entry also persists its verifier-prompt fingerprint;
+//! an absent legacy fingerprint remains readable but is fail-closed by cache
+//! readers, and recovery is only via re-evaluation (CN-04). Historical
+//! three-hash keys remain readable for informational consumers but are marked
+//! fingerprint-less before any lookup can reuse them. A passing verdict
+//! structurally carries its evidence citation.
 
 use std::fs::{File, OpenOptions};
 use std::io::{Error, ErrorKind, Read, Write};
@@ -17,7 +20,8 @@ use std::path::{Path, PathBuf};
 use domain::TrackId;
 use domain::tddd::test_obligation::errors::VerifyCacheError;
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, DeclarationHash, VerifierPromptFingerprint, WaivedReasonHash,
+    DeclarationHash, ObligationResponsibilityHash, SpecElementHash, VerifierPromptFingerprint,
+    WaivedReasonHash,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::ports::WaiverCachePort;
@@ -30,7 +34,8 @@ use crate::test_obligation::bindings_codec::{
     TestObligationEdgeIdDto, edge_id_from_dto, edge_id_to_dto,
 };
 use crate::test_obligation::fulfillment_cache_codec::{
-    cache_error_from_artifact, parse_cache_citation, parse_cache_hash, parse_cache_reason,
+    cache_error_from_artifact, open_fulfillment_cache_for_write_guarded, parse_cache_citation,
+    parse_cache_hash, parse_cache_reason,
 };
 use crate::test_obligation::obligations_codec::{
     TestObligationIdDto, obligation_id_from_dto, obligation_id_to_dto,
@@ -64,16 +69,23 @@ pub enum WaiverVerdictDto {
     Pending,
 }
 
-/// Wire form of the three-component waiver cache key (IN-09 / CN-04).
+/// Wire form of the four-component waiver cache key (IN-09 / CN-04).
 ///
 /// Private helper: the domain [`WaiverCacheKey`] has no dedicated DTO in the type
-/// contract, so its three hashes are carried inline as lowercase hex strings.
+/// contract, so its four hashes are carried inline as lowercase hex strings.
+/// The optional legacy field permits historical three-component rows to remain
+/// readable; such rows are marked fingerprint-less instead of being reused.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct WaiverCacheKeyWire {
     waived_reason_hash: String,
     declaration_hash: String,
-    anchor_text_hash: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    spec_element_hash: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    responsibility_hash: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    anchor_text_hash: Option<String>,
 }
 
 /// Serde DTO for [`WaiverCacheEntry`] (IN-09).
@@ -164,15 +176,12 @@ impl WaiverCachePort for JsonWaiverCacheCodec {
             ))
         })?;
         let path = self.artifact_path(doc.track_id());
-        let Some(parent) = path.parent() else {
+        let Some(_parent) = path.parent() else {
             return Err(diagnostic(&format!(
                 "waiver cache path {} has no parent directory",
                 path.display()
             )));
         };
-        std::fs::create_dir_all(parent).map_err(|e| {
-            diagnostic(&format!("failed to create track directory {}: {e}", parent.display()))
-        })?;
         reject_symlinked_items_root(&self.items_dir).map_err(|source| {
             diagnostic(&format!(
                 "refusing to write waiver cache under {}: {source}",
@@ -187,7 +196,20 @@ impl WaiverCachePort for JsonWaiverCacheCodec {
         }
         let dto = document_to_dto(doc);
         let json = serialize_bounded_waiver_cache(&dto)?;
-        std::fs::write(&path, json).map_err(|e| {
+        let mut file =
+            open_fulfillment_cache_for_write_guarded(&path, &self.items_dir).map_err(|e| {
+                diagnostic(&format!("failed to write waiver cache {}: {e}", path.display()))
+            })?;
+        let metadata = file.metadata().map_err(|e| {
+            diagnostic(&format!("failed to inspect waiver cache {}: {e}", path.display()))
+        })?;
+        if !metadata.is_file() {
+            return Err(diagnostic(&format!(
+                "refusing to write non-regular waiver cache {}",
+                path.display()
+            )));
+        }
+        file.write_all(&json).map_err(|e| {
             diagnostic(&format!("failed to write waiver cache {}: {e}", path.display()))
         })
     }
@@ -388,12 +410,13 @@ fn entry_from_dto(dto: WaiverCacheEntryDto) -> Result<WaiverCacheEntry, VerifyCa
         .map(obligation_id_from_dto)
         .transpose()
         .map_err(cache_error_from_artifact)?;
-    let key = key_from_wire(dto.key)?;
+    let (key, legacy_key) = key_from_wire(dto.key)?;
     let verdict = verdict_from_dto(dto.verdict)?;
     let verifier_fingerprint = dto
         .verifier_fingerprint
         .map(|fingerprint| parse_cache_hash(&fingerprint).map(VerifierPromptFingerprint::new))
-        .transpose()?;
+        .transpose()?
+        .filter(|_| !legacy_key);
     Ok(WaiverCacheEntry::new(edge_id, obligation_id, key, verdict, verifier_fingerprint))
 }
 
@@ -401,15 +424,45 @@ fn key_to_wire(key: &WaiverCacheKey) -> WaiverCacheKeyWire {
     WaiverCacheKeyWire {
         waived_reason_hash: key.waived_reason_hash().as_hash().to_hex(),
         declaration_hash: key.declaration_hash().as_hash().to_hex(),
-        anchor_text_hash: key.anchor_text_hash().as_hash().to_hex(),
+        spec_element_hash: key.spec_element_hash().as_hash().to_hex(),
+        responsibility_hash: key.responsibility_hash().as_hash().to_hex(),
+        anchor_text_hash: None,
     }
 }
 
-fn key_from_wire(wire: WaiverCacheKeyWire) -> Result<WaiverCacheKey, VerifyCacheError> {
+fn key_from_wire(wire: WaiverCacheKeyWire) -> Result<(WaiverCacheKey, bool), VerifyCacheError> {
+    let legacy_key = wire.spec_element_hash.is_empty() || wire.responsibility_hash.is_empty();
+    if !legacy_key && wire.anchor_text_hash.is_some() {
+        return Err(VerifyCacheError::MalformedJson(diagnostic(
+            "current waiver cache key cannot include anchor_text_hash",
+        )));
+    }
+    let spec_element_hex = if wire.spec_element_hash.is_empty() {
+        wire.anchor_text_hash.ok_or_else(|| {
+            VerifyCacheError::MalformedJson(diagnostic(
+                "legacy waiver cache key is missing anchor_text_hash",
+            ))
+        })?
+    } else {
+        wire.spec_element_hash
+    };
     let waived_reason_hash = WaivedReasonHash::new(parse_cache_hash(&wire.waived_reason_hash)?);
     let declaration_hash = DeclarationHash::new(parse_cache_hash(&wire.declaration_hash)?);
-    let anchor_text_hash = AnchorTextHash::new(parse_cache_hash(&wire.anchor_text_hash)?);
-    Ok(WaiverCacheKey::new(waived_reason_hash, declaration_hash, anchor_text_hash))
+    let spec_element_hash = SpecElementHash::new(parse_cache_hash(&spec_element_hex)?);
+    let responsibility_hash = if wire.responsibility_hash.is_empty() {
+        ObligationResponsibilityHash::new(domain::ContentHash::from_bytes([0u8; 32]))
+    } else {
+        ObligationResponsibilityHash::new(parse_cache_hash(&wire.responsibility_hash)?)
+    };
+    Ok((
+        WaiverCacheKey::new(
+            waived_reason_hash,
+            declaration_hash,
+            spec_element_hash,
+            responsibility_hash,
+        ),
+        legacy_key,
+    ))
 }
 
 fn verdict_to_dto(verdict: &WaiverVerdict) -> WaiverVerdictDto {
@@ -469,7 +522,8 @@ mod tests {
         WaiverCacheKey::new(
             WaivedReasonHash::new(ContentHash::from_bytes([4u8; 32])),
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([6u8; 32])),
         )
     }
 
@@ -499,7 +553,7 @@ mod tests {
     }
 
     // AC-06: the waived verdict (with citation) round-trips, including the
-    // three-hash cache key.
+    // four-hash cache key.
     #[test]
     fn test_waived_verdict_round_trips() {
         round_trip(WaiverVerdict::Waived {
@@ -521,15 +575,16 @@ mod tests {
         round_trip(WaiverVerdict::Pending);
     }
 
-    // CN-04: the three hex hashes survive serialization exactly.
+    // CN-04: the four hex hashes survive serialization exactly.
     #[test]
-    fn test_hash_triple_serializes_as_hex() {
+    fn test_hash_quadruple_serializes_as_hex() {
         let doc = document(WaiverVerdict::Pending);
         let dto = document_to_dto(&doc);
         let wire = &dto.entries[0].key;
         assert_eq!(wire.waived_reason_hash, "04".repeat(32));
         assert_eq!(wire.declaration_hash, "02".repeat(32));
-        assert_eq!(wire.anchor_text_hash, "03".repeat(32));
+        assert_eq!(wire.spec_element_hash, "03".repeat(32));
+        assert_eq!(wire.responsibility_hash, "06".repeat(32));
         assert_eq!(dto.entries[0].verifier_fingerprint, Some("05".repeat(32)));
     }
 
@@ -573,6 +628,27 @@ mod tests {
         assert!(serde_json::from_str::<WaiverCacheDocumentDto>(json).is_err());
     }
 
+    #[test]
+    fn test_legacy_three_hash_key_is_readable_but_not_reusable() {
+        let mut json =
+            serde_json::to_value(document_to_dto(&document(WaiverVerdict::Pending))).unwrap();
+        let key = json["entries"][0]["key"].as_object_mut().unwrap();
+        key.remove("spec_element_hash");
+        key.remove("responsibility_hash");
+        key.insert("anchor_text_hash".to_owned(), serde_json::Value::String("03".repeat(32)));
+
+        let legacy: WaiverCacheDocumentDto = serde_json::from_value(json).unwrap();
+        let decoded = document_from_dto(legacy).unwrap();
+        let entry = &decoded.entries()[0];
+
+        assert_eq!(entry.verifier_fingerprint(), None);
+        assert_ne!(
+            entry.verifier_fingerprint(),
+            Some(&verifier_fingerprint()),
+            "a legacy three-hash verdict must not be reusable"
+        );
+    }
+
     // IN-09 / AC-06: the codec persists and reloads a cache via the port.
     #[test]
     fn test_codec_save_then_load_round_trips() {
@@ -583,6 +659,82 @@ mod tests {
         });
         codec.save(&doc).unwrap();
         assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));
+    }
+
+    #[test]
+    fn test_codec_replaces_stale_waiver_pass_and_fail_for_subsequent_check() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
+        let current_key = key();
+        let stale_key = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([9u8; 32])),
+            current_key.declaration_hash().clone(),
+            current_key.spec_element_hash().clone(),
+            current_key.responsibility_hash().clone(),
+        );
+
+        for (stale_verdict, refreshed_verdict) in [
+            (
+                WaiverVerdict::Waived {
+                    citation: EvidenceCitation::try_new("stale waiver pass".to_owned()).unwrap(),
+                },
+                WaiverVerdict::Fail {
+                    reason: DiagnosticMessage::try_new("re-evaluated waiver failure".to_owned())
+                        .unwrap(),
+                },
+            ),
+            (
+                WaiverVerdict::Fail {
+                    reason: DiagnosticMessage::try_new("stale waiver failure".to_owned()).unwrap(),
+                },
+                WaiverVerdict::Waived {
+                    citation: EvidenceCitation::try_new("re-evaluated waiver pass".to_owned())
+                        .unwrap(),
+                },
+            ),
+        ] {
+            let stale = WaiverCacheDocument::new(
+                TrackId::try_new("my-track").unwrap(),
+                vec![WaiverCacheEntry::new(
+                    edge_id(),
+                    Some(obligation_id()),
+                    stale_key.clone(),
+                    stale_verdict,
+                    Some(verifier_fingerprint()),
+                )],
+            );
+            codec.save(&stale).unwrap();
+            let loaded = codec.load(stale.track_id()).unwrap().unwrap();
+            assert!(
+                loaded
+                    .lookup_current(
+                        &edge_id(),
+                        &obligation_id(),
+                        &current_key,
+                        &verifier_fingerprint()
+                    )
+                    .unwrap()
+                    .is_none()
+            );
+
+            let refreshed = WaiverCacheDocument::new(
+                stale.track_id().clone(),
+                vec![WaiverCacheEntry::new(
+                    edge_id(),
+                    Some(obligation_id()),
+                    current_key.clone(),
+                    refreshed_verdict.clone(),
+                    Some(verifier_fingerprint()),
+                )],
+            );
+            codec.save(&refreshed).unwrap();
+            let loaded = codec.load(refreshed.track_id()).unwrap().unwrap();
+            let selected = loaded
+                .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())
+                .unwrap()
+                .unwrap();
+            assert_eq!(selected.verdict(), &refreshed_verdict);
+        }
     }
 
     #[test]
@@ -604,7 +756,7 @@ mod tests {
         assert!(json.starts_with("{\n  \"entries\":"), "root keys must be canonical: {json}");
         assert!(
             json.contains(
-                "\"key\": {\n        \"anchor_text_hash\": \"0303030303030303030303030303030303030303030303030303030303030303\",\n        \"declaration_hash\": \"0202020202020202020202020202020202020202020202020202020202020202\",\n        \"waived_reason_hash\": \"0404040404040404040404040404040404040404040404040404040404040404\""
+                "\"key\": {\n        \"declaration_hash\": \"0202020202020202020202020202020202020202020202020202020202020202\",\n        \"responsibility_hash\": \"0606060606060606060606060606060606060606060606060606060606060606\",\n        \"spec_element_hash\": \"0303030303030303030303030303030303030303030303030303030303030303\",\n        \"waived_reason_hash\": \"0404040404040404040404040404040404040404040404040404040404040404\""
             ),
             "nested cache-key fields must be canonical: {json}"
         );

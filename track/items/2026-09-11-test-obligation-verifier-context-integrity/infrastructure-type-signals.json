@@ -1,0 +1,62 @@
+{
+  "baseline_hash": "cc12f0826a467d5ee9194d01854a685f4c440acadc0e93e93fd1fae0f2b442fd",
+  "declaration_hash": "f3d9d0773af65c8ffd2ac7e04d960bb90545eb1c7e9b2c189fd02951c6f91b78",
+  "generated_at": "2026-09-14T03:35:28Z",
+  "head_commit": "0952f97a1a28fe9435e9c958ca2f38f377b00d3b",
+  "implementation_fingerprint": "faecff2eb22cb6b0fe576617888a74ea495993f801d32e9fb7657322df41f390",
+  "resolution_fingerprint": "84bb5ef2984a38887bfb24f1288fbd72ffe2129a102665db1179ef6d0bbee55e",
+  "rustdoc_execution_identity": {
+    "crate_name": "infrastructure",
+    "expected_json_path": "target/.sotp-rustdoc/80ef124330a4d85e56773cb51d55f0af9cd1e5454c35163a47f1290391a2c9f2/doc/infrastructure.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/80ef124330a4d85e56773cb51d55f0af9cd1e5454c35163a47f1290391a2c9f2"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_items": [
+        "domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::fulfillment_verifier::ObligationFulfillmentVerifierAdapter"
+    },
+    {
+      "found_items": [
+        "domain::tddd::test_obligation::ports::WaiverVerifierPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::waiver_verifier::FailingWaiverVerifier"
+    },
+    {
+      "found_items": [
+        "domain::tddd::test_obligation::ports::WaiverVerifierPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::waiver_verifier::WaiverVerifierAdapter"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+    }
+  ]
+}

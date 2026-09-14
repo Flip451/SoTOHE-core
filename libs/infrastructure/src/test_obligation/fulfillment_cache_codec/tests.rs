@@ -55,7 +55,8 @@ fn key() -> ObligationFulfillmentCacheKey {
     ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
         DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-        AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+        SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+        ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),
     )
 }
 
@@ -79,7 +80,7 @@ fn round_trip(verdict: ObligationFulfillmentVerdict) {
 }
 
 // AC-06: the fulfilled verdict (with citation) round-trips, including the
-// three-hash cache key.
+// four-hash cache key.
 #[test]
 fn test_fulfilled_verdict_round_trips() {
     round_trip(ObligationFulfillmentVerdict::Fulfilled {
@@ -122,15 +123,16 @@ fn test_pending_verdict_round_trips() {
     round_trip(ObligationFulfillmentVerdict::Pending);
 }
 
-// CN-04: the three hex hashes survive serialization exactly.
+// CN-04: the four hex hashes survive serialization exactly.
 #[test]
-fn test_hash_triple_serializes_as_hex() {
+fn test_hash_quadruple_serializes_as_hex() {
     let doc = document(ObligationFulfillmentVerdict::Pending);
     let dto = document_to_dto(&doc);
     let wire = &dto.entries[0].key;
     assert_eq!(wire.bound_tests_set_hash, "01".repeat(32));
     assert_eq!(wire.declaration_hash, "02".repeat(32));
-    assert_eq!(wire.anchor_text_hash, "03".repeat(32));
+    assert_eq!(wire.spec_element_hash, "03".repeat(32));
+    assert_eq!(wire.responsibility_hash, "04".repeat(32));
     assert_eq!(dto.entries[0].verifier_fingerprint, Some("04".repeat(32)));
 }
 
@@ -185,7 +187,8 @@ fn test_load_preserves_fingerprint_for_pre_bound_tests_entry() {
     let historical_key = ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(ContentHash::from_bytes([9u8; 32])),
         key().declaration_hash().clone(),
-        key().anchor_text_hash().clone(),
+        key().spec_element_hash().clone(),
+        key().responsibility_hash().clone(),
     );
     assert_eq!(loaded.entries()[1].verifier_fingerprint(), Some(&verifier_fingerprint()));
     assert_eq!(loaded.entries()[1].bound_tests(), None);
@@ -407,6 +410,30 @@ fn test_unknown_field_is_rejected() {
     assert!(serde_json::from_str::<ObligationFulfillmentCacheDocumentDto>(json).is_err());
 }
 
+#[test]
+fn test_legacy_three_hash_key_is_readable_but_not_reusable() {
+    let mut json =
+        serde_json::to_value(document_to_dto(&document(ObligationFulfillmentVerdict::Pending)))
+            .unwrap();
+    let key_fields = json["entries"][0]["key"].as_object_mut().unwrap();
+    key_fields.remove("spec_element_hash");
+    key_fields.remove("responsibility_hash");
+    key_fields.insert("anchor_text_hash".to_owned(), serde_json::Value::String("03".repeat(32)));
+
+    let legacy: ObligationFulfillmentCacheDocumentDto = serde_json::from_value(json).unwrap();
+    let decoded = codec(PathBuf::new()).document_from_dto(legacy).unwrap();
+    let entry = &decoded.entries()[0];
+
+    assert_eq!(entry.verifier_fingerprint(), None);
+    assert!(
+        decoded
+            .lookup_current(&edge_id(), &obligation_id(), &key(), &verifier_fingerprint())
+            .unwrap()
+            .is_none(),
+        "a legacy three-hash verdict must not be reusable"
+    );
+}
+
 // IN-09 / AC-06: the codec persists and reloads a cache via the port.
 #[test]
 fn test_codec_save_then_load_round_trips() {
@@ -427,17 +454,26 @@ fn test_codec_save_then_load_round_trips() {
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([9u8; 32])),
             current_key.declaration_hash().clone(),
-            current_key.anchor_text_hash().clone(),
+            current_key.spec_element_hash().clone(),
+            current_key.responsibility_hash().clone(),
         ),
         ObligationFulfillmentCacheKey::new(
             current_key.bound_tests_set_hash().clone(),
             DeclarationHash::new(ContentHash::from_bytes([9u8; 32])),
-            current_key.anchor_text_hash().clone(),
+            current_key.spec_element_hash().clone(),
+            current_key.responsibility_hash().clone(),
         ),
         ObligationFulfillmentCacheKey::new(
             current_key.bound_tests_set_hash().clone(),
             current_key.declaration_hash().clone(),
-            AnchorTextHash::new(ContentHash::from_bytes([9u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([9u8; 32])),
+            current_key.responsibility_hash().clone(),
+        ),
+        ObligationFulfillmentCacheKey::new(
+            current_key.bound_tests_set_hash().clone(),
+            current_key.declaration_hash().clone(),
+            current_key.spec_element_hash().clone(),
+            ObligationResponsibilityHash::new(ContentHash::from_bytes([9u8; 32])),
         ),
     ];
     let mut entries = historical_keys
@@ -511,53 +547,70 @@ fn test_codec_replaces_stale_cache_for_subsequent_check() {
     let stale_key = ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(ContentHash::from_bytes([9u8; 32])),
         current_key.declaration_hash().clone(),
-        current_key.anchor_text_hash().clone(),
+        current_key.spec_element_hash().clone(),
+        current_key.responsibility_hash().clone(),
     );
-    let stale = ObligationFulfillmentCacheDocument::new(
-        TrackId::try_new("my-track").unwrap(),
-        vec![cache_entry(
-            edge_id(),
-            obligation_id(),
-            stale_key,
-            ObligationFulfillmentVerdict::Pending,
-            Some(verifier_fingerprint()),
-        )],
-    );
-    codec.save(&stale).unwrap();
-
-    let Some(before_re_evaluation) = codec.load(stale.track_id()).unwrap() else {
-        panic!("saved stale cache must remain readable for fail-closed checking");
-    };
-    assert!(
-        before_re_evaluation
-            .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint(),)
-            .unwrap()
-            .is_none()
-    );
-
-    let refreshed = ObligationFulfillmentCacheDocument::new(
-        stale.track_id().clone(),
-        vec![cache_entry(
-            edge_id(),
-            obligation_id(),
-            current_key.clone(),
+    for (stale_verdict, refreshed_verdict) in [
+        (
+            ObligationFulfillmentVerdict::Fulfilled {
+                citation: EvidenceCitation::try_new("stale evidence".to_owned()).unwrap(),
+            },
+            ObligationFulfillmentVerdict::Fail {
+                category: FulfillmentFailCategory::Contradiction,
+                reason: DiagnosticMessage::try_new("re-evaluated failure".to_owned()).unwrap(),
+            },
+        ),
+        (
+            ObligationFulfillmentVerdict::Fail {
+                category: FulfillmentFailCategory::Contradiction,
+                reason: DiagnosticMessage::try_new("stale failure".to_owned()).unwrap(),
+            },
             ObligationFulfillmentVerdict::Fulfilled {
                 citation: EvidenceCitation::try_new("re-evaluated evidence".to_owned()).unwrap(),
             },
-            Some(verifier_fingerprint()),
-        )],
-    );
-    codec.save(&refreshed).unwrap();
+        ),
+    ] {
+        let stale = ObligationFulfillmentCacheDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![cache_entry(
+                edge_id(),
+                obligation_id(),
+                stale_key.clone(),
+                stale_verdict,
+                Some(verifier_fingerprint()),
+            )],
+        );
+        codec.save(&stale).unwrap();
+        let Some(before_re_evaluation) = codec.load(stale.track_id()).unwrap() else {
+            panic!("saved stale cache must remain readable for fail-closed checking");
+        };
+        assert!(
+            before_re_evaluation
+                .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())
+                .unwrap()
+                .is_none()
+        );
 
-    let Some(after_re_evaluation) = codec.load(refreshed.track_id()).unwrap() else {
-        panic!("re-evaluated cache must be readable for the subsequent check");
-    };
-    assert!(
-        after_re_evaluation
-            .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint(),)
+        let refreshed = ObligationFulfillmentCacheDocument::new(
+            stale.track_id().clone(),
+            vec![cache_entry(
+                edge_id(),
+                obligation_id(),
+                current_key.clone(),
+                refreshed_verdict.clone(),
+                Some(verifier_fingerprint()),
+            )],
+        );
+        codec.save(&refreshed).unwrap();
+        let Some(after_re_evaluation) = codec.load(refreshed.track_id()).unwrap() else {
+            panic!("re-evaluated cache must be readable for the subsequent check");
+        };
+        let selected = after_re_evaluation
+            .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())
             .unwrap()
-            .is_some()
-    );
+            .expect("fresh wire row must be selected");
+        assert_eq!(selected.verdict(), &refreshed_verdict);
+    }
 }
 
 // IN-09 / CN-04: the trusted items root itself must not be a symlink.

@@ -21,7 +21,8 @@ use domain::tddd::catalogue_v2::{
     TraitImplDeclV2, TypeEntry, TypeKindV2, TypeRef,
 };
 use domain::tddd::semantic_verify::{
-    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecSectionKind,
+    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecElementRef,
+    SpecSectionKind,
 };
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
@@ -32,8 +33,8 @@ use domain::tddd::test_obligation::errors::{
     VerifyCacheError,
 };
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, TestBodySpanHash,
-    VerifierPromptFingerprint, WaivedReasonHash,
+    BoundTestsSetHash, DeclarationHash, ObligationResponsibilityHash, SpecElementHash,
+    TestBodySpanHash, VerifierPromptFingerprint, WaivedReasonHash,
 };
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, RoleName, TestFunctionName, TestModulePath, TestObligationAnchorId,
@@ -54,7 +55,7 @@ use domain::tddd::test_obligation::verdict::{
     FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument,
     ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheEntryState,
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
+    WaiverCacheEntry, WaiverCacheKey, WaiverCacheLookupError, WaiverVerdict,
 };
 use domain::tddd::test_obligation::vocab::{
     TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind, TestObligationPerAxis,
@@ -1207,12 +1208,13 @@ fn trait_entry(role: ContractRole) -> TraitEntry {
     )
 }
 
-/// A parsed spec with `IN-05` (cited), plus an uncited `AC-01` and `CN-01`.
-fn spec_doc() -> SpecDocument {
+/// Builds a parsed spec with one cited in-scope element, plus an uncited
+/// `AC-01` and `CN-01`.
+fn spec_doc_with_in_scope_element(element_id: &str, text: &str) -> SpecDocument {
     let in_scope = vec![
         SpecRequirement::new(
-            SpecElementId::try_new("IN-05").unwrap(),
-            "Money positive",
+            SpecElementId::try_new(element_id.to_owned()).unwrap(),
+            text,
             vec![],
             vec![],
             vec![],
@@ -1241,8 +1243,126 @@ fn spec_doc() -> SpecDocument {
     .unwrap()
 }
 
+/// A parsed spec with `IN-05` (cited), plus an uncited `AC-01` and `CN-01`.
+fn spec_doc() -> SpecDocument {
+    spec_doc_with_in_scope_element("IN-05", "Money positive")
+}
+
+/// The same `IN-05` id and text moved from `in_scope` to `out_of_scope`.
+fn section_moved_spec_doc() -> SpecDocument {
+    let moved = SpecRequirement::new(
+        SpecElementId::try_new("IN-05").unwrap(),
+        "Money positive",
+        vec![],
+        vec![],
+        vec![],
+    )
+    .unwrap();
+    SpecDocument::new(
+        "Test spec",
+        "1.0",
+        vec![],
+        SpecScope::new(vec![], vec![moved]),
+        vec![
+            SpecRequirement::new(
+                SpecElementId::try_new("CN-01").unwrap(),
+                "c",
+                vec![],
+                vec![],
+                vec![],
+            )
+            .unwrap(),
+        ],
+        vec![
+            SpecRequirement::new(
+                SpecElementId::try_new("AC-01").unwrap(),
+                "a",
+                vec![],
+                vec![],
+                vec![],
+            )
+            .unwrap(),
+        ],
+        vec![],
+        vec![],
+        None,
+    )
+    .unwrap()
+}
+
+fn out_of_scope_anchor() -> TestObligationAnchorId {
+    TestObligationAnchorId::try_new("spec.json".to_owned(), "OUT-01".to_owned()).unwrap()
+}
+
+fn out_of_scope_edge() -> TestObligationEdgeId {
+    TestObligationEdgeId::new(entry_key(), out_of_scope_anchor())
+}
+
+fn out_of_scope_spec_doc() -> SpecDocument {
+    let excluded = SpecRequirement::new(
+        SpecElementId::try_new("OUT-01".to_owned()).unwrap(),
+        "this reference remains outside the implementation scope",
+        vec![],
+        vec![],
+        vec![],
+    )
+    .unwrap();
+    SpecDocument::new(
+        "Out-of-scope edge test spec",
+        "1.0",
+        vec![],
+        SpecScope::new(vec![], vec![excluded]),
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        None,
+    )
+    .unwrap()
+}
+
+fn out_of_scope_catalogue() -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_type(
+        entry_key(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Command,
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("OUT-01".to_owned()).unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    catalogue
+}
+
 fn fresh_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
     fresh_fulfillment_cache_for(&obligation())
+}
+
+fn fulfilled_verdict() -> ObligationFulfillmentVerdict {
+    ObligationFulfillmentVerdict::Fulfilled {
+        citation: EvidenceCitation::try_new("cached fulfillment".to_owned()).unwrap(),
+    }
+}
+
+fn failed_verdict() -> ObligationFulfillmentVerdict {
+    ObligationFulfillmentVerdict::Fail {
+        category: domain::tddd::test_obligation::vocab::FulfillmentFailCategory::Contradiction,
+        reason: DiagnosticMessage::try_new("cached fulfillment failure".to_owned()).unwrap(),
+    }
 }
 
 fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfillmentCacheDocument {
@@ -1251,6 +1371,24 @@ fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfill
         &money_catalogue(),
         Some(fulfillment_verifier_fingerprint()),
     )
+}
+
+fn spec_element_hash_for_money() -> SpecElementHash {
+    crate::test_obligation::freshness::spec_element_hash(
+        &[SpecElementRef::new(
+            SpecSectionKind::InScope,
+            SpecElementId::try_new("IN-05").unwrap(),
+            "Money positive".to_owned(),
+        )],
+        &edge(),
+    )
+}
+
+fn responsibility_hash(
+    obligation_id: &TestObligationId,
+    obligation_brief: &TestObligationBrief,
+) -> ObligationResponsibilityHash {
+    crate::test_obligation::freshness::responsibility_hash(obligation_id, obligation_brief)
 }
 
 fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
@@ -1269,15 +1407,18 @@ fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
         )
         .as_bytes(),
     ));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash =
+        responsibility_hash(&synthetic, &synthetic_voluntary_obligation_brief(&edge()).unwrap());
     let entry = cache_entry(
         edge(),
-        TestObligationId::new(
-            entry_key(),
-            TestObligationKind::Logic,
-            TestObligationItemIdentifier::try_new("voluntary:IN-05".to_owned()).unwrap(),
+        synthetic,
+        ObligationFulfillmentCacheKey::new(
+            bound,
+            declaration,
+            spec_element_hash,
+            responsibility_hash,
         ),
-        ObligationFulfillmentCacheKey::new(bound, declaration, anchor_hash),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
@@ -1307,11 +1448,12 @@ fn fresh_fulfillment_cache_for_catalogue(
         )
         .as_bytes(),
     ));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash = responsibility_hash(obligation.id(), obligation.brief());
     let entry = cache_entry(
         edge(),
         obligation.id().clone(),
-        ObligationFulfillmentCacheKey::new(bound, decl, anchor_hash),
+        ObligationFulfillmentCacheKey::new(bound, decl, spec_element_hash, responsibility_hash),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
@@ -1340,11 +1482,13 @@ fn fresh_direct_waiver_cache() -> WaiverCacheDocument {
         synthetic.item_identifier().as_str(),
     );
     let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash =
+        responsibility_hash(&synthetic, &synthetic_voluntary_obligation_brief(&edge()).unwrap());
     let entry = WaiverCacheEntry::new(
         edge(),
         Some(synthetic),
-        WaiverCacheKey::new(reason_hash, decl, anchor_hash),
+        WaiverCacheKey::new(reason_hash, decl, spec_element_hash, responsibility_hash),
         WaiverVerdict::Waived {
             citation: EvidenceCitation::try_new("waived by policy".to_owned()).unwrap(),
         },
@@ -1372,11 +1516,12 @@ fn fresh_waiver_cache_for_catalogue(
         obligation.id().item_identifier().as_str(),
     );
     let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash = responsibility_hash(obligation.id(), obligation.brief());
     let entry = WaiverCacheEntry::new(
         edge(),
         Some(obligation.id().clone()),
-        WaiverCacheKey::new(reason_hash, decl, anchor_hash),
+        WaiverCacheKey::new(reason_hash, decl, spec_element_hash, responsibility_hash),
         WaiverVerdict::Waived {
             citation: EvidenceCitation::try_new("waived by policy".to_owned()).unwrap(),
         },
@@ -1424,6 +1569,29 @@ fn interactor_with_rules_and_catalogue(
     catalogue: CatalogueDocument,
     scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
 ) -> CheckTestObligationsInteractor {
+    interactor_with_rules_catalogue_and_spec(
+        obligations,
+        bindings,
+        fulfillment,
+        waiver,
+        rules,
+        catalogue,
+        scanner,
+        spec_doc(),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn interactor_with_rules_catalogue_and_spec(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    waiver: Option<WaiverCacheDocument>,
+    rules: TestObligationRulesDocument,
+    catalogue: CatalogueDocument,
+    scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
+    spec: SpecDocument,
+) -> CheckTestObligationsInteractor {
     CheckTestObligationsInteractor::new(
         Arc::new(StubRules { doc: rules }),
         Arc::new(StubObligations(obligations)),
@@ -1433,7 +1601,7 @@ fn interactor_with_rules_and_catalogue(
         Arc::new(StubWaiverCache(waiver)),
         fulfillment_verifier_fingerprint(),
         waiver_verifier_fingerprint(),
-        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubSpec(spec)),
         Arc::new(StubCatalogue(catalogue)),
         task_contract_reader(),
         impl_plan_reader(),
@@ -1549,6 +1717,89 @@ fn command() -> CheckTestObligationsCommand {
     ))
 }
 
+fn assert_spec_change_stales_both_verifier_lanes(
+    changed_spec: SpecDocument,
+    change_description: &str,
+) {
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+
+    for (verdict_description, verdict) in
+        [("pass", fulfilled_verdict()), ("fail", failed_verdict())]
+    {
+        let current = fresh_fulfillment_cache().entries()[0].clone();
+        let cache = ObligationFulfillmentCacheDocument::new(
+            track(),
+            vec![cache_entry(
+                edge(),
+                obligation().id().clone(),
+                current.key().clone(),
+                verdict,
+                Some(fulfillment_verifier_fingerprint()),
+            )],
+        );
+        let result = interactor_with_rules_catalogue_and_spec(
+            Some(obligations.clone()),
+            Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+            Some(cache),
+            None,
+            rules_doc(),
+            money_catalogue(),
+            Arc::new(StubScanner),
+            changed_spec.clone(),
+        )
+        .execute(&command());
+        assert!(
+            matches!(result, Err(ObligationCheckError::DriftsDetected { .. })),
+            "{change_description} must stale the fulfillment {verdict_description}"
+        );
+    }
+
+    for (verdict_description, verdict) in [
+        (
+            "pass",
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("cached waiver".to_owned()).unwrap(),
+            },
+        ),
+        (
+            "fail",
+            WaiverVerdict::Fail {
+                reason: DiagnosticMessage::try_new("cached waiver failure".to_owned()).unwrap(),
+            },
+        ),
+    ] {
+        let current =
+            fresh_waiver_cache_for_fingerprint(&obligation(), Some(waiver_verifier_fingerprint()))
+                .entries()[0]
+                .clone();
+        let cache = WaiverCacheDocument::new(
+            track(),
+            vec![WaiverCacheEntry::new(
+                current.edge_id().clone(),
+                current.obligation_id().cloned(),
+                current.key().clone(),
+                verdict,
+                current.verifier_fingerprint().cloned(),
+            )],
+        );
+        let result = interactor_with_rules_catalogue_and_spec(
+            Some(obligations.clone()),
+            Some(TestBindingsDocument::new(track(), vec![waiver_binding()])),
+            None,
+            Some(cache),
+            rules_doc(),
+            money_catalogue(),
+            Arc::new(StubScanner),
+            changed_spec.clone(),
+        )
+        .execute(&command());
+        assert!(
+            matches!(result, Err(ObligationCheckError::DriftsDetected { .. })),
+            "{change_description} must stale the waiver {verdict_description}"
+        );
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -1616,6 +1867,32 @@ fn test_materialized_scope_reports_uncited_findings() {
     )));
     // IN-05 is cited by the Money entry → not a finding.
     assert_eq!(outcome.uncited_findings().len(), 2);
+}
+
+#[test]
+fn test_check_keeps_unresolved_out_of_scope_edge_pending() {
+    // The check interactor owns the structural totality gate, not semantic
+    // out-of-scope classification. An active edge with no derived obligation
+    // or binding must remain unresolved instead of being silently accepted or
+    // automatically waived.
+    let result = interactor_with_rules_catalogue_and_spec(
+        Some(ObligationsDocument::new(track(), vec![])),
+        Some(TestBindingsDocument::new(track(), vec![])),
+        Some(ObligationFulfillmentCacheDocument::new(track(), vec![])),
+        None,
+        empty_rules_doc(),
+        out_of_scope_catalogue(),
+        Arc::new(StubScanner),
+        out_of_scope_spec_doc(),
+    )
+    .execute(&command());
+
+    match result {
+        Err(ObligationCheckError::UnresolvedEdges { edges }) => {
+            assert_eq!(edges.as_slice(), &[out_of_scope_edge()]);
+        }
+        other => panic!("an unresolved out-of-scope edge must not pass: {other:?}"),
+    }
 }
 
 #[test]
@@ -2377,6 +2654,80 @@ fn test_fresh_fulfilled_verdict_resolves_edge() {
             .execute(&command())
             .unwrap();
     assert_eq!(outcome.resolved_edges(), &[edge()]);
+}
+
+#[test]
+fn test_section_only_spec_move_stales_pass_and_fail_in_both_verifier_lanes() {
+    let original = SpecElementRef::new(
+        SpecSectionKind::InScope,
+        SpecElementId::try_new("IN-05").unwrap(),
+        "Money positive".to_owned(),
+    );
+    let moved = SpecElementRef::new(
+        SpecSectionKind::OutOfScope,
+        SpecElementId::try_new("IN-05").unwrap(),
+        "Money positive".to_owned(),
+    );
+    assert_eq!(original.element_id, moved.element_id);
+    assert_eq!(original.text_label, moved.text_label);
+    assert_ne!(
+        crate::test_obligation::freshness::spec_element_material(&original),
+        crate::test_obligation::freshness::spec_element_material(&moved),
+    );
+
+    assert_spec_change_stales_both_verifier_lanes(section_moved_spec_doc(), "section move");
+}
+
+#[test]
+fn test_check_canonical_spec_element_material_keeps_section_id_and_verbatim_text() {
+    let element = SpecElementRef::new(
+        SpecSectionKind::OutOfScope,
+        SpecElementId::try_new("IN-01").unwrap(),
+        "body mentions in_scope but stays verbatim".to_owned(),
+    );
+
+    assert_eq!(
+        crate::test_obligation::freshness::spec_element_material(&element),
+        "section=out_of_scope\nelement_id=IN-01\ntext_label=body mentions in_scope but stays verbatim"
+    );
+}
+
+#[test]
+fn test_id_and_text_only_spec_changes_stale_pass_and_fail_in_both_verifier_lanes() {
+    let original = SpecElementRef::new(
+        SpecSectionKind::InScope,
+        SpecElementId::try_new("IN-05").unwrap(),
+        "Money positive".to_owned(),
+    );
+    let identifier_changed = SpecElementRef::new(
+        SpecSectionKind::InScope,
+        SpecElementId::try_new("IN-06").unwrap(),
+        "Money positive".to_owned(),
+    );
+    let text_changed = SpecElementRef::new(
+        SpecSectionKind::InScope,
+        SpecElementId::try_new("IN-05").unwrap(),
+        "Money remains positive".to_owned(),
+    );
+    assert_eq!(original.section, identifier_changed.section);
+    assert_eq!(original.text_label, identifier_changed.text_label);
+    assert_eq!(original.section, text_changed.section);
+    assert_eq!(original.element_id, text_changed.element_id);
+    assert_ne!(
+        crate::test_obligation::freshness::spec_element_material(&original),
+        crate::test_obligation::freshness::spec_element_material(&identifier_changed),
+    );
+    assert_ne!(
+        crate::test_obligation::freshness::spec_element_material(&original),
+        crate::test_obligation::freshness::spec_element_material(&text_changed),
+    );
+
+    for (change_description, changed_spec) in [
+        ("identifier change", spec_doc_with_in_scope_element("IN-06", "Money positive")),
+        ("text change", spec_doc_with_in_scope_element("IN-05", "Money remains positive")),
+    ] {
+        assert_spec_change_stales_both_verifier_lanes(changed_spec, change_description);
+    }
 }
 
 #[test]
@@ -3185,6 +3536,77 @@ fn test_absent_waiver_fingerprint_is_a_missing_stale_verdict() {
 }
 
 #[test]
+fn test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes() {
+    // CN-01 / AC-03: neither an old verifier identity nor a missing identity
+    // may preserve the meaning of a cached pass or fail result.
+    for fingerprint in
+        [Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))), None]
+    {
+        for verdict in [fulfilled_verdict(), failed_verdict()] {
+            let current = fresh_fulfillment_cache_for(&obligation()).entries()[0].clone();
+            let cache = ObligationFulfillmentCacheDocument::new(
+                track(),
+                vec![cache_entry(
+                    edge(),
+                    obligation().id().clone(),
+                    current.key().clone(),
+                    verdict,
+                    fingerprint.clone(),
+                )],
+            );
+            let result = interactor(
+                Some(ObligationsDocument::new(track(), vec![obligation()])),
+                Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+                Some(cache),
+                None,
+            )
+            .execute(&command());
+
+            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+        }
+    }
+
+    for fingerprint in
+        [Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))), None]
+    {
+        for verdict in [
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("cached waiver pass".to_owned()).unwrap(),
+            },
+            WaiverVerdict::Fail {
+                reason: DiagnosticMessage::try_new("cached waiver failure".to_owned()).unwrap(),
+            },
+        ] {
+            let current = fresh_waiver_cache_for_fingerprint(
+                &obligation(),
+                Some(waiver_verifier_fingerprint()),
+            )
+            .entries()[0]
+                .clone();
+            let cache = WaiverCacheDocument::new(
+                track(),
+                vec![WaiverCacheEntry::new(
+                    current.edge_id().clone(),
+                    current.obligation_id().cloned(),
+                    current.key().clone(),
+                    verdict,
+                    fingerprint.clone(),
+                )],
+            );
+            let result = interactor(
+                Some(ObligationsDocument::new(track(), vec![obligation()])),
+                Some(TestBindingsDocument::new(track(), vec![waiver_binding()])),
+                None,
+                Some(cache),
+            )
+            .execute(&command());
+
+            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+        }
+    }
+}
+
+#[test]
 fn test_voluntary_binding_for_derived_edge_returns_consistency_finding() {
     let obligations = ObligationsDocument::new(track(), vec![obligation()]);
     let bindings = TestBindingsDocument::new(track(), vec![voluntary_binding()]);
@@ -3310,11 +3732,17 @@ fn test_declaration_change_stales_verdict_as_drift() {
     // A cache entry whose declaration_hash does not match the current catalogue.
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let stale_decl = DeclarationHash::new(sha256_content_hash(b"an older declaration"));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let spec_element_hash = spec_element_hash_for_money();
+    let responsibility_hash = responsibility_hash(obligation().id(), obligation().brief());
     let entry = cache_entry(
         edge(),
         obligation().id().clone(),
-        ObligationFulfillmentCacheKey::new(bound, stale_decl, anchor_hash),
+        ObligationFulfillmentCacheKey::new(
+            bound,
+            stale_decl,
+            spec_element_hash,
+            responsibility_hash,
+        ),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
@@ -3333,19 +3761,22 @@ fn test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift() {
     let fresh = fresh_fulfillment_cache();
     let entry = fresh.entries().first().unwrap();
     let current_declaration = entry.key().declaration_hash().clone();
-    let current_anchor = entry.key().anchor_text_hash().clone();
+    let current_spec_element = entry.key().spec_element_hash().clone();
+    let current_responsibility = entry.key().responsibility_hash().clone();
     let current_bound_tests = entry.key().bound_tests_set_hash().clone();
 
     for key in [
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
             current_declaration.clone(),
-            current_anchor.clone(),
+            current_spec_element.clone(),
+            current_responsibility.clone(),
         ),
         ObligationFulfillmentCacheKey::new(
             current_bound_tests.clone(),
             current_declaration.clone(),
-            AnchorTextHash::new(ContentHash::from_bytes([2u8; 32])),
+            SpecElementHash::new(ContentHash::from_bytes([2u8; 32])),
+            current_responsibility.clone(),
         ),
     ] {
         let cache = ObligationFulfillmentCacheDocument::new(
@@ -3369,6 +3800,176 @@ fn test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift() {
         .execute(&command());
 
         assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+    }
+}
+
+#[test]
+fn test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes() {
+    // IN-03 / AC-03: a verdict frozen for an earlier obligation brief is stale
+    // even when its bound-test, declaration, specification, and verifier
+    // fingerprint inputs still match. Check must reject both old pass/fail
+    // outcomes in the fulfillment and waiver lanes.
+    let current_obligation = obligation();
+    let previous_brief =
+        TestObligationBrief::try_new("previous responsibility brief".to_owned()).unwrap();
+    let stale_responsibility = responsibility_hash(current_obligation.id(), &previous_brief);
+    assert_ne!(
+        stale_responsibility,
+        responsibility_hash(current_obligation.id(), current_obligation.brief())
+    );
+
+    let expected_drift = || {
+        TestObligationDrift::decl_changed_edge(
+            edge(),
+            DiagnosticMessage::try_new(
+                "obligation responsibility changed since the verdict was frozen".to_owned(),
+            )
+            .unwrap(),
+        )
+    };
+
+    let fulfillment_current =
+        fresh_fulfillment_cache_for(&current_obligation).entries().first().unwrap().clone();
+    let stale_fulfillment_key = ObligationFulfillmentCacheKey::new(
+        fulfillment_current.key().bound_tests_set_hash().clone(),
+        fulfillment_current.key().declaration_hash().clone(),
+        fulfillment_current.key().spec_element_hash().clone(),
+        stale_responsibility.clone(),
+    );
+    for verdict in [fulfilled_verdict(), failed_verdict()] {
+        let result = interactor(
+            Some(ObligationsDocument::new(track(), vec![current_obligation.clone()])),
+            Some(TestBindingsDocument::new(
+                track(),
+                vec![fulfillment_binding_for(&current_obligation)],
+            )),
+            Some(ObligationFulfillmentCacheDocument::new(
+                track(),
+                vec![cache_entry(
+                    edge(),
+                    current_obligation.id().clone(),
+                    stale_fulfillment_key.clone(),
+                    verdict,
+                    Some(fulfillment_verifier_fingerprint()),
+                )],
+            )),
+            None,
+        )
+        .execute(&command());
+
+        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+            panic!("a responsibility change must stale fulfillment pass and fail verdicts");
+        };
+        assert_eq!(drifts.as_slice(), &[expected_drift()]);
+    }
+
+    let waiver_current = fresh_waiver_cache_for_fingerprint(
+        &current_obligation,
+        Some(waiver_verifier_fingerprint()),
+    )
+    .entries()
+    .first()
+    .unwrap()
+    .clone();
+    let stale_waiver_key = WaiverCacheKey::new(
+        waiver_current.key().waived_reason_hash().clone(),
+        waiver_current.key().declaration_hash().clone(),
+        waiver_current.key().spec_element_hash().clone(),
+        stale_responsibility,
+    );
+    for verdict in [
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("cached waiver".to_owned()).unwrap(),
+        },
+        WaiverVerdict::Fail {
+            reason: DiagnosticMessage::try_new("cached waiver failure".to_owned()).unwrap(),
+        },
+    ] {
+        let result = interactor(
+            Some(ObligationsDocument::new(track(), vec![current_obligation.clone()])),
+            Some(TestBindingsDocument::new(track(), vec![waiver_binding()])),
+            None,
+            Some(WaiverCacheDocument::new(
+                track(),
+                vec![WaiverCacheEntry::new(
+                    edge(),
+                    Some(current_obligation.id().clone()),
+                    stale_waiver_key.clone(),
+                    verdict,
+                    Some(waiver_verifier_fingerprint()),
+                )],
+            )),
+        )
+        .execute(&command());
+
+        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+            panic!("a responsibility change must stale waiver pass and fail verdicts");
+        };
+        assert_eq!(drifts.as_slice(), &[expected_drift()]);
+    }
+}
+
+#[test]
+fn test_check_waiver_reason_change_stales_pass_and_fail() {
+    // IN-03 / AC-03: changing the material supplied as the waiver claim must
+    // stale either previously cached waiver outcome.
+    let current_obligation = obligation();
+    let waiver_current = fresh_waiver_cache_for_fingerprint(
+        &current_obligation,
+        Some(waiver_verifier_fingerprint()),
+    )
+    .entries()
+    .first()
+    .unwrap()
+    .clone();
+    let changed_reason = WaivedReasonHash::new(sha256_content_hash(b"changed waiver reason"));
+    assert_ne!(changed_reason, waiver_current.key().waived_reason_hash().clone());
+    let stale_key = WaiverCacheKey::new(
+        changed_reason,
+        waiver_current.key().declaration_hash().clone(),
+        waiver_current.key().spec_element_hash().clone(),
+        waiver_current.key().responsibility_hash().clone(),
+    );
+
+    let expected_drift = || {
+        TestObligationDrift::reason_changed_edge(
+            edge(),
+            DiagnosticMessage::try_new(
+                "waived reason changed since the verdict was frozen".to_owned(),
+            )
+            .unwrap(),
+        )
+    };
+
+    for verdict in [
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("cached waiver".to_owned()).unwrap(),
+        },
+        WaiverVerdict::Fail {
+            reason: DiagnosticMessage::try_new("cached waiver failure".to_owned()).unwrap(),
+        },
+    ] {
+        let result = interactor(
+            Some(ObligationsDocument::new(track(), vec![current_obligation.clone()])),
+            Some(TestBindingsDocument::new(track(), vec![waiver_binding()])),
+            None,
+            Some(WaiverCacheDocument::new(
+                track(),
+                vec![WaiverCacheEntry::new(
+                    edge(),
+                    Some(current_obligation.id().clone()),
+                    stale_key.clone(),
+                    verdict,
+                    Some(waiver_verifier_fingerprint()),
+                )],
+            )),
+        )
+        .execute(&command());
+
+        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+            panic!("a waiver reason change must stale pass and fail verdicts");
+        };
+        assert_eq!(drifts.as_slice(), &[expected_drift()]);
     }
 }
 
@@ -3446,7 +4047,8 @@ fn test_check_with_historical_fulfillment_row_uses_current_full_key() {
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
             current.key().declaration_hash().clone(),
-            current.key().anchor_text_hash().clone(),
+            current.key().spec_element_hash().clone(),
+            current.key().responsibility_hash().clone(),
         ),
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("historical cite".to_owned()).unwrap(),
@@ -3477,7 +4079,8 @@ fn test_check_aggregates_historical_fulfillment_key_drifts_independent_of_row_or
         ObligationFulfillmentCacheKey::new(
             BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
             current.key().declaration_hash().clone(),
-            current.key().anchor_text_hash().clone(),
+            current.key().spec_element_hash().clone(),
+            current.key().responsibility_hash().clone(),
         ),
         ObligationFulfillmentVerdict::Pending,
         Some(fulfillment_verifier_fingerprint()),
@@ -3488,7 +4091,8 @@ fn test_check_aggregates_historical_fulfillment_key_drifts_independent_of_row_or
         ObligationFulfillmentCacheKey::new(
             current.key().bound_tests_set_hash().clone(),
             DeclarationHash::new(ContentHash::from_bytes([7u8; 32])),
-            current.key().anchor_text_hash().clone(),
+            current.key().spec_element_hash().clone(),
+            current.key().responsibility_hash().clone(),
         ),
         ObligationFulfillmentVerdict::Pending,
         Some(fulfillment_verifier_fingerprint()),
@@ -3564,6 +4168,48 @@ fn test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error() {
             }
             other => {
                 panic!("expected ambiguity error with the complete cache identity, got {other:?}")
+            }
+        }
+    }
+}
+
+#[test]
+fn test_check_with_duplicate_current_waiver_rows_returns_lookup_error() {
+    let current =
+        fresh_waiver_cache_for_fingerprint(&obligation(), Some(waiver_verifier_fingerprint()))
+            .entries()[0]
+            .clone();
+    let duplicate = WaiverCacheEntry::new(
+        current.edge_id().clone(),
+        current.obligation_id().cloned(),
+        current.key().clone(),
+        WaiverVerdict::Pending,
+        current.verifier_fingerprint().cloned(),
+    );
+
+    for entries in [vec![current.clone(), duplicate.clone()], vec![duplicate, current.clone()]] {
+        let cache = WaiverCacheDocument::new(track(), entries);
+        let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+        let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
+        let result =
+            interactor(Some(obligations), Some(bindings), None, Some(cache)).execute(&command());
+
+        match result {
+            Err(ObligationCheckError::WaiverCacheLookup(
+                WaiverCacheLookupError::AmbiguousCurrentEntries {
+                    edge_id: actual_edge_id,
+                    obligation_id: actual_obligation_id,
+                    key: actual_key,
+                },
+            )) => {
+                assert_eq!(actual_edge_id, edge());
+                assert_eq!(actual_obligation_id, obligation().id().clone());
+                assert_eq!(actual_key, current.key().clone());
+            }
+            other => {
+                panic!(
+                    "expected waiver ambiguity error with the complete cache identity, got {other:?}"
+                )
             }
         }
     }

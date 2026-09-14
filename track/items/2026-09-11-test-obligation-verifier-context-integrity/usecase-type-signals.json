@@ -1,0 +1,48 @@
+{
+  "baseline_hash": "66bb53d89d2c5fab6598bc367f21a7a3406d9f9af5bd29cd1f47aac39fae2ec0",
+  "declaration_hash": "e64a92286363b78df4756f976540f137d2102a2b686e97922d9a6dffc8812cbd",
+  "generated_at": "2026-09-14T03:35:11Z",
+  "head_commit": "0952f97a1a28fe9435e9c958ca2f38f377b00d3b",
+  "implementation_fingerprint": "faecff2eb22cb6b0fe576617888a74ea495993f801d32e9fb7657322df41f390",
+  "resolution_fingerprint": "84bb5ef2984a38887bfb24f1288fbd72ffe2129a102665db1179ef6d0bbee55e",
+  "rustdoc_execution_identity": {
+    "crate_name": "usecase",
+    "expected_json_path": "target/.sotp-rustdoc/f855b69b5c9e87ebfe506c211426b5d3c50fd843a7f90d2fa08b3355ddb5fcea/doc/usecase.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/f855b69b5c9e87ebfe506c211426b5d3c50fd843a7f90d2fa08b3355ddb5fcea"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_items": [
+        "CheckTestObligationsApplicationService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+    },
+    {
+      "found_items": [
+        "EvaluateTestObligationsApplicationService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+    },
+    {
+      "found_items": [
+        "TestObligationResultsApplicationService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::results::TestObligationResultsInteractor"
+    }
+  ]
+}

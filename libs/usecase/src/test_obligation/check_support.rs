@@ -6,7 +6,7 @@
 
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::catalogue_v2::roles::ItemAction;
-use domain::tddd::semantic_verify::{CatalogueEntryKey, SpecSectionKind};
+use domain::tddd::semantic_verify::{CatalogueEntryKey, SpecElementRef, SpecSectionKind};
 use domain::tddd::test_obligation::binding::{
     TestBindingRecord, TestBindingsDocument, TestLocation,
 };
@@ -19,8 +19,9 @@ use domain::tddd::test_obligation::ids::{
 use domain::tddd::test_obligation::obligations::ObligationsDocument;
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::vocab::TestObligationKind;
-use domain::{SpecDocument, SpecElementId, SpecRef, SpecRequirement};
+use domain::{SpecDocument, SpecRef};
 
+use super::freshness;
 use super::status_lanes::{StatusLaneFinding, StatusLaneFindingKind, StatusLaneTarget};
 use super::{LoadedCatalogueDocument, cited_anchor_ids, diag};
 
@@ -77,12 +78,8 @@ impl GateState {
     }
 }
 
-/// A parsed spec element (id + section + anchor text).
-pub(super) struct SpecElement {
-    id: String,
-    section: SpecSectionKind,
-    text: String,
-}
+/// A section-aware spec element used by all freshness consumers.
+pub(super) type SpecElement = SpecElementRef;
 
 /// Returns the bound tests for the obligation with `id`, if a `Fulfillment`
 /// binding exists.
@@ -231,23 +228,6 @@ pub(super) fn synthetic_edge(obligation_id: &TestObligationId) -> TestObligation
     TestObligationEdgeId::new(obligation_id.entry_key().clone(), anchor)
 }
 
-/// Returns the anchor text for `anchor`, or an empty string when unknown.
-pub(super) fn anchor_text(
-    spec_texts: &[(String, String)],
-    anchor: &TestObligationAnchorId,
-) -> String {
-    spec_texts
-        .iter()
-        .find(|(id, _)| id == anchor.element_id())
-        .map(|(_, text)| text.clone())
-        .unwrap_or_default()
-}
-
-/// Projects the parsed elements into `(element_id, text)` pairs.
-pub(super) fn anchor_texts(elements: &[SpecElement]) -> Vec<(String, String)> {
-    elements.iter().map(|e| (e.id.clone(), e.text.clone())).collect()
-}
-
 /// Computes the uncited `AC` / `CN` findings from catalogues + spec elements.
 pub(super) fn compute_uncited_from(
     catalogues: &[LoadedCatalogueDocument],
@@ -262,10 +242,11 @@ pub(super) fn compute_uncited_from(
             element.section,
             SpecSectionKind::AcceptanceCriteria | SpecSectionKind::Constraint
         );
-        if is_ac_or_cn && !cited.iter().any(|c| c == &element.id) {
-            if let Ok(id) = SpecElementId::try_new(element.id.clone()) {
-                findings.push(UncitedSpecElementFinding::new(id, element.section.clone()));
-            }
+        if is_ac_or_cn && !cited.iter().any(|c| c == element.element_id.as_ref()) {
+            findings.push(UncitedSpecElementFinding::new(
+                element.element_id.clone(),
+                element.section.clone(),
+            ));
         }
     }
     findings
@@ -273,30 +254,5 @@ pub(super) fn compute_uncited_from(
 
 /// Projects parsed spec document sections into the local uncited-finding view.
 pub(super) fn spec_elements_from_document(spec: &SpecDocument) -> Vec<SpecElement> {
-    let mut elements = Vec::new();
-    push_requirements(&mut elements, spec.goal(), SpecSectionKind::Goal);
-    push_requirements(&mut elements, spec.scope().in_scope(), SpecSectionKind::InScope);
-    push_requirements(&mut elements, spec.scope().out_of_scope(), SpecSectionKind::OutOfScope);
-    push_requirements(&mut elements, spec.constraints(), SpecSectionKind::Constraint);
-    push_requirements(
-        &mut elements,
-        spec.acceptance_criteria(),
-        SpecSectionKind::AcceptanceCriteria,
-    );
-    elements
-}
-
-/// Appends one parsed spec section to the local uncited-finding view.
-fn push_requirements(
-    elements: &mut Vec<SpecElement>,
-    requirements: &[SpecRequirement],
-    section: SpecSectionKind,
-) {
-    for requirement in requirements {
-        elements.push(SpecElement {
-            id: requirement.id().as_ref().to_owned(),
-            section: section.clone(),
-            text: requirement.text().to_owned(),
-        });
-    }
+    freshness::spec_elements_from_document(spec)
 }

@@ -1,0 +1,672 @@
+{
+  "entries": [
+    {
+      "claim_hash": "3102554ba5917ac04fd136fd759b309dda5ae2b4e1636870addce4d892940946",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "履行検証器と免除検証器が、仕様要素の識別子・所属区分・本文、対象宣言が所有する責務、および完全な正規化済み判定要求を一貫して用い、対象外の意味反転、責務越境、意味変更後の旧判定再利用を防ぐ。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "仕様要素の意味入力を、識別子、構造化仕様上の所属区分、本文の組として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3102554ba5917ac04fd136fd759b309dda5ae2b4e1636870addce4d892940946",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "履行検証器と免除検証器が、仕様要素の識別子・所属区分・本文、対象宣言が所有する責務、および完全な正規化済み判定要求を一貫して用い、対象外の意味反転、責務越境、意味変更後の旧判定再利用を防ぐ。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "責務越境の原因は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断する。必要な対象情報が既存の入力構築で失われていれば保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3102554ba5917ac04fd136fd759b309dda5ae2b4e1636870addce4d892940946",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "履行検証器と免除検証器が、仕様要素の識別子・所属区分・本文、対象宣言が所有する責務、および完全な正規化済み判定要求を一貫して用い、対象外の意味反転、責務越境、意味変更後の旧判定再利用を防ぐ。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既存の判定入力構築が両検証器へ渡す正規化済みの判定要求全体を、その集合の正とする。入力構築は、検証器が観測できる可変の意味をこの要求へ明示的に投影し、鮮度はその要求全体を正規化してハッシュする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0bbaa3adfbfb359a71187e5badfc28d631f73001ad946c3823283d021749822f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず、対象外の内容を肯定的な実装要求として表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "仕様要素の意味入力を、識別子、構造化仕様上の所属区分、本文の組として扱う。所属区分の正は既存の構造化仕様モデルとし、識別子の接頭辞や本文から推測しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0bbaa3adfbfb359a71187e5badfc28d631f73001ad946c3823283d021749822f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "両検証器へ渡す各仕様要素の意味入力で、既存の構造化仕様モデルを正として識別子・所属区分・本文を保持する。所属区分を識別子接頭辞や本文から推測せず、対象外の内容を肯定的な実装要求として表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "検証器は所属区分と本文を合わせ、対象宣言に関係する範囲境界を解釈する。対象外という所属は、その本文に列挙された機能を実装する義務を生まない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "524d3c3bb1349a0a7ee13a32a9aaadcecb106860a4b12ac7876314bdeaa2a70f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "対象外を、実装義務を生まない範囲境界、非保証、対象責務に属する明示禁止として区別して解釈する。対象外の参照関係を一括除外・自動免除せず、材料不足は既存の保留経路で扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "対象外という理由だけで参照関係を評価から落としたり、履行・免除を無条件に合格させたりしない。... 判断材料が足りない場合は未確定として既存の保留経路で扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "120e7353f64c70e27bf060941fd9d285fc81ae3cbf5dcf9ce8d08845550e2e7c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "履行・免除の判定を、義務の対象である宣言項目が所有する参照先仕様の振る舞いに限定する。責務越境の報告は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断し、確認された入力欠落だけを補う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "履行検証が問う範囲は、義務の対象となる宣言項目が所有する、参照先仕様の振る舞いに限定する。免除検証も、その参照関係の対象に関係する部分について理由を評価する。責務越境の原因は、実際の判定入力に届く宣言・義務の同一性と説明・テスト本文または免除理由を照合して診断する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "88b1fe722f9be17a7c6f3a562af6f1dd97d4bf2c813b21fd782cc2300f6c80c4",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "評価、確認、結果表示が同じ正規化済み判定要求全体から意味入力の鮮度を決めるようにする。仕様区分・対象責務を含む可変の意味入力、要求構造、または判定意味論に関わる入力形式の改訂は、旧合否を再利用不能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既存の判定入力構築が両検証器へ渡す正規化済みの判定要求全体を、その集合の正とする。入力構築は、検証器が観測できる可変の意味をこの要求へ明示的に投影し、鮮度はその要求全体を正規化してハッシュする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2ab0ba3289c9bb55e07c345e9f1f6dd339259927f4f08ede1cd7d433b92b2d4f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "入力構築・検証器指示・鮮度判定について決定的な回帰検証を追加し、通常のビルド・更新経路で、既存キャッシュを残したまま修正後の評価と確認を行う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "回帰保証の中心を、入力構築・指示・鮮度判定の決定的な検証に置く。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2430f63facbbda2bbdc6d6b37b1702a3a23c806f12b498e1ede7e2a8ccde2073",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "参照関係を評価対象から除外・自動免除して対象外の問題を回避すること、または対象の責務を増やして既存の判定に合わせること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "一方、対象外という理由だけで参照関係を評価から落としたり、履行・免除を無条件に合格させたりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2430f63facbbda2bbdc6d6b37b1702a3a23c806f12b498e1ede7e2a8ccde2073",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "参照関係を評価対象から除外・自動免除して対象外の問題を回避すること、または対象の責務を増やして既存の判定に合わせること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "この診断・修正は既存の参照関係ごとの検証を前提とする。対象の責務を増やして判定に合わせること、義務の導出・参照所有規則を変更すること、別の対象のテストを機械的に混ぜて通過させることは採用しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "090464945deaf000e143c5f0f10aaa67e8ad9c1cae11799509e25e9cf094c02d",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "入力不足の確認前に外部文脈取得を追加すること、またはリポジトリ・上流成果物を都度探索して責務や鮮度の意味入力を推定すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "入力不足が確認される前に外部文脈取得機構を追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "090464945deaf000e143c5f0f10aaa67e8ad9c1cae11799509e25e9cf094c02d",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "入力不足の確認前に外部文脈取得を追加すること、またはリポジトリ・上流成果物を都度探索して責務や鮮度の意味入力を推定すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ここでいう可変の意味入力の集合は、リポジトリや上流成果物を探索して都度推定するものではない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "460fe7c9b6b4d9eaa53d60d47d662b989f94a0a6984b228ba34dab1e29066d00",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "キャッシュの削除・手編集、ゲート緩和、または同一条件で合格するまでの反復を、判定更新または修正確認の経路にすること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "キャッシュ削除・手編集を更新経路としない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "460fe7c9b6b4d9eaa53d60d47d662b989f94a0a6984b228ba34dab1e29066d00",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "キャッシュの削除・手編集、ゲート緩和、または同一条件で合格するまでの反復を、判定更新または修正確認の経路にすること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "修正版の配布は通常のビルド・更新経路を用い、既存キャッシュを残した評価と確認で更新の有効性を確かめる。残る正当なテスト不足は通常の結び付け修復へ戻す。ゲート緩和や同一条件で合格するまで繰り返す運用は採用しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1ae3dff41a4f88efbdaa3fc8dabafcbbfa1687fdd73bf9014aa40643fa1f0d52",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-04",
+          "section": "out_of_scope",
+          "text_label": "モデル、提供者、実行段階を検証器指紋の構成要素へ追加すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "モデル・提供者・実行段階は指紋に含めない既存方針を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ce35203a0f81b62182eb00564b8e676f5caa49bd9b5d4c788ccd7083dc6f4c51",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "旧形式、指紋欠如、または指紋不一致の判定は、合否にかかわらず再利用せず、既存のタスク状態に応じた未確定判定へ戻す。鮮度の回復は新しい入力での再評価だけで行う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "旧形式または指紋欠如・不一致の判定は、合否を問わず再利用対象から除外し、既存のタスク状態に応じた未確定判定へ戻す。再評価により新しい入力に対する判定を得ることで鮮度を回復する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d31c6f352e255f8e1fa7b27f6b07fca187c245720a78152a9f2d792351f4df74",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し、対象宣言の振る舞いが対象責務の約束と矛盾する場合、テスト本文または免除理由が対象責務とは別の振る舞いだけを扱う場合、または対象義務の説明が直接要求する振る舞いに対応する証拠がない場合は不合格とする。対象宣言と義務の同一性、参照先仕様の所属・本文、またはテスト本文・免除理由が判定要求に不足して照合できない場合は保留として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "検証器は所属区分と本文を合わせ、対象宣言に関係する範囲境界を解釈する。... 免除理由は引き続き対象宣言と仕様要素の記述に裏付けられる必要がある。判断材料が足りない場合は未確定として既存の保留経路で扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d31c6f352e255f8e1fa7b27f6b07fca187c245720a78152a9f2d792351f4df74",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し、対象宣言の振る舞いが対象責務の約束と矛盾する場合、テスト本文または免除理由が対象責務とは別の振る舞いだけを扱う場合、または対象義務の説明が直接要求する振る舞いに対応する証拠がない場合は不合格とする。対象宣言と義務の同一性、参照先仕様の所属・本文、またはテスト本文・免除理由が判定要求に不足して照合できない場合は保留として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "対象の責務を増やして判定に合わせること、義務の導出・参照所有規則を変更すること、別の対象のテストを機械的に混ぜて通過させることは採用しない。対象自身の矛盾、別の振る舞いへのすり替え、中心的な約束の未検証は引き続き不合格とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d31c6f352e255f8e1fa7b27f6b07fca187c245720a78152a9f2d792351f4df74",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "正規化済み判定要求に含まれる対象宣言・義務・参照先仕様・テスト本文または免除理由を照合し、対象宣言の振る舞いが対象責務の約束と矛盾する場合、テスト本文または免除理由が対象責務とは別の振る舞いだけを扱う場合、または対象義務の説明が直接要求する振る舞いに対応する証拠がない場合は不合格とする。対象宣言と義務の同一性、参照先仕様の所属・本文、またはテスト本文・免除理由が判定要求に不足して照合できない場合は保留として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "対象自身の矛盾・すり替え・中心部の未検証を不合格にする指示と、材料不足を保留にする経路も維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac476e3202405ef95d438d10225ce70649acf724d44a5a3591a0b82eefbb9940",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "決定的な検証で、goal・constraints・acceptance_criteria・in_scope・out_of_scope の各仕様要素について、識別子・所属区分・本文が両検証器の実入力に保持され、同一本文が対象範囲と対象外のどちらに属するかを区別できることを確認できる。さらに、対象外の名詞句を肯定的な実装要求へ反転させず、単なる非保証から否定要件を作らない一方、対象責務に属する明示的な禁止は検証対象として扱うことを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "仕様要素の意味入力を、識別子、構造化仕様上の所属区分、本文の組として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac476e3202405ef95d438d10225ce70649acf724d44a5a3591a0b82eefbb9940",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "決定的な検証で、goal・constraints・acceptance_criteria・in_scope・out_of_scope の各仕様要素について、識別子・所属区分・本文が両検証器の実入力に保持され、同一本文が対象範囲と対象外のどちらに属するかを区別できることを確認できる。さらに、対象外の名詞句を肯定的な実装要求へ反転させず、単なる非保証から否定要件を作らない一方、対象責務に属する明示的な禁止は検証対象として扱うことを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "検証器は所属区分と本文を合わせ、対象宣言に関係する範囲境界を解釈する。単に機能を保証しないという記述から、その機能が存在しないことを立証する否定要件を作らない。本文が明示する禁止は、その禁止が対象の責務に属する範囲で検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac476e3202405ef95d438d10225ce70649acf724d44a5a3591a0b82eefbb9940",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "決定的な検証で、goal・constraints・acceptance_criteria・in_scope・out_of_scope の各仕様要素について、識別子・所属区分・本文が両検証器の実入力に保持され、同一本文が対象範囲と対象外のどちらに属するかを区別できることを確認できる。さらに、対象外の名詞句を肯定的な実装要求へ反転させず、単なる非保証から否定要件を作らない一方、対象責務に属する明示的な禁止は検証対象として扱うことを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同一本文の対象範囲と対象外が両検証器の実入力で区別されること、対象外の名詞句を実装要求へ反転させない指示、非保証と明示禁止の区別",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff94115940195ec90fa7c136c50e8c336cc0f8082a89ef45655ed87cf5ef036c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "決定的な検証で、単一入力を扱う対象宣言と入力選択を所有する宣言を区別し、前者に呼び出し元の選択・設定読込責務を要求せず、後者の選択欠陥は検出対象に保つことを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "例えば、選択済みの単一入力を解析する宣言に、呼び出し元の入力選択や設定読込時の既定値適用を要求しない。入力選択を所有する宣言の選択欠陥は検出対象である。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff94115940195ec90fa7c136c50e8c336cc0f8082a89ef45655ed87cf5ef036c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "決定的な検証で、単一入力を扱う対象宣言と入力選択を所有する宣言を区別し、前者に呼び出し元の選択・設定読込責務を要求せず、後者の選択欠陥は検出対象に保つことを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "対象自身と呼び出し元の責務の区別を検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "eae0c5400d555722e43458261d3646fecdd14520fd3d67bb5db2e65e58ef41c8",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本文が同一の区分移動でも旧判定を再利用しない。評価、確認、結果表示は同じ正規化とハッシュの意味を使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "eae0c5400d555722e43458261d3646fecdd14520fd3d67bb5db2e65e58ef41c8",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "仕様区分の移動、対象責務情報の変更、判定要求の構造変更、または検証器入力形式・意味論の改訂について、評価・確認・結果表示が旧合格・旧不合格を同じように失効させ、再評価後の状態で一致することを確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "区分変更と指紋更新について、評価・確認・結果表示が旧合格・旧不合格の失効と再評価後の状態で一致することを検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8215e198ede03f05e66620c86e0ca9a633afb025c8771b2ce97479bca31bc8f7",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "通常のビルド・更新経路で修正版を評価・確認するとき、既存キャッシュを削除または手編集せずに、新しい判定入力に対する判定で鮮度を回復できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "再評価により新しい入力に対する判定を得ることで鮮度を回復する。キャッシュ削除・手編集を更新経路としない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8215e198ede03f05e66620c86e0ca9a633afb025c8771b2ce97479bca31bc8f7",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "通常のビルド・更新経路で修正版を評価・確認するとき、既存キャッシュを削除または手編集せずに、新しい判定入力に対する判定で鮮度を回復できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3bc1554e21b04d5feeffd88168beccb46ecf02d2dcfe984147b28ef94a6751e1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-09-11-1320-test-obligation-verifier-context-integrity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "修正版の配布は通常のビルド・更新経路を用い、既存キャッシュを残した評価と確認で更新の有効性を確かめる。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

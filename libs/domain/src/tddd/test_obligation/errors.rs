@@ -15,7 +15,7 @@ use thiserror::Error;
 use crate::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use crate::tddd::test_obligation::drift::{NonEmptyDrifts, NonEmptyEdgeVerdictRecords};
 use crate::tddd::test_obligation::ids::{DiagnosticMessage, NonEmptyEdgeIds, RoleName};
-use crate::tddd::test_obligation::verdict::FulfillmentCacheLookupError;
+use crate::tddd::test_obligation::verdict::{FulfillmentCacheLookupError, WaiverCacheLookupError};
 use crate::{FrozenTrackStatus, SpecDocumentLoadError};
 
 /// Error raised while loading and validating the test-obligation rules config.
@@ -185,6 +185,8 @@ pub enum ObligationCheckError {
     TaskAttribution(DiagnosticMessage),
     /// Resolving the current fulfillment-cache entry was ambiguous.
     FulfillmentCacheLookup(FulfillmentCacheLookupError),
+    /// Resolving the current waiver-cache entry was ambiguous.
+    WaiverCacheLookup(WaiverCacheLookupError),
     /// A binding violates the derived-obligation ownership invariant.
     BindingConsistency(TestBindingConsistencyError),
     /// The fulfillment cache must be reevaluated before it can resolve an edge.
@@ -215,6 +217,8 @@ pub enum ObligationEvaluateError {
     CachePersistence(VerifyCacheError),
     /// Resolving a current fulfillment-cache entry was ambiguous.
     FulfillmentCacheLookup(FulfillmentCacheLookupError),
+    /// Resolving a current waiver-cache entry was ambiguous.
+    WaiverCacheLookup(WaiverCacheLookupError),
     /// Evaluation confirmed one or more semantic failures.
     SemanticFailuresConfirmed {
         /// The per-edge records that failed (non-empty by construction).
@@ -307,15 +311,20 @@ mod tests {
 
     use std::path::PathBuf;
 
+    use crate::ContentHash;
     use crate::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
     use crate::tddd::semantic_verify::CatalogueEntryKey;
     use crate::tddd::test_obligation::drift::{
         EdgeResolutionOutcome, EdgeVerdictRecord, TestObligationDrift,
     };
+    use crate::tddd::test_obligation::hashes::{
+        DeclarationHash, ObligationResponsibilityHash, SpecElementHash, WaivedReasonHash,
+    };
     use crate::tddd::test_obligation::ids::{
         TestObligationAnchorId, TestObligationEdgeId, TestObligationId,
         TestObligationItemIdentifier,
     };
+    use crate::tddd::test_obligation::verdict::WaiverCacheKey;
     use crate::tddd::test_obligation::vocab::TestObligationKind;
 
     fn diag(text: &str) -> DiagnosticMessage {
@@ -356,6 +365,19 @@ mod tests {
 
     fn catalogue_load_error() -> CatalogueDocumentLoaderError {
         CatalogueDocumentLoaderError::NotFound { path: PathBuf::from("missing-types.json") }
+    }
+
+    fn waiver_lookup_error() -> WaiverCacheLookupError {
+        WaiverCacheLookupError::AmbiguousCurrentEntries {
+            edge_id: edge(),
+            obligation_id: obligation(),
+            key: WaiverCacheKey::new(
+                WaivedReasonHash::new(ContentHash::from_bytes([1u8; 32])),
+                DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
+                SpecElementHash::new(ContentHash::from_bytes([3u8; 32])),
+                ObligationResponsibilityHash::new(ContentHash::from_bytes([4u8; 32])),
+            ),
+        }
     }
 
     #[test]
@@ -478,6 +500,20 @@ mod tests {
         let error = ObligationCheckError::FulfillmentCacheRequiresEvaluation;
 
         assert!(matches!(error, ObligationCheckError::FulfillmentCacheRequiresEvaluation));
+    }
+
+    #[test]
+    fn test_obligation_errors_preserve_waiver_cache_lookup_identity() {
+        let lookup = waiver_lookup_error();
+
+        assert!(matches!(
+            ObligationCheckError::WaiverCacheLookup(lookup.clone()),
+            ObligationCheckError::WaiverCacheLookup(actual) if actual == lookup
+        ));
+        assert!(matches!(
+            ObligationEvaluateError::WaiverCacheLookup(lookup.clone()),
+            ObligationEvaluateError::WaiverCacheLookup(actual) if actual == lookup
+        ));
     }
 
     #[test]
