@@ -3536,6 +3536,77 @@ fn test_absent_waiver_fingerprint_is_a_missing_stale_verdict() {
 }
 
 #[test]
+fn test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes() {
+    // CN-01 / AC-03: neither an old verifier identity nor a missing identity
+    // may preserve the meaning of a cached pass or fail result.
+    for fingerprint in
+        [Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))), None]
+    {
+        for verdict in [fulfilled_verdict(), failed_verdict()] {
+            let current = fresh_fulfillment_cache_for(&obligation()).entries()[0].clone();
+            let cache = ObligationFulfillmentCacheDocument::new(
+                track(),
+                vec![cache_entry(
+                    edge(),
+                    obligation().id().clone(),
+                    current.key().clone(),
+                    verdict,
+                    fingerprint.clone(),
+                )],
+            );
+            let result = interactor(
+                Some(ObligationsDocument::new(track(), vec![obligation()])),
+                Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+                Some(cache),
+                None,
+            )
+            .execute(&command());
+
+            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+        }
+    }
+
+    for fingerprint in
+        [Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))), None]
+    {
+        for verdict in [
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("cached waiver pass".to_owned()).unwrap(),
+            },
+            WaiverVerdict::Fail {
+                reason: DiagnosticMessage::try_new("cached waiver failure".to_owned()).unwrap(),
+            },
+        ] {
+            let current = fresh_waiver_cache_for_fingerprint(
+                &obligation(),
+                Some(waiver_verifier_fingerprint()),
+            )
+            .entries()[0]
+                .clone();
+            let cache = WaiverCacheDocument::new(
+                track(),
+                vec![WaiverCacheEntry::new(
+                    current.edge_id().clone(),
+                    current.obligation_id().cloned(),
+                    current.key().clone(),
+                    verdict,
+                    fingerprint.clone(),
+                )],
+            );
+            let result = interactor(
+                Some(ObligationsDocument::new(track(), vec![obligation()])),
+                Some(TestBindingsDocument::new(track(), vec![waiver_binding()])),
+                None,
+                Some(cache),
+            )
+            .execute(&command());
+
+            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+        }
+    }
+}
+
+#[test]
 fn test_voluntary_binding_for_derived_edge_returns_consistency_finding() {
     let obligations = ObligationsDocument::new(track(), vec![obligation()]);
     let bindings = TestBindingsDocument::new(track(), vec![voluntary_binding()]);
@@ -3833,6 +3904,70 @@ fn test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifi
 
         let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
             panic!("a responsibility change must stale waiver pass and fail verdicts");
+        };
+        assert_eq!(drifts.as_slice(), &[expected_drift()]);
+    }
+}
+
+#[test]
+fn test_check_waiver_reason_change_stales_pass_and_fail() {
+    // IN-03 / AC-03: changing the material supplied as the waiver claim must
+    // stale either previously cached waiver outcome.
+    let current_obligation = obligation();
+    let waiver_current = fresh_waiver_cache_for_fingerprint(
+        &current_obligation,
+        Some(waiver_verifier_fingerprint()),
+    )
+    .entries()
+    .first()
+    .unwrap()
+    .clone();
+    let changed_reason = WaivedReasonHash::new(sha256_content_hash(b"changed waiver reason"));
+    assert_ne!(changed_reason, waiver_current.key().waived_reason_hash().clone());
+    let stale_key = WaiverCacheKey::new(
+        changed_reason,
+        waiver_current.key().declaration_hash().clone(),
+        waiver_current.key().spec_element_hash().clone(),
+        waiver_current.key().responsibility_hash().clone(),
+    );
+
+    let expected_drift = || {
+        TestObligationDrift::reason_changed_edge(
+            edge(),
+            DiagnosticMessage::try_new(
+                "waived reason changed since the verdict was frozen".to_owned(),
+            )
+            .unwrap(),
+        )
+    };
+
+    for verdict in [
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("cached waiver".to_owned()).unwrap(),
+        },
+        WaiverVerdict::Fail {
+            reason: DiagnosticMessage::try_new("cached waiver failure".to_owned()).unwrap(),
+        },
+    ] {
+        let result = interactor(
+            Some(ObligationsDocument::new(track(), vec![current_obligation.clone()])),
+            Some(TestBindingsDocument::new(track(), vec![waiver_binding()])),
+            None,
+            Some(WaiverCacheDocument::new(
+                track(),
+                vec![WaiverCacheEntry::new(
+                    edge(),
+                    Some(current_obligation.id().clone()),
+                    stale_key.clone(),
+                    verdict,
+                    Some(waiver_verifier_fingerprint()),
+                )],
+            )),
+        )
+        .execute(&command());
+
+        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+            panic!("a waiver reason change must stale pass and fail verdicts");
         };
         assert_eq!(drifts.as_slice(), &[expected_drift()]);
     }

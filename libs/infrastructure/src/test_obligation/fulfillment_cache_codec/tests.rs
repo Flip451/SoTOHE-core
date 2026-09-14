@@ -550,51 +550,67 @@ fn test_codec_replaces_stale_cache_for_subsequent_check() {
         current_key.spec_element_hash().clone(),
         current_key.responsibility_hash().clone(),
     );
-    let stale = ObligationFulfillmentCacheDocument::new(
-        TrackId::try_new("my-track").unwrap(),
-        vec![cache_entry(
-            edge_id(),
-            obligation_id(),
-            stale_key,
-            ObligationFulfillmentVerdict::Pending,
-            Some(verifier_fingerprint()),
-        )],
-    );
-    codec.save(&stale).unwrap();
-
-    let Some(before_re_evaluation) = codec.load(stale.track_id()).unwrap() else {
-        panic!("saved stale cache must remain readable for fail-closed checking");
-    };
-    assert!(
-        before_re_evaluation
-            .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint(),)
-            .unwrap()
-            .is_none()
-    );
-
-    let refreshed = ObligationFulfillmentCacheDocument::new(
-        stale.track_id().clone(),
-        vec![cache_entry(
-            edge_id(),
-            obligation_id(),
-            current_key.clone(),
+    for (stale_verdict, refreshed_verdict) in [
+        (
+            ObligationFulfillmentVerdict::Fulfilled {
+                citation: EvidenceCitation::try_new("stale evidence".to_owned()).unwrap(),
+            },
+            ObligationFulfillmentVerdict::Fail {
+                category: FulfillmentFailCategory::Contradiction,
+                reason: DiagnosticMessage::try_new("re-evaluated failure".to_owned()).unwrap(),
+            },
+        ),
+        (
+            ObligationFulfillmentVerdict::Fail {
+                category: FulfillmentFailCategory::Contradiction,
+                reason: DiagnosticMessage::try_new("stale failure".to_owned()).unwrap(),
+            },
             ObligationFulfillmentVerdict::Fulfilled {
                 citation: EvidenceCitation::try_new("re-evaluated evidence".to_owned()).unwrap(),
             },
-            Some(verifier_fingerprint()),
-        )],
-    );
-    codec.save(&refreshed).unwrap();
+        ),
+    ] {
+        let stale = ObligationFulfillmentCacheDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![cache_entry(
+                edge_id(),
+                obligation_id(),
+                stale_key.clone(),
+                stale_verdict,
+                Some(verifier_fingerprint()),
+            )],
+        );
+        codec.save(&stale).unwrap();
+        let Some(before_re_evaluation) = codec.load(stale.track_id()).unwrap() else {
+            panic!("saved stale cache must remain readable for fail-closed checking");
+        };
+        assert!(
+            before_re_evaluation
+                .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())
+                .unwrap()
+                .is_none()
+        );
 
-    let Some(after_re_evaluation) = codec.load(refreshed.track_id()).unwrap() else {
-        panic!("re-evaluated cache must be readable for the subsequent check");
-    };
-    assert!(
-        after_re_evaluation
-            .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint(),)
+        let refreshed = ObligationFulfillmentCacheDocument::new(
+            stale.track_id().clone(),
+            vec![cache_entry(
+                edge_id(),
+                obligation_id(),
+                current_key.clone(),
+                refreshed_verdict.clone(),
+                Some(verifier_fingerprint()),
+            )],
+        );
+        codec.save(&refreshed).unwrap();
+        let Some(after_re_evaluation) = codec.load(refreshed.track_id()).unwrap() else {
+            panic!("re-evaluated cache must be readable for the subsequent check");
+        };
+        let selected = after_re_evaluation
+            .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())
             .unwrap()
-            .is_some()
-    );
+            .expect("fresh wire row must be selected");
+        assert_eq!(selected.verdict(), &refreshed_verdict);
+    }
 }
 
 // IN-09 / CN-04: the trusted items root itself must not be a symlink.

@@ -1377,6 +1377,93 @@ fn test_results_projects_stale_pass_and_fail_to_pending_in_both_verifier_lanes()
 }
 
 #[test]
+fn test_results_rechecks_stale_waiver_pass_and_fail_after_refresh() {
+    // AC-03 / AC-04: a stale waiver row is shown as pending, while the normal
+    // replacement write restores the new pass/fail result without deleting it.
+    let binding = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: edge("Money", "IN-05"),
+            reason: status_waiver_reason(),
+        }],
+    );
+
+    for (stale_verdict, refreshed_verdict) in [
+        (
+            WaiverVerdict::Waived { citation: citation() },
+            WaiverVerdict::Fail { reason: reason("refreshed waiver failure") },
+        ),
+        (
+            WaiverVerdict::Fail { reason: reason("stale waiver failure") },
+            WaiverVerdict::Waived { citation: citation() },
+        ),
+    ] {
+        let stale = status_interactor_with_caches(
+            binding.clone(),
+            None,
+            Some(status_waiver_cache(
+                stale_verdict,
+                status_waiver_key_for_section(SpecSectionKind::InScope),
+            )),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        )
+        .execute(&status_command())
+        .unwrap();
+        let stale_lane = stale
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Waiver)
+            .unwrap();
+        assert_eq!(stale_lane.pass_count(), 0);
+        assert_eq!(stale_lane.fail_count(), 0);
+        assert_eq!(stale_lane.pending_count(), 1);
+
+        let refreshed = status_interactor_with_caches(
+            binding.clone(),
+            None,
+            Some(status_waiver_cache(
+                refreshed_verdict.clone(),
+                status_waiver_key_for_section(SpecSectionKind::OutOfScope),
+            )),
+            TaskStatusKind::Done,
+            status_spec_moved_to_out_of_scope(),
+        )
+        .execute(&status_command())
+        .unwrap();
+        let refreshed_lane = refreshed
+            .lane_summaries()
+            .iter()
+            .find(|summary| summary.chain_name() == &TestObligationChainLabel::Waiver)
+            .unwrap();
+        match &refreshed_verdict {
+            WaiverVerdict::Waived { .. } => {
+                assert_eq!(refreshed_lane.pass_count(), 1);
+                assert_eq!(refreshed_lane.fail_count(), 0);
+                assert_eq!(refreshed.records().len(), 0);
+            }
+            WaiverVerdict::Fail { .. } => {
+                assert_eq!(refreshed_lane.pass_count(), 0);
+                assert_eq!(refreshed_lane.fail_count(), 1);
+                assert_eq!(refreshed.records().len(), 1);
+            }
+            WaiverVerdict::Pending => panic!("matrix has no pending verdict"),
+        }
+        let status = refreshed
+            .status_lane_summaries()
+            .unwrap()
+            .iter()
+            .find(|summary| summary.task_status() == TaskStatusKind::Done)
+            .unwrap();
+        assert_eq!(status.stale_count(), 0);
+        assert_eq!(
+            status.verdict_absent_count(),
+            usize::from(matches!(refreshed_verdict, WaiverVerdict::Fail { .. }))
+        );
+    }
+}
+
+#[test]
 fn test_results_stales_pass_and_fail_when_target_responsibility_changes() {
     // AC-03: a changed target-responsibility brief invalidates both cached
     // outcomes while all other cache-key components remain current.

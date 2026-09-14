@@ -662,6 +662,82 @@ mod tests {
     }
 
     #[test]
+    fn test_codec_replaces_stale_waiver_pass_and_fail_for_subsequent_check() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
+        let current_key = key();
+        let stale_key = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([9u8; 32])),
+            current_key.declaration_hash().clone(),
+            current_key.spec_element_hash().clone(),
+            current_key.responsibility_hash().clone(),
+        );
+
+        for (stale_verdict, refreshed_verdict) in [
+            (
+                WaiverVerdict::Waived {
+                    citation: EvidenceCitation::try_new("stale waiver pass".to_owned()).unwrap(),
+                },
+                WaiverVerdict::Fail {
+                    reason: DiagnosticMessage::try_new("re-evaluated waiver failure".to_owned())
+                        .unwrap(),
+                },
+            ),
+            (
+                WaiverVerdict::Fail {
+                    reason: DiagnosticMessage::try_new("stale waiver failure".to_owned()).unwrap(),
+                },
+                WaiverVerdict::Waived {
+                    citation: EvidenceCitation::try_new("re-evaluated waiver pass".to_owned())
+                        .unwrap(),
+                },
+            ),
+        ] {
+            let stale = WaiverCacheDocument::new(
+                TrackId::try_new("my-track").unwrap(),
+                vec![WaiverCacheEntry::new(
+                    edge_id(),
+                    Some(obligation_id()),
+                    stale_key.clone(),
+                    stale_verdict,
+                    Some(verifier_fingerprint()),
+                )],
+            );
+            codec.save(&stale).unwrap();
+            let loaded = codec.load(stale.track_id()).unwrap().unwrap();
+            assert!(
+                loaded
+                    .lookup_current(
+                        &edge_id(),
+                        &obligation_id(),
+                        &current_key,
+                        &verifier_fingerprint()
+                    )
+                    .unwrap()
+                    .is_none()
+            );
+
+            let refreshed = WaiverCacheDocument::new(
+                stale.track_id().clone(),
+                vec![WaiverCacheEntry::new(
+                    edge_id(),
+                    Some(obligation_id()),
+                    current_key.clone(),
+                    refreshed_verdict.clone(),
+                    Some(verifier_fingerprint()),
+                )],
+            );
+            codec.save(&refreshed).unwrap();
+            let loaded = codec.load(refreshed.track_id()).unwrap().unwrap();
+            let selected = loaded
+                .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())
+                .unwrap()
+                .unwrap();
+            assert_eq!(selected.verdict(), &refreshed_verdict);
+        }
+    }
+
+    #[test]
     fn test_waiver_cache_writer_populated_verdict_returns_canonical_deterministic_bytes() {
         let dir = tempfile::tempdir().unwrap();
         let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());

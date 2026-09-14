@@ -2486,6 +2486,99 @@ fn test_section_only_spec_move_reverifies_cached_pass_and_fail() {
 }
 
 #[test]
+fn test_stale_pass_and_fail_are_reverified_in_both_evaluate_lanes() {
+    // AC-03 / CN-01: changing the section invalidates either old outcome, and
+    // evaluate persists only the fresh verdict returned by the lane's driver.
+    for (cached, fresh) in [(fulfilled(), fulfillment_fail()), (fulfillment_fail(), fulfilled())] {
+        let h = harness_with_read_models_and_config(
+            Some(obligations_doc()),
+            Some(fulfillment_bindings()),
+            fresh.clone(),
+            fresh.clone(),
+            WaiverVerdict::Pending,
+            Arc::new(StubScanner),
+            Some(cached_fulfillment_doc(cached)),
+            None,
+            section_moved_spec_doc(),
+            money_catalogue(),
+            config_with_rate(0),
+        );
+
+        let result = run(h.interactor.execute(&command()));
+        match &fresh {
+            ObligationFulfillmentVerdict::Fulfilled { .. } => {
+                assert_eq!(result.unwrap().pass_count(), 1);
+            }
+            ObligationFulfillmentVerdict::Fail { .. } => {
+                assert!(matches!(
+                    result,
+                    Err(ObligationEvaluateError::SemanticFailuresConfirmed { .. })
+                ));
+            }
+            ObligationFulfillmentVerdict::Pending => panic!("matrix has no pending verdict"),
+        }
+        assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().first(), Some(&ModelTier::Fast));
+        assert_eq!(
+            h.fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries()[0].verdict(),
+            &fresh
+        );
+    }
+
+    for (cached, fresh) in [
+        (
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("old waiver pass".to_owned()).unwrap(),
+            },
+            WaiverVerdict::Fail {
+                reason: DiagnosticMessage::try_new("fresh waiver failure".to_owned()).unwrap(),
+            },
+        ),
+        (
+            WaiverVerdict::Fail {
+                reason: DiagnosticMessage::try_new("old waiver failure".to_owned()).unwrap(),
+            },
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("fresh waiver pass".to_owned()).unwrap(),
+            },
+        ),
+    ] {
+        let h = harness_with_read_models_and_config(
+            Some(obligations_doc()),
+            Some(waiver_bindings()),
+            fulfillment_fail(),
+            fulfillment_fail(),
+            fresh.clone(),
+            Arc::new(StubScanner),
+            None,
+            Some(cached_waiver_doc(cached)),
+            section_moved_spec_doc(),
+            money_catalogue(),
+            config_with_rate(0),
+        );
+
+        let result = run(h.interactor.execute(&command()));
+        match &fresh {
+            WaiverVerdict::Waived { .. } => assert_eq!(result.unwrap().pass_count(), 1),
+            WaiverVerdict::Fail { .. } => {
+                assert!(matches!(
+                    result,
+                    Err(ObligationEvaluateError::SemanticFailuresConfirmed { .. })
+                ));
+            }
+            WaiverVerdict::Pending => panic!("matrix has no pending verdict"),
+        }
+        assert_eq!(
+            *h.waiver_driver.calls.lock().unwrap(),
+            1 + usize::from(matches!(&fresh, WaiverVerdict::Fail { .. }))
+        );
+        assert_eq!(
+            h.waiver_cache.saved.lock().unwrap().as_ref().unwrap().entries()[0].verdict(),
+            &fresh
+        );
+    }
+}
+
+#[test]
 fn test_evaluate_forwards_structured_spec_and_owned_responsibility_to_both_verifiers() {
     let current = harness_with_read_models_and_config(
         Some(obligations_doc()),

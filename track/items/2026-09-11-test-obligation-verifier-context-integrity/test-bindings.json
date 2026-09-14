@@ -1030,6 +1030,17 @@
       "reason": "At CheckTestObligationsInteractor × AC-02, the declared interactor has only cache, artifact, catalogue, spec, and status readers; it has no semantic verifier or driver and performs no selection-responsibility judgment. Distinguishing an already-selected-input declaration from a selection-owning declaration and preserving the corresponding positive/negative semantic outcome belongs to the evaluator/verifier lane, not this pure cached-gate query."
     },
     {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "At EvaluateTestObligationsInteractor × AC-01, the declared use-case interactor owns carrying the authoritative section identifier, ownership class, and verbatim text into both driver requests, covered by the retained forwarding tests. It does not own configured-provider calibration of out-of-scope noun phrases as non-requirements, non-guarantees as non-prohibitions, or target-owned explicit prohibitions as verifiable behavior; that semantic calibration belongs to the ignored infrastructure adapter/provider test test_configured_provider_calibrates_section_and_ownership_boundaries. This waiver covers only that non-owned provider-semantic remainder and does not waive forwarding."
+    },
+    {
       "kind": "fulfillment",
       "obligation_id": {
         "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
@@ -1145,6 +1156,11 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_fresh_fulfilled_verdict_resolves_edge"
         },
         {
@@ -1171,6 +1187,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fulfillment_cache_entry_must_match_obligation_id"
         },
         {
           "layer": "usecase",
@@ -1221,6 +1242,21 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_waiver_reason_change_stales_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
         }
       ]
     },
@@ -1286,6 +1322,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_rechecks_stale_waiver_pass_and_fail_after_refresh"
         }
       ]
     }

@@ -1750,7 +1750,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(fulfillment.spec_element().element_id.as_ref(), \"IN-05\");\nassert_eq!(&fulfillment.spec_element().section, &SpecSectionKind::InScope);\nassert_eq!(fulfillment.spec_element().text_label.as_str(), anchor_text());\n...\nassert_eq!(moved_fulfillment.spec_element().element_id.as_ref(), \"IN-05\");\nassert_eq!(&moved_fulfillment.spec_element().section, &SpecSectionKind::OutOfScope);\nassert_eq!(moved_fulfillment.spec_element().text_label.as_str(), anchor_text());",
+        "citation": "assert_eq!(moved_fulfillment.spec_element().element_id.as_ref(), \"IN-05\");\nassert_eq!(&moved_fulfillment.spec_element().section, &SpecSectionKind::OutOfScope);\nassert_eq!(moved_fulfillment.spec_element().text_label.as_str(), anchor_text());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -1872,7 +1872,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let selected_pair = pairs\n        .iter()\n        .find(|pair| pair.obligation_id() == selected.id())\n        .expect(\"selected-input obligation must reach the driver\");\n    assert_eq!(selected_pair.spec_element().element_id.as_ref(), \"IN-05\");\n    assert_eq!(\n        selected_pair.spec_element().text_label,\n        \"handles one caller-selected input without selecting or loading configuration\"\n    );\n    assert_eq!(selected_pair.obligation_brief().as_str(), \"handle one already-selected input\");\n    assert!(selected_pair.entry_declaration().as_str().contains(\"handle_selected_input\"));\n    assert_eq!(\n        selected_pair.tests_source().as_str(),\n        \"assert_eq!(selected_input.id(), expected_id);\\n\"\n    );\n\n    let selecting_pair = pairs\n        .iter()\n        .find(|pair| pair.obligation_id() == selecting.id())\n        .expect(\"selection-owning obligation must reach the driver\");\n    assert_eq!(selecting_pair.spec_element().element_id.as_ref(), \"IN-06\");\n    assert_eq!(selecting_pair.spec_element().text_label, \"selects the input before evaluating it\");\n    assert_eq!(selecting_pair.obligation_brief().as_str(), \"select the input before evaluation\");\n    assert!(selecting_pair.entry_declaration().as_str().contains(\"select_input\"));\n    assert_eq!(\n        selecting_pair.tests_source().as_str(),\n        \"assert_eq!(selector.select(input), expected_input);\\n\"\n    );\n    assert_ne!(\n        selected_pair.entry_declaration().as_str(),\n        selecting_pair.entry_declaration().as_str()\n    );\n    assert_ne!(selected_pair.tests_source().as_str(), selecting_pair.tests_source().as_str());",
+        "citation": "assert_eq!(fulfillment.tests_source().as_str(), \"assert!(money.is_positive());\\n\");\n    assert!(fulfillment.entry_declaration().as_str().contains(\"Money\"));\n    assert_eq!(fulfillment.spec_element().element_id.as_ref(), \"IN-05\");\n    assert_eq!(&fulfillment.spec_element().section, &SpecSectionKind::InScope);\n    assert_eq!(fulfillment.spec_element().text_label.as_str(), anchor_text());\n    assert_eq!(fulfillment.obligation_id(), obligation().id());\n    assert_eq!(fulfillment.obligation_brief().as_str(), \"cover positivity\");\n\n    let waiver = current\n        .waiver_driver\n        .pairs\n        .lock()\n        .unwrap()\n        .iter()\n        .find(|pair| pair.spec_element().element_id.as_ref() == \"IN-06\")\n        .cloned()\n        .expect(\"the second edge must reach the waiver verifier\");\n    assert!(!waiver.entry_declaration().as_str().is_empty());\n    assert!(waiver.entry_declaration().as_str().contains(\"Obligation item\"));\n    assert_eq!(waiver.spec_element().element_id.as_ref(), \"IN-06\");\n    assert_eq!(&waiver.spec_element().section, &SpecSectionKind::InScope);\n    assert_eq!(waiver.spec_element().text_label.as_str(), \"Money conversions must be lossless.\");\n    assert_eq!(waiver.waived_reason().as_str(), waiver_reason().as_str());\n    assert_eq!(waiver.obligation_id().entry_key().as_str(), \"Money\");\n    assert_eq!(waiver.obligation_id().item_identifier().as_str(), \"voluntary:IN-06\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -1994,129 +1994,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(\n    !h.fulfillment_driver.tiers.lock().unwrap().is_empty(),\n    \"moving an element between sections must not reuse the old cache key\"\n);\nlet saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();\nassert_ne!(saved.entries()[0].key(), &old_key);",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_evaluate_forwards_structured_spec_and_owned_responsibility_to_both_verifiers"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_evaluate_forwards_same_spec_identity_and_text_for_every_authoritative_section"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_evaluate_preserves_injected_selected_input_and_selection_owner_outcomes"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_section_only_spec_move_reverifies_cached_pass_and_fail"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_matching_fulfillment_cache_reuses_frozen_verdict"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_changed_fulfillment_obligation_brief_invalidates_cache"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_parent_only_fulfillment_declaration_hash_reverifies"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_mismatched_fulfillment_fingerprint_reverifies_and_overwrites_entry"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_absent_fulfillment_fingerprint_reverifies_and_overwrites_entry"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_waiver_binding_uses_waiver_lane"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_matching_waiver_cache_reuses_frozen_verdict"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_parent_only_waiver_declaration_hash_reverifies"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_mismatched_waiver_fingerprint_reverifies_and_overwrites_entry"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_absent_waiver_fingerprint_reverifies_and_overwrites_entry"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_plan_fulfillment_trait_method_anchors_limits_each_obligation_to_owned_and_shared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_waiver_adjudicates_every_obligation_owning_the_edge"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::test_obligation::evaluate::tests",
-          "test_name": "test_trait_impl_obligation_verifies_against_impl_declaration"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-01",
-          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
-        },
-        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
-      },
-      "key": {
-        "bound_tests_set_hash": "8fe6f5f72d59add1d6061ea6135f44c72be864d86ddc38b8675b4935a9168856",
-        "declaration_hash": "775e57b854696a4b88ab21432f02f050b5684fb86a69827b3fa3b73d81a4b963",
-        "responsibility_hash": "da858c451154158dab2a4dc0ddfa55eb262c1529c3f4e2948b86e407545c268d",
-        "spec_element_hash": "0b538c6cfa074483728666dca17acb56838abdfccd156dbb2a75428f725124e7"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "assert_eq!(fulfillment.spec_element().element_id.as_ref(), \"IN-05\");\n    assert_eq!(&fulfillment.spec_element().section, &SpecSectionKind::InScope);\n    assert_eq!(fulfillment.spec_element().text_label.as_str(), anchor_text());\n    assert_eq!(fulfillment.obligation_id(), obligation().id());\n    assert_eq!(fulfillment.obligation_brief().as_str(), \"cover positivity\");\n...\nassert_eq!(moved_fulfillment.spec_element().element_id.as_ref(), \"IN-05\");\n    assert_eq!(&moved_fulfillment.spec_element().section, &SpecSectionKind::OutOfScope);\n    assert_eq!(moved_fulfillment.spec_element().text_label.as_str(), anchor_text());",
+        "citation": "assert_ne!(bound_tests_mismatch.key().bound_tests_set_hash(), current.key().bound_tests_set_hash());\nassert_ne!(declaration_mismatch.key().declaration_hash(), current.key().declaration_hash());\nassert_ne!(spec_element_mismatch.key().spec_element_hash(), current.key().spec_element_hash());\nassert_ne!(fingerprint_mismatch.verifier_fingerprint(), current.verifier_fingerprint());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -2238,7 +2116,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(selected_pair.entry_declaration().as_str().contains(\"handle_selected_input\"));\nassert_eq!(selected_pair.tests_source().as_str(), \"assert_eq!(selected_input.id(), expected_id);\\n\");\n\nassert!(selecting_pair.entry_declaration().as_str().contains(\"select_input\"));\nassert_eq!(selecting_pair.tests_source().as_str(),\n    \"assert_eq!(selector.select(input), expected_input);\\n\"\n);",
+        "citation": "assert_eq!(selected_pair.spec_element().text_label, \"handles one caller-selected input without selecting or loading configuration\");\nassert_eq!(selecting_pair.spec_element().text_label, \"selects the input before evaluating it\");\nassert_eq!(selecting_pair.tests_source().as_str(), \"assert_eq!(selector.select(input), expected_input);\\n\");\nassert!(matches!(result, Err(ObligationEvaluateError::SemanticFailuresConfirmed { .. })));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -2360,7 +2238,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(run(moved.interactor.execute(&command())).unwrap().pass_count(), 2); ... assert_ne!(saved.entries()[0].key(), &old_key); ... assert_eq!(saved.entries()[0].verdict(), &verdict); ... assert_ne!(saved.entries()[0].key().declaration_hash(), cached_fulfillment_doc(fulfilled()).entries()[0].key().declaration_hash(), \"a changed responsibility brief must not reuse the old cache identity\");",
+        "citation": "assert!(\n            !h.fulfillment_driver.tiers.lock().unwrap().is_empty(),\n            \"moving an element between sections must not reuse the old cache key\"\n        );\n        let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();\n        assert_ne!(saved.entries()[0].key(), &old_key);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -2492,6 +2370,11 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_fresh_fulfilled_verdict_resolves_edge"
         },
         {
@@ -2518,6 +2401,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fulfillment_cache_entry_must_match_obligation_id"
         },
         {
           "layer": "usecase",
@@ -2568,6 +2456,21 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_waiver_reason_change_stales_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
         }
       ],
       "edge_id": {
@@ -2578,7 +2481,7 @@
         "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "c0c5264aa345e40373153df7330d051bbec92ba05019cfed9ee56ba182fc19d9",
+        "bound_tests_set_hash": "8d6964caf95e1a68a298982f67241d226f42520eb81ead3b5df4d14849b45676",
         "declaration_hash": "5bd42a8b9bf0ae94780be47bbb4e8379f1e805459513a2bdfc781c4499298061",
         "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
         "spec_element_hash": "8520494fdb932280b5fbf1b31dde1dd7d0e85d9c308f6ceeb77391d45b4891f5"
@@ -2589,13 +2492,18 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let element = SpecElementRef::new(\n        SpecSectionKind::OutOfScope,\n        SpecElementId::try_new(\"IN-01\").unwrap(),\n        \"body mentions in_scope but stays verbatim\".to_owned(),\n    );\n\n    assert_eq!(\n        crate::test_obligation::freshness::spec_element_material(&element),\n        \"section=out_of_scope\\nelement_id=IN-01\\ntext_label=body mentions in_scope but stays verbatim\"\n    );\n\n    assert_spec_change_stales_both_verifier_lanes(section_moved_spec_doc(), \"section move\");\n\n    match result {\n        Err(ObligationCheckError::UnresolvedEdges { edges }) => {\n            assert_eq!(edges.as_slice(), &[out_of_scope_edge()]);\n        }\n        other => panic!(\"an unresolved out-of-scope edge must not pass: {other:?}\"),\n    }",
+        "citation": "assert_eq!(\n        crate::test_obligation::freshness::spec_element_material(&element),\n        \"section=out_of_scope\\nelement_id=IN-01\\ntext_label=body mentions in_scope but stays verbatim\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
     },
     {
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
@@ -2625,6 +2533,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fulfillment_cache_entry_must_match_obligation_id"
         },
         {
           "layer": "usecase",
@@ -2675,6 +2588,21 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_waiver_reason_change_stales_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
         }
       ],
       "edge_id": {
@@ -2685,7 +2613,7 @@
         "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "c0c5264aa345e40373153df7330d051bbec92ba05019cfed9ee56ba182fc19d9",
+        "bound_tests_set_hash": "8d6964caf95e1a68a298982f67241d226f42520eb81ead3b5df4d14849b45676",
         "declaration_hash": "5bd42a8b9bf0ae94780be47bbb4e8379f1e805459513a2bdfc781c4499298061",
         "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
         "spec_element_hash": "cbb492c4c16b0919a1a4a0e6b06908756f3a4f014b47874036fd9d576fe8fc8a"
@@ -2696,13 +2624,18 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "match result {\n        Err(ObligationCheckError::UnresolvedEdges { edges }) => {\n            assert_eq!(edges.as_slice(), &[out_of_scope_edge()]);\n        }\n        other => panic!(\"an unresolved out-of-scope edge must not pass: {other:?}\"),\n    }",
+        "citation": "let result = interactor_with_rules_catalogue_and_spec(\n        Some(ObligationsDocument::new(track(), vec![])),\n        Some(TestBindingsDocument::new(track(), vec![])),\n        Some(ObligationFulfillmentCacheDocument::new(track(), vec![])),\n        None,\n        empty_rules_doc(),\n        out_of_scope_catalogue(),\n        Arc::new(StubScanner),\n        out_of_scope_spec_doc(),\n    )\n    .execute(&command());\n\n    match result {\n        Err(ObligationCheckError::UnresolvedEdges { edges }) => {\n            assert_eq!(edges.as_slice(), &[out_of_scope_edge()]);\n        }\n        other => panic!(\"an unresolved out-of-scope edge must not pass: {other:?}\"),\n    }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
     },
     {
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
@@ -2732,6 +2665,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fulfillment_cache_entry_must_match_obligation_id"
         },
         {
           "layer": "usecase",
@@ -2782,6 +2720,21 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_waiver_reason_change_stales_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
         }
       ],
       "edge_id": {
@@ -2792,7 +2745,7 @@
         "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "c0c5264aa345e40373153df7330d051bbec92ba05019cfed9ee56ba182fc19d9",
+        "bound_tests_set_hash": "8d6964caf95e1a68a298982f67241d226f42520eb81ead3b5df4d14849b45676",
         "declaration_hash": "5bd42a8b9bf0ae94780be47bbb4e8379f1e805459513a2bdfc781c4499298061",
         "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
         "spec_element_hash": "65417ce538258f0f871104737c846c3c9b0610448ec88656fdf09ed5d0ae7477"
@@ -2803,13 +2756,18 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "// IN-03 / AC-03: a verdict frozen for an earlier obligation brief is stale\n// even when its bound-test, declaration, specification, and verifier\n// fingerprint inputs still match. Check must reject both old pass/fail\n// outcomes in the fulfillment and waiver lanes.\nlet current_obligation = obligation();\nlet previous_brief =\n    TestObligationBrief::try_new(\"previous responsibility brief\".to_owned()).unwrap();\nlet stale_responsibility = responsibility_hash(current_obligation.id(), &previous_brief);\nassert_ne!(\n    stale_responsibility,\n    responsibility_hash(current_obligation.id(), current_obligation.brief())\n);",
+        "citation": "// IN-03 / AC-03: a verdict frozen for an earlier obligation brief is stale\n    // even when its bound-test, declaration, specification, and verifier\n    // fingerprint inputs still match. Check must reject both old pass/fail\n    // outcomes in the fulfillment and waiver lanes.\n\nlet Err(ObligationCheckError::DriftsDetected { drifts }) = result else {\n            panic!(\"a responsibility change must stale fulfillment pass and fail verdicts\");\n        };\n        assert_eq!(drifts.as_slice(), &[expected_drift()]);\n\nlet wrong_obligation_id = obligation_with_item(\"invariant:first\");\n    let obligations = ObligationsDocument::new(track(), vec![expected.clone()]);\n    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding_for(&expected)]);\n    let cache = fresh_fulfillment_cache_for(&wrong_obligation_id);\n\n    let result =\n        interactor(Some(obligations), Some(bindings), Some(cache), None).execute(&command());\n\n    assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
     },
     {
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
@@ -2839,6 +2797,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fulfillment_cache_entry_must_match_obligation_id"
         },
         {
           "layer": "usecase",
@@ -2889,6 +2852,21 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_waiver_reason_change_stales_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
         }
       ],
       "edge_id": {
@@ -2899,7 +2877,7 @@
         "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "c0c5264aa345e40373153df7330d051bbec92ba05019cfed9ee56ba182fc19d9",
+        "bound_tests_set_hash": "8d6964caf95e1a68a298982f67241d226f42520eb81ead3b5df4d14849b45676",
         "declaration_hash": "5bd42a8b9bf0ae94780be47bbb4e8379f1e805459513a2bdfc781c4499298061",
         "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
         "spec_element_hash": "e3f9e99f856bf219ebe588080bc4ebe8ab7c716f525456082f0e504c4152b7e0"
@@ -2910,13 +2888,18 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_spec_change_stales_both_verifier_lanes(section_moved_spec_doc(), \"section move\");\n...\nassert_spec_change_stales_both_verifier_lanes(changed_spec, change_description);",
+        "citation": "assert_spec_change_stales_both_verifier_lanes(changed_spec, change_description);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
     },
     {
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
@@ -2946,6 +2929,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fulfillment_cache_entry_must_match_obligation_id"
         },
         {
           "layer": "usecase",
@@ -2996,6 +2984,21 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_waiver_reason_change_stales_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
         }
       ],
       "edge_id": {
@@ -3006,7 +3009,7 @@
         "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "c0c5264aa345e40373153df7330d051bbec92ba05019cfed9ee56ba182fc19d9",
+        "bound_tests_set_hash": "8d6964caf95e1a68a298982f67241d226f42520eb81ead3b5df4d14849b45676",
         "declaration_hash": "5bd42a8b9bf0ae94780be47bbb4e8379f1e805459513a2bdfc781c4499298061",
         "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
         "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d"
@@ -3017,13 +3020,18 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "// IN-03 / AC-03: a verdict frozen for an earlier obligation brief is stale\n// even when its bound-test, declaration, specification, and verifier\n// fingerprint inputs still match. Check must reject both old pass/fail\n// outcomes in the fulfillment and waiver lanes.\nfor verdict in [fulfilled_verdict(), failed_verdict()] {\n        let result = interactor(\n            Some(ObligationsDocument::new(track(), vec![current_obligation.clone()])),\n            Some(TestBindingsDocument::new(\n                track(),\n                vec![fulfillment_binding_for(&current_obligation)],\n            )),\n            Some(ObligationFulfillmentCacheDocument::new(\n                track(),\n                vec![cache_entry(\n                    edge(),\n                    current_obligation.id().clone(),\n                    stale_fulfillment_key.clone(),\n                    verdict,\n                    Some(fulfillment_verifier_fingerprint()),\n                )],\n            )),\n            None,\n        )\n        .execute(&command());\n\n        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {\n            panic!(\"a responsibility change must stale fulfillment pass and fail verdicts\");\n        };\n        assert_eq!(drifts.as_slice(), &[expected_drift()]);\n    }\n\nassert_spec_change_stales_both_verifier_lanes(section_moved_spec_doc(), \"section move\");\n\nassert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\n\nlet recovered_check =\n        interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();\n    assert_eq!(recovered_check.resolved_edges(), &[edge()]);",
+        "citation": "for verdict in [fulfilled_verdict(), failed_verdict()] { ... } ... for verdict in [ WaiverVerdict::Waived { ... }, WaiverVerdict::Fail { ... }, ] { ... } assert_eq!(drifts.as_slice(), &[expected_drift()]);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
     },
     {
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
@@ -3053,6 +3061,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_responsibility_material_change_stales_pass_and_fail_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_fulfillment_cache_entry_must_match_obligation_id"
         },
         {
           "layer": "usecase",
@@ -3103,6 +3116,21 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_keeps_unresolved_out_of_scope_edge_pending"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_rejects_stale_pass_and_fail_fingerprints_in_both_verifier_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_waiver_reason_change_stales_pass_and_fail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
         }
       ],
       "edge_id": {
@@ -3113,7 +3141,7 @@
         "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "c0c5264aa345e40373153df7330d051bbec92ba05019cfed9ee56ba182fc19d9",
+        "bound_tests_set_hash": "8d6964caf95e1a68a298982f67241d226f42520eb81ead3b5df4d14849b45676",
         "declaration_hash": "5bd42a8b9bf0ae94780be47bbb4e8379f1e805459513a2bdfc781c4499298061",
         "responsibility_hash": "cbcbfbdb3cd6901062578cdf2b92ebe15627041a416a098b81a6f5abaff8ba04",
         "spec_element_hash": "3b2d0bb26a62f3f8a998ff4ac0df626ba60578c32b25229d96e0998865829f90"
@@ -3185,6 +3213,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_rechecks_stale_waiver_pass_and_fail_after_refresh"
         }
       ],
       "edge_id": {
@@ -3195,7 +3228,7 @@
         "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "87254e1a2c9d661e9fb847fea312a22dba416e9f82bc9d853281053e7dc36b18",
+        "bound_tests_set_hash": "061913cb6c526f6279e6e4fb9dd673187bd5b8fec0626b789edf831a4a11bbbf",
         "declaration_hash": "b42514e3385c5c948b15ae1d82fa9a00f832e8c907372bf34c41bcee814094a3",
         "responsibility_hash": "91942f89f4996cc3ba3806ca473ee17e3197c899cd88f2539ea7817d9390d1f4",
         "spec_element_hash": "e3f9e99f856bf219ebe588080bc4ebe8ab7c716f525456082f0e504c4152b7e0"
@@ -3206,7 +3239,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(moved_summary.stale_count(), 1);",
+        "citation": "assert_stale_and_refreshed_fulfillment_results(\n        stale_key,\n        VerifierPromptFingerprint::new(hash(9)),\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -3267,6 +3300,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_rechecks_stale_waiver_pass_and_fail_after_refresh"
         }
       ],
       "edge_id": {
@@ -3277,7 +3315,7 @@
         "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "87254e1a2c9d661e9fb847fea312a22dba416e9f82bc9d853281053e7dc36b18",
+        "bound_tests_set_hash": "061913cb6c526f6279e6e4fb9dd673187bd5b8fec0626b789edf831a4a11bbbf",
         "declaration_hash": "b42514e3385c5c948b15ae1d82fa9a00f832e8c907372bf34c41bcee814094a3",
         "responsibility_hash": "91942f89f4996cc3ba3806ca473ee17e3197c899cd88f2539ea7817d9390d1f4",
         "spec_element_hash": "8ee21b83d51cd56c73440505811ac8b5bd88b0d09ad07ae47adb15951f6b349d"
@@ -3288,7 +3326,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "\"let moved_interactor: TestObligationResultsInteractor = status_interactor_with_spec(\\n            binding.clone(),\\n            Some(cache),\\n            TaskStatusKind::Done,\\n            status_spec_moved_to_out_of_scope(),\\n        );\" and \"assert_eq!(moved_summary.stale_count(), 1);\" and \"assert_eq!(post_summary.stale_count(), 0);\" and \"assert_stale_and_refreshed_fulfillment_results(\\n        stale_key,\\n        VerifierPromptFingerprint::new(hash(9)),\\n    );\"",
+        "citation": "for verdict in [\n    ObligationFulfillmentVerdict::Fulfilled { citation: citation() },\n    ObligationFulfillmentVerdict::Fail {\n        category: FulfillmentFailCategory::Contradiction,\n        reason: reason(\"cached failure\"),\n    },\n] {\n    ...\n    assert_eq!(fresh_summary.stale_count(), 0);\n    ...\n    assert_eq!(moved_summary.stale_count(), 1);\n    ...\n    assert_eq!(post_summary.stale_count(), 0);\n    ...\n    assert_eq!(fulfillment_lane.pass_count(), 1);\n    ...\n    assert_eq!(fulfillment_lane.fail_count(), 1);\n}",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "b65cfdcac5d774af71bb4c7747decc0ed7e1ae0c8e89d5b6ba2142cdeeaa52ab"
@@ -3349,6 +3387,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::results_tests",
           "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_rechecks_stale_waiver_pass_and_fail_after_refresh"
         }
       ],
       "edge_id": {
@@ -3359,7 +3402,7 @@
         "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
       },
       "key": {
-        "bound_tests_set_hash": "87254e1a2c9d661e9fb847fea312a22dba416e9f82bc9d853281053e7dc36b18",
+        "bound_tests_set_hash": "061913cb6c526f6279e6e4fb9dd673187bd5b8fec0626b789edf831a4a11bbbf",
         "declaration_hash": "b42514e3385c5c948b15ae1d82fa9a00f832e8c907372bf34c41bcee814094a3",
         "responsibility_hash": "91942f89f4996cc3ba3806ca473ee17e3197c899cd88f2539ea7817d9390d1f4",
         "spec_element_hash": "3b2d0bb26a62f3f8a998ff4ac0df626ba60578c32b25229d96e0998865829f90"

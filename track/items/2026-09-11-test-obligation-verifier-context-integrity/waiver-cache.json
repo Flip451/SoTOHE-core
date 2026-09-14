@@ -449,6 +449,31 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-11-test-obligation-verifier-context-integrity/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+      },
+      "key": {
+        "declaration_hash": "9646ab374a59e32e5f46e7a8854b43a5747fb115dd076821ccc7e37755ed2c4f",
+        "responsibility_hash": "da858c451154158dab2a4dc0ddfa55eb262c1529c3f4e2948b86e407545c268d",
+        "spec_element_hash": "0b538c6cfa074483728666dca17acb56838abdfccd156dbb2a75428f725124e7",
+        "waived_reason_hash": "e8f286ab9483212a165908d8f66c96f82e8c7d832633dd276734154535513c91"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "「識別子・所属区分・本文が両検証器の実入力に保持され」",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "73c52958aad811e10af6c2237f51d3376efea17fcc0e2a9b833c72564d959dc6"
     }
   ],
   "track_id": "2026-09-11-test-obligation-verifier-context-integrity"

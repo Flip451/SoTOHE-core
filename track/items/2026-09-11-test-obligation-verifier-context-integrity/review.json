@@ -351,6 +351,20 @@
           "hash": "rvw1:sha256:879a3d17daa196f63b83b0c76a6edde8690009c39723a339698af3638ce84027",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T02:58:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6efbbee2c055b6771a56f5b661ae17ea96b2392b6b031d97add459c8380fd8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:03:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6efbbee2c055b6771a56f5b661ae17ea96b2392b6b031d97add459c8380fd8",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -426,6 +440,20 @@
           "at": "2026-09-12T03:57:04Z",
           "findings": [],
           "hash": "rvw1:sha256:655d4596a08e1882e14eb2f1969b943690cde4161c4fad904299e72394d17725",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:01:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8089fd6ff845771c3191f72d08bd0ffe3f87767bda29543259bce15f42cf2c4c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:15:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8089fd6ff845771c3191f72d08bd0ffe3f87767bda29543259bce15f42cf2c4c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -551,6 +579,20 @@
           "at": "2026-09-14T01:48:35Z",
           "findings": [],
           "hash": "rvw1:sha256:6cace23e3415fe4f401b530b0bfe4575dd2df9bbabc0e45e1e5836b388b8d417",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T02:59:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43afa6ca868ee68a3c6663e8341dddd118216d18ac21d82a06cf8cd8d5e142fa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:08:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43afa6ca868ee68a3c6663e8341dddd118216d18ac21d82a06cf8cd8d5e142fa",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -843,6 +885,35 @@
           "at": "2026-09-12T07:17:45Z",
           "findings": [],
           "hash": "rvw1:sha256:f90759807d6db5b9bf3eeae306cfb5c445f5b724b6bf923ae25891c068580c92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:01:31Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_tests.rs",
+              "line": 1439,
+              "message": "`refreshed_verdict` is matched by value at line 1439 and then used again at line 1461, but `WaiverVerdict` is not `Copy`; this causes a compile error (use-after-move). Match by reference or compute the boolean before the match.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:5577bf454a90e75352d1bd990975780d2c87bdacdab91ee571d3622e47773cdf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-14T03:08:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:671a782b55d09d963c85357ba55603633123c1c26b2ecfd4db5d6161040cde76",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-14T03:18:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:671a782b55d09d963c85357ba55603633123c1c26b2ecfd4db5d6161040cde76",
           "type": "final",
           "verdict": "zero_findings"
         }
