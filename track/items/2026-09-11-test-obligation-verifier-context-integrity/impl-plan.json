@@ -129,6 +129,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "0952f97a1a28fe9435e9c958ca2f38f377b00d3b",
       "depends_on": [
         "T003",
         "T004",
@@ -140,6 +141,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "0952f97a1a28fe9435e9c958ca2f38f377b00d3b",
       "depends_on": [
         "T007",
         "T008"
